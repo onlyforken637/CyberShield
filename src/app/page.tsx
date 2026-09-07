@@ -334,7 +334,7 @@ export default function CyberShieldPage() {
                 {[
                   ["Update Frequency:", "12 MIN TTL"],
                   ["Primary Proxy:", "MULTI-FAILOVER"],
-                  ["Security Engine:", "CLIENT-SIDE AGG"],
+                  ["Intel Engine:", "SERVER ENRICHMENT GRID"],
                   ["License:", "MIT OPEN SOURCE"],
                 ].map(([label, value], index) => (
                   <div

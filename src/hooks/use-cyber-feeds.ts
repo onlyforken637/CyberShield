@@ -1,16 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  SOURCES,
-  fetchRss2Json,
-  mapFeedItem,
-  type FeedItem,
-  type FeedVia,
-  type RawRss2JsonItem,
-  type SourceConfig,
-} from "@/lib/cyber/feeds";
-import { normalizeKey } from "@/lib/cyber/utils";
+import { SOURCES, type FeedItem, type FeedVia } from "@/lib/cyber/feeds";
 
 export type FeedRuntimeStatus = "idle" | "syncing" | "online" | "offline" | "empty";
 
@@ -29,12 +20,18 @@ export interface FeedSyncOutcome {
   online: number;
 }
 
-type SettledResult = {
-  source: SourceConfig;
-  via: FeedVia | null;
-  items: FeedItem[];
-  error: string | null;
-};
+interface NewsApiResponse {
+  generatedAt?: number;
+  items?: FeedItem[];
+  sources?: Array<{
+    id: string;
+    status: "online" | "offline" | "empty";
+    via: FeedVia;
+    count: number;
+    error?: string;
+  }>;
+  error?: string;
+}
 
 function initialFeedStates(): Record<string, FeedRuntimeState> {
   return Object.fromEntries(
@@ -46,12 +43,13 @@ function initialFeedStates(): Record<string, FeedRuntimeState> {
 }
 
 /**
- * Live cybersecurity news engine.
+ * Live cybersecurity news engine (client side).
  *
- * Re-fetches every integrated RSS source through the public RSS→JSON
- * converter (browser-direct first, server relay fallback), dedupes
- * cross-source stories, and exposes per-feed runtime telemetry so the
- * sidebar tracker can toggle sources in and out of the stream.
+ * One call to our own /api/news returns the fully aggregated, deduped and
+ * enriched stream for all 20 research streams — the server does the heavy
+ * lifting (direct XML → converter failover, thumbnail extraction, analyst
+ * briefs), the browser just renders it. Exposes per-feed runtime telemetry
+ * so the sidebar tracker can toggle sources in and out of the stream.
  */
 export function useCyberFeeds() {
   const [items, setItems] = useState<FeedItem[]>([]);
@@ -76,57 +74,46 @@ export function useCyberFeeds() {
       return next;
     });
 
-    const settled: SettledResult[] = await Promise.all(
-      SOURCES.map(async (source): Promise<SettledResult> => {
-        try {
-          const { via, items: rawItems } = await fetchRss2Json(source.rss);
-          const mapped = rawItems
-            .map((raw: RawRss2JsonItem) => mapFeedItem(raw, source))
-            .filter((item: FeedItem) => item.title && item.link);
-          return { source, via, items: mapped, error: null };
-        } catch (error) {
-          return {
-            source,
-            via: null,
-            items: [],
+    try {
+      const res = await fetch("/api/news", { cache: "no-store" });
+      if (!res.ok) throw new Error(`/api/news uplink HTTP ${res.status}`);
+      const data = (await res.json()) as NewsApiResponse;
+      if (!Array.isArray(data.items)) throw new Error(data.error ?? "invalid news payload");
+
+      const nextStates: Record<string, FeedRuntimeState> = { ...initialFeedStates() };
+      let online = 0;
+      for (const source of data.sources ?? []) {
+        nextStates[source.id] = {
+          status: source.status,
+          via: source.via ?? null,
+          count: source.count,
+          lastSync: data.generatedAt ?? Date.now(),
+          error: source.error,
+        };
+        if (source.status === "online") online += 1;
+      }
+
+      setItems(data.items);
+      setFeedStates(nextStates);
+      setLastSyncAt(data.generatedAt ?? Date.now());
+      return { ok: online > 0, started: true, total: data.items.length, online };
+    } catch (error) {
+      setFeedStates((prev) => {
+        const next: Record<string, FeedRuntimeState> = {};
+        for (const [id, state] of Object.entries(prev)) {
+          next[id] = {
+            ...state,
+            status: "offline",
             error: error instanceof Error ? error.message : "uplink failure",
           };
         }
-      }),
-    );
-
-    const seen = new Set<string>();
-    const merged: FeedItem[] = [];
-    let online = 0;
-    for (const result of settled) {
-      if (!result.error && result.items.length > 0) online += 1;
-      for (const item of result.items) {
-        const key = normalizeKey(item.link);
-        if (key && seen.has(key)) continue;
-        if (key) seen.add(key);
-        merged.push(item);
-      }
+        return next;
+      });
+      return { ok: false, started: true, total: 0, online: 0 };
+    } finally {
+      setSyncing(false);
+      syncingRef.current = false;
     }
-    merged.sort((a, b) => b.publishedAt - a.publishedAt);
-
-    const nextStates: Record<string, FeedRuntimeState> = {};
-    for (const result of settled) {
-      nextStates[result.source.id] = {
-        status: result.error ? "offline" : result.items.length > 0 ? "online" : "empty",
-        via: result.via,
-        count: result.items.length,
-        lastSync: Date.now(),
-        error: result.error ?? undefined,
-      };
-    }
-
-    setItems(merged);
-    setFeedStates(nextStates);
-    setLastSyncAt(Date.now());
-    setSyncing(false);
-    syncingRef.current = false;
-
-    return { ok: online > 0, started: true, total: merged.length, online };
   }, []);
 
   useEffect(() => {

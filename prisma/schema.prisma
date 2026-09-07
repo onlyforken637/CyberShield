@@ -30,3 +30,16 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+/// Cached AI-generated analyst briefs, keyed by normalized article URL.
+model IntelBrief {
+  id        String   @id @default(cuid())
+  urlKey    String   @unique
+  url       String
+  title     String
+  sourceId  String
+  brief     String
+  model     String   @default("glm")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

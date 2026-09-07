@@ -12,9 +12,11 @@ import {
   Fingerprint,
   ShieldCheck,
   Skull,
+  Sparkles,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { AIVerdictPanel } from "@/components/cybershield/ai-verdict";
 import { ArticleThumb } from "@/components/cybershield/article-card";
 import { SEVERITY_STYLES, severityForDate, type CisaVuln } from "@/lib/cyber/cisa";
 import type { FeedItem } from "@/lib/cyber/feeds";
@@ -31,7 +33,7 @@ interface InvestigationDrawerProps {
   onClose: () => void;
 }
 
-type TabKey = "summary" | "raw";
+type TabKey = "summary" | "ai" | "raw";
 
 /**
  * The Investigation Drawer — 500px slide-out panel with backdrop blur.
@@ -126,18 +128,26 @@ function DrawerBody({ target }: { target: DrawerTarget | null }) {
 
   return (
     <>
-      <div className="flex shrink-0 gap-1 border-b border-cyber-border bg-cyber-panel/40 px-3 pt-2.5">
+      <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-cyber-border bg-cyber-panel/40 px-3 pt-2.5 no-scrollbar">
         <TabButton
           active={tab === "summary"}
           onClick={() => setTab("summary")}
           icon={<ShieldCheck className="h-3 w-3" />}
           label="EXECUTIVE SUMMARY"
         />
+        {target?.kind === "article" && (
+          <TabButton
+            active={tab === "ai"}
+            onClick={() => setTab("ai")}
+            icon={<Sparkles className="h-3 w-3" />}
+            label="AI ANALYST VERDICT"
+          />
+        )}
         <TabButton
           active={tab === "raw"}
           onClick={() => setTab("raw")}
           icon={<Braces className="h-3 w-3" />}
-          label="RAW STREAM TELEMETRY"
+          label="RAW TELEMETRY"
         />
       </div>
 
@@ -145,6 +155,7 @@ function DrawerBody({ target }: { target: DrawerTarget | null }) {
         {target?.kind === "article" && (
           <ArticleSummary item={target.item} visible={tab === "summary"} />
         )}
+        {target?.kind === "article" && tab === "ai" && <AIVerdictPanel item={target.item} />}
         {target?.kind === "vuln" && <VulnSummary vuln={target.item} visible={tab === "summary"} />}
         {tab === "raw" && rawPayload !== null && <JsonBlock data={rawPayload} />}
       </div>
@@ -185,7 +196,14 @@ function TabButton({
 /* ── Tab 1: article executive summary ───────────────────────────── */
 
 function ArticleSummary({ item, visible }: { item: FeedItem; visible: boolean }) {
-  const paragraphs = useMemo(() => htmlToParagraphs(item.descriptionHtml), [item.descriptionHtml]);
+  const paragraphs = useMemo(() => {
+    const all = htmlToParagraphs(item.descriptionHtml);
+    // drop syndication boilerplate tails (e.g. "The post … appeared first on …")
+    const meaningful = all.filter(
+      (paragraph) => !/appeared first on|^read more\b|all rights reserved/i.test(paragraph),
+    );
+    return meaningful.length > 0 ? meaningful : all;
+  }, [item.descriptionHtml]);
 
   if (!visible) return null;
   return (
@@ -203,6 +221,44 @@ function ArticleSummary({ item, visible }: { item: FeedItem; visible: boolean })
       </div>
 
       <h3 className="text-base font-bold leading-snug text-slate-100">{item.title}</h3>
+
+      {(item.intel.tags.length > 0 || item.intel.cves.length > 0 || item.intel.orgs.length > 0) && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {item.intel.tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-sm border border-cyber-violet/40 bg-cyber-violet/10 px-1.5 py-0.5 text-[8px] font-bold tracking-widest text-cyber-violet"
+            >
+              {tag}
+            </span>
+          ))}
+          {item.intel.cves.map((cve) => (
+            <span
+              key={cve}
+              className="digital rounded-sm border border-cyber-crimson/40 bg-cyber-crimson/10 px-1.5 py-0.5 text-[8px] font-bold text-cyber-crimson/90"
+            >
+              {cve}
+            </span>
+          ))}
+          {item.intel.orgs.map((org) => (
+            <span
+              key={org}
+              className="rounded-sm border border-cyber-teal/30 bg-cyber-teal/5 px-1.5 py-0.5 text-[8px] font-semibold text-cyber-teal/90"
+            >
+              {org}
+            </span>
+          ))}
+          <span className="digital ml-auto text-[8.5px] tracking-widest text-slate-600">
+            {item.intel.readMinutes} MIN READ
+          </span>
+        </div>
+      )}
+
+      {item.intel.lede && (
+        <p className="border-l-2 border-cyber-teal/60 pl-2.5 text-[12px] font-medium leading-relaxed text-slate-200">
+          {item.intel.lede}
+        </p>
+      )}
 
       {paragraphs.length > 0 ? (
         <div className="space-y-2.5">
@@ -433,7 +489,7 @@ function JsonBlock({ data }: { data: unknown }) {
     <div className="overflow-hidden rounded-md border border-cyber-border bg-[#0A0F1B]">
       <div className="flex items-center justify-between border-b border-cyber-border bg-cyber-panel/70 px-3 py-2">
         <span className="digital text-[9px] font-bold tracking-widest text-slate-500">
-          LIVE JSON PAYLOAD · AS RECEIVED
+          UPSTREAM PAYLOAD · NORMALIZED TELEMETRY
         </span>
         <button
           type="button"

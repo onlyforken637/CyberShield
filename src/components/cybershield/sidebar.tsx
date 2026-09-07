@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Filter, Radio, Rss, Tags } from "lucide-react";
+import { Filter, Gauge, Radio, Rss, Tags } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   ExploitMatrixCard,
@@ -11,7 +11,7 @@ import {
 } from "@/components/cybershield/threat-panel";
 import { SOURCES } from "@/lib/cyber/feeds";
 import { KEYWORD_LEXICON } from "@/lib/cyber/keywords";
-import type { CisaVuln } from "@/lib/cyber/cisa";
+import type { CisaMetrics, CisaVuln } from "@/lib/cyber/cisa";
 import type { FeedItem } from "@/lib/cyber/feeds";
 import type { FeedRuntimeState } from "@/hooks/use-cyber-feeds";
 import { cn } from "@/lib/utils";
@@ -75,6 +75,7 @@ export function Sidebar({
 
   return (
     <div className="space-y-5">
+      <ThreatConditionCard items={items} metrics={metrics} />
       <KevMetricsCard {...kevPanel} />
       <SeverityBreakdownCard metrics={metrics} syncing={syncing} />
       <ExploitMatrixCard {...kevPanel} onOpenVuln={onOpenVuln} />
@@ -89,6 +90,152 @@ export function Sidebar({
         enabledSources={enabledSources}
         onToggleSource={onToggleSource}
       />
+    </div>
+  );
+}
+
+/* ── Threat Condition gauge ──────────────────────────────────────── */
+
+interface ThreatLevel {
+  label: string;
+  color: string;
+  glow: string;
+  bar: string;
+}
+
+const THREAT_LEVELS: Array<{ min: number } & ThreatLevel> = [
+  { min: 78, label: "CRITICAL", color: "text-cyber-crimson", glow: "neon-crimson", bar: "#ff3b30" },
+  { min: 58, label: "SEVERE", color: "text-cyber-orange", glow: "neon-amber", bar: "#ff8a3d" },
+  { min: 38, label: "ELEVATED", color: "text-cyber-amber", glow: "neon-amber", bar: "#ffb300" },
+  { min: 0, label: "GUARDED", color: "text-cyber-green", glow: "neon-green", bar: "#2bff9e" },
+];
+
+const ARC_LENGTH = Math.PI * 50; // semicircle arc, r = 50
+
+/**
+ * Global Threat Condition — computed LIVE from the stream (24h average
+ * article severity, critical share) plus the CISA KEV catalog pressure.
+ */
+function ThreatConditionCard({
+  items,
+  metrics,
+}: {
+  items: FeedItem[];
+  metrics: CisaMetrics | null;
+}) {
+  const condition = useMemo(() => {
+    // the full live stream currently on screen drives the condition
+    const pool = items;
+
+    const avgSeverity =
+      pool.length > 0
+        ? pool.reduce((sum, item) => sum + item.intel.severity.score, 0) / pool.length
+        : 0;
+    const criticalShare =
+      pool.length > 0
+        ? (pool.filter((item) => item.intel.severity.label === "CRITICAL").length / pool.length) * 100
+        : 0;
+    // the sharpest edge of the current stream matters as much as the average
+    const topSeverity =
+      pool.length > 0
+        ? [...pool]
+            .sort((a, b) => b.intel.severity.score - a.intel.severity.score)
+            .slice(0, 3)
+            .reduce((sum, item) => sum + item.intel.severity.score, 0) / Math.min(3, pool.length)
+        : 0;
+    const kevPressure = metrics
+      ? Math.min(
+          100,
+          (metrics.severity.critical / Math.max(1, metrics.total)) * 400 + metrics.addedLast30Days * 1.2,
+        )
+      : 0;
+
+    const score = Math.round(
+      Math.min(
+        100,
+        avgSeverity * 0.3 + topSeverity * 0.3 + criticalShare * 0.2 + kevPressure * 0.2,
+      ),
+    );
+    const level = THREAT_LEVELS.find((entry) => score >= entry.min) ?? THREAT_LEVELS[THREAT_LEVELS.length - 1]!;
+
+    return { score, level, avgSeverity, criticalShare, kevPressure };
+  }, [items, metrics]);
+
+  const needleAngle = -90 + (condition.score / 100) * 180;
+
+  return (
+    <section
+      className="rounded-2xl border border-cyber-border bg-cyber-panel p-4 shadow-lg"
+      aria-label="Global threat condition"
+    >
+      <header className="mb-1 flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-1.5 font-display text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">
+          <Gauge className="h-3.5 w-3.5 text-cyber-teal" />
+          Threat Condition
+        </h2>
+        <span className="digital text-[8.5px] tracking-widest text-slate-600">LIVE COMPUTED</span>
+      </header>
+
+      <div className="relative mx-auto mt-1 w-full max-w-[220px]">
+        <svg viewBox="0 0 120 68" className="w-full" role="img" aria-label={`Threat condition ${condition.level.label}, score ${condition.score} of 100`}>
+          {/* track */}
+          <path
+            d="M 10 60 A 50 50 0 0 1 110 60"
+            fill="none"
+            stroke="#222f47"
+            strokeWidth="9"
+            strokeLinecap="round"
+          />
+          {/* progress */}
+          <path
+            d="M 10 60 A 50 50 0 0 1 110 60"
+            fill="none"
+            stroke={condition.level.bar}
+            strokeWidth="9"
+            strokeLinecap="round"
+            strokeDasharray={ARC_LENGTH}
+            strokeDashoffset={ARC_LENGTH * (1 - condition.score / 100)}
+            style={{ filter: `drop-shadow(0 0 6px ${condition.level.bar})` }}
+          />
+          {/* needle */}
+          <line
+            x1="60"
+            y1="60"
+            x2="60"
+            y2="22"
+            stroke="#d9e2f1"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            style={{
+              transform: `rotate(${needleAngle}deg)`,
+              transformOrigin: "60px 60px",
+              transformBox: "view-box",
+              transition: "transform 1.4s cubic-bezier(0.22, 1, 0.36, 1)",
+            }}
+          />
+          <circle cx="60" cy="60" r="4.5" fill="#d9e2f1" />
+        </svg>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 text-center">
+          <span className={cn("font-display text-lg font-black tracking-widest", condition.level.glow)}>
+            {condition.level.label}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-3 gap-2 border-t border-cyber-border/60 pt-2.5">
+        <MiniStat label="STREAM SEV" value={`${Math.round(condition.avgSeverity)}`} />
+        <MiniStat label="CRIT SHARE" value={`${Math.round(condition.criticalShare)}%`} />
+        <MiniStat label="KEV PRESS" value={`${Math.round(condition.kevPressure)}`} />
+      </div>
+    </section>
+  );
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="text-center">
+      <div className="digital text-[13px] font-black text-slate-100">{value}</div>
+      <div className="digital text-[7.5px] tracking-widest text-slate-600">{label}</div>
     </div>
   );
 }
@@ -245,11 +392,11 @@ function SourcesTracker({
                   {state.via && (
                     <span
                       className={cn(
-                        "ml-1.5",
-                        state.via === "direct" ? "text-cyber-teal/70" : "text-cyber-amber/70",
+                        "ml-1.5 font-bold",
+                        state.via === "xml" ? "text-cyber-teal/70" : "text-cyber-amber/70",
                       )}
                     >
-                      · {state.via === "direct" ? "DIRECT" : "RELAY"}
+                      · {state.via === "xml" ? "XML" : "CONV"}
                     </span>
                   )}
                 </span>

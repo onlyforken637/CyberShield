@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2, RefreshCw, Search, SlidersHorizontal, X } from "lucide-react";
+import { useMemo } from "react";
+import { Flame, Loader2, RefreshCw, Search, SlidersHorizontal, X } from "lucide-react";
 import { ArticleCard } from "@/components/cybershield/article-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,8 +32,8 @@ interface FeedColumnProps {
 }
 
 /**
- * Main feed column — Threat Intelligence masthead, refresh control,
- * active filter chips and the fluid live news stream.
+ * Main feed column — Threat Intelligence masthead, Ranked Threat Board,
+ * refresh control, active filter chips and the fluid live news stream.
  */
 export function FeedColumn({
   items,
@@ -60,9 +61,25 @@ export function FeedColumn({
     activeCategory !== "all" ||
     enabledSourceCount < totalSources;
 
+  // signals intercepted in the last hour — live stream velocity
+  const signalRate = useMemo(() => {
+    const cutoff = Date.now() - 60 * 60 * 1000;
+    return items.filter((item) => item.publishedAt >= cutoff).length;
+  }, [items]);
+
+  // highest-severity live signals — the exhibition "top board"
+  const topThreats = useMemo(
+    () =>
+      [...items]
+        .filter((item) => item.intel.lede)
+        .sort((a, b) => b.intel.severity.score - a.intel.severity.score)
+        .slice(0, 3),
+    [items],
+  );
+
   const meta = booting
     ? "Connecting to streams…"
-    : `${items.length} of ${totalCount} signals · ${onlineCount}/${totalSources} streams online${
+    : `${items.length} of ${totalCount} signals · ${signalRate} SIG/HR · ${onlineCount}/${totalSources} streams online${
         lastSyncAt ? ` · synced ${formatUtc(lastSyncAt, false)} UTC` : ""
       }`;
 
@@ -149,7 +166,96 @@ export function FeedColumn({
         </div>
       )}
 
-      {/* ── Live feed stack ──────────────────────────────────────── */}
+      {/* ── Ranked threat board (only on the unfiltered stream) ──── */}
+      {!filtersActive && topThreats.length === 3 && (
+        <section
+          className="mb-5 rounded-xl border border-cyber-border bg-cyber-panel/60 p-4 shadow-lg"
+          aria-label="Ranked threat board"
+        >
+          <header className="mb-3 flex items-center gap-2">
+            <Flame className="h-3.5 w-3.5 text-cyber-crimson" />
+            <h2 className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-slate-300">
+              Ranked Threat Board
+            </h2>
+            <span className="digital ml-auto text-[8.5px] tracking-widest text-slate-600">
+              TOP SEVERITY · LIVE COMPUTED
+            </span>
+          </header>
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+            {topThreats.map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onOpenArticle(item)}
+                className="card-in group relative overflow-hidden rounded-md border border-cyber-border/80 bg-cyber-surface/80 p-3 text-left transition-all hover:border-cyber-teal/50 hover:bg-cyber-surface"
+                style={{ animationDelay: `${index * 90}ms` }}
+              >
+                <div className="flex items-start gap-2.5">
+                  <span
+                    className={cn(
+                      "digital text-2xl font-black leading-none",
+                      index === 0
+                        ? "neon-crimson"
+                        : index === 1
+                          ? "neon-amber"
+                          : "neon-teal",
+                    )}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <span
+                      className={cn(
+                        "digital text-[8px] font-black tracking-widest",
+                        item.intel.severity.label === "CRITICAL"
+                          ? "text-cyber-crimson"
+                          : item.intel.severity.label === "HIGH"
+                            ? "text-cyber-orange"
+                            : "text-cyber-amber",
+                      )}
+                    >
+                      {item.intel.severity.label} · {item.intel.severity.score}/100
+                    </span>
+                    <p className="mt-1 line-clamp-2 text-[11.5px] font-bold leading-snug text-slate-100 transition-colors group-hover:text-cyber-teal">
+                      {item.title}
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-[9.5px] leading-relaxed text-slate-500">
+                      {item.intel.lede}
+                    </p>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                      <span
+                        className={cn(
+                          "rounded-sm border px-1 py-0.5 text-[7.5px] font-bold tracking-widest",
+                          item.accent.chip,
+                        )}
+                      >
+                        {item.sourceShort}
+                      </span>
+                      {item.intel.cves.slice(0, 1).map((cve) => (
+                        <span
+                          key={cve}
+                          className="digital rounded-sm border border-cyber-crimson/40 bg-cyber-crimson/10 px-1 py-0.5 text-[7.5px] font-bold text-cyber-crimson/90"
+                        >
+                          {cve}
+                        </span>
+                      ))}
+                      {item.intel.orgs.slice(0, 1).map((org) => (
+                        <span
+                          key={org}
+                          className="rounded-sm border border-cyber-violet/30 bg-cyber-violet/5 px-1 py-0.5 text-[7.5px] font-semibold text-cyber-violet/90"
+                        >
+                          {org}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <div className="w-full space-y-2.5" aria-label="Live cybersecurity news feed" role="feed">
         {booting ? (
           <>
@@ -191,12 +297,13 @@ export function FeedColumn({
             </button>
           </div>
         ) : (
-          items.map((item) => (
+          items.map((item, index) => (
             <ArticleCard
               key={item.id}
               item={item}
               selected={selectedId === item.id}
               onOpen={onOpenArticle}
+              entranceDelay={Math.min(index, 10) * 45}
             />
           ))
         )}
