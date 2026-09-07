@@ -28,3 +28,26 @@ Stage Summary:
 - Data is 100% live: rss2json browser-direct (primary) → /api/rss2json relay (fallback); CISA browser-direct (primary) → /api/cisa (official → mirror fallback). Uplink mode surfaced in UI (DIRECT/RELAY/MIRROR).
 - Known live-truth: BleepingComputer feed is bot-blocked upstream of rss2json → tracker shows it OFFLINE (red, 0 signals) by design; auto-recovers if upstream unblocks. In end-user browsers with residential IPs, CISA direct usually succeeds → chip flips to DIRECT.
 - Artifacts: verification screenshots in /tmp (cs-desktop-initial, cs-drawer-summary, cs-drawer-raw, cs-drawer-vuln, cs-search, cs-topic2, cs-toggle, cs-mobile-*, cs-toast-caught).
+
+---
+Task ID: 2
+Agent: Z.ai Code (main orchestrator)
+Task: Upgrade the CyberShield news feed to the user's uploaded index.html design (richer CyberShield News layout) while keeping 100% live data.
+
+Work Log:
+- Parsed /home/z/my-project/upload/index.html reference (top utility bar, sticky brand header, category pill strip, LIVE ALERTS marquee ticker, feed+sidebar 2-col layout, about modal, 4-col footer, mobile bottom nav).
+- Design system (globals.css/layout.tsx): added Orbitron display + Inter sans via next/font, `.digital` pinned to mono, 4 new accents (cyber-orange/rose/lime/fuchsia), marquee keyframes + pause-on-hover + reduced-motion, `.no-scrollbar` util; metadata retitled "CyberShield News — Live Threat Intelligence".
+- Data layer: feeds.ts expanded 3 → 20 real open RSS research streams (BleepingComputer, THN, Threatpost, KrebsOnSecurity, DarkReading, SecurityWeek, HelpNetSecurity, InfosecurityMag, CyberScoop, TheRecord, GrahamCluley, Malwarebytes, Securelist, Unit42, MicrosoftSecurity, SentinelOne, Schneier, ArsTechnica Security, ZDI, CISA Advisories) with 9-color accent cycling; mapFeedItem now auto-classifies every article into threat categories.
+- New lib categories.ts: 9 keyword lexicons (ransomware, vulnerabilities, breaches, apt, malware, phishing, ai-security, cloud, mobile-iot) + HIGH_PRIORITY_CATEGORY_IDS + matchCategories.
+- cisa.ts: computeCisaMetrics now also buckets the whole live catalog into severity {critical ≤30d, high ≤180d, watch >180d}.
+- threat-panel.tsx refactored into exports: NeonNumber, KevMetricsCard (2×2 tiles + share bar), SeverityBreakdownCard (animated bars w/ counts+%), ExploitMatrixCard (unchanged table), KevUnavailable.
+- sidebar.tsx rewritten as right analytics column: KevMetricsCard, SeverityBreakdownCard, ExploitMatrixCard, TopicCloud (Clear button), SourcesTracker (all 20 sources, checkbox+status dot+signal count+DIRECT/RELAY, max-h-80 scroll).
+- New components: top-bar.tsx (LIVE FEED | live UTC clock | N/20 SOURCES ACTIVE | TTL countdown | About App), category-bar.tsx (11 live-count pills w/ icons, horizontal scroll), ticker.tsx (LIVE ALERTS marquee, latest ≤24h items, hover-pause, click→drawer, duplicated track for seamless loop), about-modal.tsx (pipelines + live diagnostics dialog), mobile-nav.tsx (bottom nav Feed/Categories/Sync/About + left categories Sheet).
+- feed-column.tsx rewritten: "// LIVE THREAT STREAM / Threat Intelligence" Orbitron masthead, live meta line (N of M signals · online/total streams · synced HH:MM:SS UTC), Refresh Stream button, mobile-only search mirror, filter chips incl. category, skeleton/empty states kept.
+- page.tsx recomposed: TopBar + sticky Header(search)+CategoryBar + Ticker + grid [1fr_320px→360px] + 4-col footer (live streams-online badge, High Priority Intel→category shortcuts w/ smooth scroll, Intel Snapshot, About CTA) + overlays; new state activeCategory/aboutOpen/mobileNavOpen; filter chain sources→category→topics→search; root pb safe-area for bottom nav; sticky footer preserved.
+- Debugged: lucide `Virus` icon missing → `Biohazard`; stale Turbopack CSS chunk (marquee styles absent) → dev server restart; verified marquee applied (inline-flex + ticker-marquee 60s).
+
+Stage Summary:
+- Browser-verified E2E (agent-browser): desktop 1600×900 + mobile 390×844. Live boot: 165 signals/17-20 streams, KEV 1,695 v2026.09.04, severity buckets CRITICAL 33/HIGH 123/WATCH 1,539. Category pills slice (Ransomware 20/165; APT 35/125), search "vmware"→3/165, ticker click→drawer, article drawer Exec Summary + Raw Telemetry tabs, Escape close, source toggle→"19/20 SOURCES" chip, KEV row→dossier (CVE-2026-85046 CRITICAL · 3D), topic "Exploit"→55/165, footer link→category+scroll, manual sync→toast "CyberShield Stream Synced Successfully — 125 live signals re-synced · CISA KEV v2026.09.04 updated", About modal live diagnostics (165 buffered/17 online/T-09:11), mobile bottom nav + categories sheet + footer clearance, sticky header on scroll. Zero page errors; lint clean.
+- Honest live-truth: streams fluctuate 13–17/20 online (upstream rss2json rejects some feeds per cycle); offline feeds render red in tracker by design.
+- Artifacts: /tmp/csn-*.png (desktop initial/mid/bottom/footer, drawer, raw, about, mobile top/sheet/footer, sync toast, final desktop).

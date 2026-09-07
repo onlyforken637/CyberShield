@@ -2,24 +2,27 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { AboutModal } from "@/components/cybershield/about-modal";
 import { DashboardHeader } from "@/components/cybershield/header";
-import { Sidebar } from "@/components/cybershield/sidebar";
 import { FeedColumn } from "@/components/cybershield/feed-column";
-import { ThreatPanel } from "@/components/cybershield/threat-panel";
-import {
-  InvestigationDrawer,
-  type DrawerTarget,
-} from "@/components/cybershield/investigation-drawer";
+import { InvestigationDrawer, type DrawerTarget } from "@/components/cybershield/investigation-drawer";
+import { MobileBottomBar, MobileCategoriesSheet } from "@/components/cybershield/mobile-nav";
+import { Sidebar } from "@/components/cybershield/sidebar";
+import { Ticker } from "@/components/cybershield/ticker";
+import { TopBar } from "@/components/cybershield/top-bar";
 import { useCyberFeeds } from "@/hooks/use-cyber-feeds";
 import { useCisaCatalog } from "@/hooks/use-cisa-catalog";
+import { HIGH_PRIORITY_CATEGORY_IDS, CATEGORY_MAP } from "@/lib/cyber/categories";
 import type { FeedItem } from "@/lib/cyber/feeds";
 import type { CisaVuln } from "@/lib/cyber/cisa";
-import { formatUtc } from "@/lib/cyber/utils";
+import { SOURCES } from "@/lib/cyber/feeds";
 
 /** Auto-refresh TTL — 12 minutes, per the CyberShield sync engine spec. */
 const SYNC_TTL_MS = 12 * 60 * 1000;
 
 type SyncMode = "initial" | "auto" | "manual";
+
+const ALL_SOURCE_IDS = SOURCES.map((source) => source.id);
 
 export default function CyberShieldPage() {
   const { items, feedStates, syncing: feedsSyncing, lastSyncAt: feedsLastSync, sync } = useCyberFeeds();
@@ -34,9 +37,12 @@ export default function CyberShieldPage() {
 
   const [query, setQuery] = useState("");
   const [activeTopics, setActiveTopics] = useState<string[]>([]);
-  const [enabledSources, setEnabledSources] = useState<string[]>(["bleepingcomputer", "thehackernews", "threatpost"]);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [enabledSources, setEnabledSources] = useState<string[]>(ALL_SOURCE_IDS);
   const [target, setTarget] = useState<DrawerTarget | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [nextSyncAt, setNextSyncAt] = useState<number | null>(null);
 
   const bootRef = useRef(false);
@@ -115,11 +121,34 @@ export default function CyberShieldPage() {
     })();
   }, [refreshCisa]);
 
-  /* ── filter context (Column A → Column B) ────────────────────── */
+  /* ── live telemetry derived from feed states ─────────────────── */
+  const onlineCount = useMemo(
+    () => Object.values(feedStates).filter((state) => state.status === "online").length,
+    [feedStates],
+  );
+
+  /* ── category counts (global, from the live stream) ──────────── */
+  const categoryCounts = useMemo(() => {
+    const counts = new Map<string, number>([["all", items.length]]);
+    for (const item of items) {
+      for (const categoryId of item.categoryIds) {
+        counts.set(categoryId, (counts.get(categoryId) ?? 0) + 1);
+      }
+    }
+    return [...counts.entries()].map(([id, count]) => ({ id, count }));
+  }, [items]);
+
+  const categoryCountMap = useMemo(
+    () => Object.fromEntries(categoryCounts.map((c) => [c.id, c.count])),
+    [categoryCounts],
+  );
+
+  /* ── filter engine: sources ∪ category ∪ topics ∪ search ─────── */
   const filteredItems = useMemo(() => {
     const q = query.trim().toLowerCase();
     return items.filter((item) => {
       if (!enabledSources.includes(item.sourceId)) return false;
+      if (activeCategory !== "all" && !item.categoryIds.includes(activeCategory)) return false;
       if (
         activeTopics.length > 0 &&
         !activeTopics.some((topic) => item.searchBlob.includes(topic.toLowerCase()))
@@ -129,7 +158,7 @@ export default function CyberShieldPage() {
       if (q && !item.searchBlob.includes(q)) return false;
       return true;
     });
-  }, [items, enabledSources, activeTopics, query]);
+  }, [items, enabledSources, activeCategory, activeTopics, query]);
 
   const toggleSource = useCallback((sourceId: string) => {
     setEnabledSources((prev) =>
@@ -146,10 +175,15 @@ export default function CyberShieldPage() {
   const clearFilters = useCallback(() => {
     setQuery("");
     setActiveTopics([]);
-    setEnabledSources(["bleepingcomputer", "thehackernews", "threatpost"]);
+    setActiveCategory("all");
+    setEnabledSources(ALL_SOURCE_IDS);
   }, []);
 
-  /* ── investigation drawer ────────────────────────────────────── */
+  const scrollToFeed = useCallback(() => {
+    document.getElementById("main-feed")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
+  /* ── drawers ─────────────────────────────────────────────────── */
   const openArticle = useCallback((item: FeedItem) => {
     setTarget({ kind: "article", item });
     setDrawerOpen(true);
@@ -160,42 +194,61 @@ export default function CyberShieldPage() {
     setDrawerOpen(true);
   }, []);
 
+  const selectCategoryAndFocus = useCallback(
+    (categoryId: string) => {
+      setActiveCategory(categoryId);
+      scrollToFeed();
+    },
+    [scrollToFeed],
+  );
+
   const booting = items.length === 0 && feedsSyncing;
   const selectedId = target?.kind === "article" ? target.item.id : null;
+  const syncing = feedsSyncing || cisaSyncing;
 
   return (
-    <div className="flex min-h-dvh flex-col bg-cyber-bg lg:h-dvh lg:overflow-hidden">
+    <div className="flex min-h-dvh flex-col bg-cyber-bg pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
+      {/* Skip link for keyboard users */}
+      <a
+        href="#main-feed"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-[100] focus:rounded-md focus:bg-cyber-teal focus:px-4 focus:py-2 focus:font-semibold focus:text-cyber-bg"
+      >
+        Skip to content
+      </a>
+
+      <TopBar onlineCount={onlineCount} nextSyncAt={nextSyncAt} onOpenAbout={() => setAboutOpen(true)} />
+
       <DashboardHeader
-        syncing={feedsSyncing || cisaSyncing}
-        lastSyncAt={feedsLastSync}
-        nextSyncAt={nextSyncAt}
-        onManualSync={handleManualSync}
+        query={query}
+        onQueryChange={setQuery}
+        categoryCounts={categoryCounts}
+        activeCategory={activeCategory}
+        onSelectCategory={selectCategoryAndFocus}
+        onOpenAbout={() => setAboutOpen(true)}
+        onOpenMobileNav={() => setMobileNavOpen(true)}
       />
 
-      <main className="mx-auto w-full max-w-[1920px] flex-1 lg:min-h-0">
-        <div className="grid grid-cols-1 gap-3 p-3 lg:h-full lg:grid-cols-[280px_minmax(0,1fr)_380px]">
-          {/* Column A */}
-          <aside aria-label="Filter context sidebar" className="order-2 lg:order-1 lg:min-h-0 lg:overflow-y-auto cyber-scroll lg:pr-1">
-            <Sidebar
-              items={items}
-              feedStates={feedStates}
-              enabledSources={enabledSources}
-              onToggleSource={toggleSource}
-              activeTopics={activeTopics}
-              onToggleTopic={toggleTopic}
-              onResetFilters={clearFilters}
-            />
-          </aside>
+      <Ticker items={items} onOpenArticle={openArticle} />
 
-          {/* Column B */}
-          <section aria-label="Live news stream" className="order-1 flex min-h-0 flex-col lg:order-2">
+      {/* ── Main layout: feed + sidebar analytics ─────────────────── */}
+      <main className="mx-auto w-full max-w-[1600px] flex-1 px-3 py-6 sm:px-6 lg:px-8">
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] lg:gap-8 xl:grid-cols-[1fr_360px]">
+          {/* Feed column */}
+          <section id="main-feed" className="w-full min-w-0 scroll-mt-36" aria-label="Threat feed">
             <FeedColumn
               items={filteredItems}
               totalCount={items.length}
+              onlineCount={onlineCount}
+              totalSources={SOURCES.length}
+              lastSyncAt={feedsLastSync}
+              syncing={feedsSyncing}
+              onManualSync={handleManualSync}
               query={query}
               onQueryChange={setQuery}
               activeTopics={activeTopics}
               onRemoveTopic={(topic) => toggleTopic(topic)}
+              activeCategory={activeCategory}
+              onSelectCategory={selectCategoryAndFocus}
               enabledSourceCount={enabledSources.length}
               onClearFilters={clearFilters}
               booting={booting}
@@ -204,33 +257,173 @@ export default function CyberShieldPage() {
             />
           </section>
 
-          {/* Column C */}
-          <aside aria-label="Threat intelligence panel" className="order-3 lg:min-h-0 lg:overflow-y-auto cyber-scroll lg:pr-1">
-            <ThreatPanel
+          {/* Sidebar analytics column */}
+          <aside className="w-full space-y-5" aria-label="Sidebar analytics">
+            <Sidebar
+              items={items}
+              feedStates={feedStates}
+              enabledSources={enabledSources}
+              onToggleSource={toggleSource}
+              activeTopics={activeTopics}
+              onToggleTopic={toggleTopic}
+              onClearTopics={() => setActiveTopics([])}
+              onOpenVuln={openVuln}
               metrics={metrics}
               via={cisaVia}
               syncing={cisaSyncing}
               error={cisaError}
               lastSyncAt={cisaLastSync}
               onRetry={handleRetryKev}
-              onOpenVuln={openVuln}
             />
           </aside>
         </div>
       </main>
 
-      {/* sticky footer — mt-auto keeps it pinned on short pages */}
-      <footer className="mt-auto shrink-0 border-t border-cyber-border bg-cyber-panel/70 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-sm">
-        <div className="mx-auto flex w-full max-w-[1920px] flex-wrap items-center justify-between gap-x-4 gap-y-1">
-          <span className="digital text-[8.5px] tracking-[0.2em] text-slate-600">
-            CYBER_SHIELD v2.4.1 // SOC-GRID BUILD 8842 // SECOPS MONITOR
-          </span>
-          <span className="digital text-[8.5px] tracking-[0.2em] text-slate-700">
-            UPLINKS: RSS2JSON · CISA KEV // 100% LIVE TELEMETRY // NO MOCK DATA · LAST BOOT SYNC{" "}
-            {feedsLastSync ? formatUtc(feedsLastSync) : "—"}
-          </span>
+      {/* ── Footer ─────────────────────────────────────────────────── */}
+      <footer className="mt-auto w-full border-t border-cyber-border/80 bg-cyber-panel/50 py-10">
+        <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 grid grid-cols-1 gap-8 border-b border-cyber-border/60 pb-10 md:grid-cols-2 lg:grid-cols-4">
+            {/* Col 1: brand & status */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="cyber-ping relative inline-flex h-3 w-3 text-cyber-teal">
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-cyber-teal" />
+                </span>
+                <span className="font-display text-xl font-black tracking-wider text-slate-100">
+                  CYBER<span className="text-cyber-teal">SHIELD</span>
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed text-slate-400">
+                Real-time threat intelligence ecosystem parsing {SOURCES.length}+ cybersecurity
+                research blogs, vulnerability feeds, and nation-state advisories in real time.
+              </p>
+              <div className="pt-1">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyber-teal/30 bg-cyber-teal/10 px-3 py-1 text-[10px] font-bold text-cyber-teal">
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyber-teal" />
+                  {onlineCount}/{SOURCES.length} STREAMS ONLINE
+                </span>
+              </div>
+            </div>
+
+            {/* Col 2: high priority intel */}
+            <div>
+              <h3 className="mb-4 font-display text-xs font-bold uppercase tracking-wider text-slate-400">
+                High Priority Intel
+              </h3>
+              <ul className="space-y-2 text-xs text-slate-400">
+                {HIGH_PRIORITY_CATEGORY_IDS.map((categoryId) => (
+                  <li key={categoryId}>
+                    <button
+                      type="button"
+                      onClick={() => selectCategoryAndFocus(categoryId)}
+                      className="transition-colors hover:text-cyber-teal"
+                    >
+                      • {CATEGORY_MAP[categoryId]?.label ?? categoryId}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Col 3: intel snapshot */}
+            <div>
+              <h3 className="mb-4 font-display text-xs font-bold uppercase tracking-wider text-slate-400">
+                Intel Snapshot
+              </h3>
+              <div className="space-y-2 text-xs text-slate-400">
+                {[
+                  ["Update Frequency:", "12 MIN TTL"],
+                  ["Primary Proxy:", "MULTI-FAILOVER"],
+                  ["Security Engine:", "CLIENT-SIDE AGG"],
+                  ["License:", "MIT OPEN SOURCE"],
+                ].map(([label, value], index) => (
+                  <div
+                    key={label}
+                    className={`flex justify-between border-b border-cyber-border/40 pb-1 ${index === 3 ? "border-b-0" : ""}`}
+                  >
+                    <span>{label}</span>
+                    <span className={`digital font-bold ${index === 3 ? "text-slate-200" : "text-cyber-teal"}`}>
+                      {value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Col 4: about */}
+            <div className="space-y-3">
+              <h3 className="font-display text-xs font-bold uppercase tracking-wider text-slate-400">
+                Emergency Threat Briefs
+              </h3>
+              <p className="text-xs leading-relaxed text-slate-400">
+                Stay ahead of zero-day exploits. Bookmark CyberShield News for instant situational
+                awareness.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value="cybershield // live_feed"
+                  aria-label="CyberShield feed identifier"
+                  className="pointer-events-none w-full rounded-lg border border-cyber-border bg-cyber-surface px-3 py-1.5 text-xs text-slate-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setAboutOpen(true)}
+                  className="neon-teal shrink-0 rounded-lg border border-cyber-teal/50 bg-cyber-teal/10 px-3 py-1.5 text-xs font-bold text-cyber-teal transition-colors hover:bg-cyber-teal/20"
+                >
+                  About
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center justify-between gap-4 pt-2 text-xs text-slate-500 sm:flex-row sm:text-left">
+            <div className="digital text-[9.5px] tracking-wider">
+              © {new Date().getFullYear()} CYBERSHIELD NEWS · REAL-TIME SITUATIONAL AWARENESS
+              AGGREGATOR · 100% LIVE TELEMETRY
+            </div>
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="transition-colors hover:text-cyber-teal"
+            >
+              Back to Top ↑
+            </button>
+          </div>
         </div>
       </footer>
+
+      {/* ── Overlays ──────────────────────────────────────────────── */}
+      <MobileBottomBar
+        syncing={syncing}
+        onScrollTop={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        onOpenCategories={() => setMobileNavOpen(true)}
+        onManualSync={handleManualSync}
+        onOpenAbout={() => setAboutOpen(true)}
+      />
+
+      <MobileCategoriesSheet
+        open={mobileNavOpen}
+        onOpenChange={setMobileNavOpen}
+        counts={categoryCountMap}
+        activeCategory={activeCategory}
+        onSelectCategory={setActiveCategory}
+        onlineCount={onlineCount}
+        totalSources={SOURCES.length}
+      />
+
+      <AboutModal
+        open={aboutOpen}
+        onOpenChange={setAboutOpen}
+        diagnostics={{
+          totalSignals: items.length,
+          onlineCount,
+          lastSyncAt: feedsLastSync,
+          nextSyncAt,
+          metrics,
+        }}
+      />
 
       <InvestigationDrawer target={target} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>

@@ -1,0 +1,98 @@
+"use client";
+
+import { LayoutGrid, type LucideIcon } from "lucide-react";
+import {
+  Biohazard,
+  Bot,
+  Bug,
+  Cloud,
+  DatabaseZap,
+  Fish,
+  LockKeyhole,
+  Smartphone,
+  Skull,
+} from "lucide-react";
+import { CATEGORIES } from "@/lib/cyber/categories";
+import { cn } from "@/lib/utils";
+
+export interface CategoryCount {
+  id: string;
+  count: number;
+}
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  all: LayoutGrid,
+  ransomware: LockKeyhole,
+  vulnerabilities: Bug,
+  breaches: DatabaseZap,
+  apt: Skull,
+  malware: Biohazard,
+  phishing: Fish,
+  "ai-security": Bot,
+  cloud: Cloud,
+  "mobile-iot": Smartphone,
+};
+
+interface CategoryBarProps {
+  counts: CategoryCount[];
+  active: string;
+  onSelect: (categoryId: string) => void;
+  onOpenAbout: () => void;
+}
+
+/**
+ * Sleek horizontal pill strip — threat categories derived live from the
+ * incoming stream. Scrolls horizontally on small screens.
+ */
+export function CategoryBar({ counts, active, onSelect }: CategoryBarProps) {
+  const countMap = new Map(counts.map((c) => [c.id, c.count]));
+
+  const pills = [
+    { id: "all", label: "All Signals", count: countMap.get("all") ?? 0 },
+    ...CATEGORIES.map((category) => ({
+      id: category.id,
+      label: category.label,
+      count: countMap.get(category.id) ?? 0,
+    })),
+  ];
+
+  return (
+    <div className="no-scrollbar w-full overflow-x-auto border-t border-cyber-border/60 bg-cyber-panel/50 py-2">
+      <nav
+        className="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 py-0.5 sm:px-6 lg:px-8"
+        aria-label="Threat categories"
+      >
+        {pills.map((pill) => {
+          const Icon = CATEGORY_ICONS[pill.id] ?? LayoutGrid;
+          const selected = active === pill.id;
+          return (
+            <button
+              key={pill.id}
+              type="button"
+              data-category={pill.id}
+              onClick={() => onSelect(pill.id)}
+              aria-pressed={selected}
+              className={cn(
+                "flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all duration-150",
+                selected
+                  ? "border-cyber-teal bg-cyber-teal/15 text-cyber-teal shadow-[0_0_12px_rgba(0,229,255,0.2)]"
+                  : "border-cyber-border bg-cyber-surface text-slate-400 hover:border-cyber-teal/50 hover:text-slate-200",
+              )}
+            >
+              <Icon className={cn("h-3 w-3", selected ? "text-cyber-teal" : "text-slate-500")} />
+              {pill.label}
+              <span
+                className={cn(
+                  "digital rounded-sm px-1 text-[8.5px]",
+                  selected ? "bg-cyber-teal/20 text-cyber-teal" : "bg-cyber-raised text-slate-500",
+                )}
+              >
+                {pill.count}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+    </div>
+  );
+}

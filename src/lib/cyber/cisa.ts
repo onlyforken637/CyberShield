@@ -123,6 +123,8 @@ export interface CisaMetrics {
   catalogVersion: string;
   dateReleased: string;
   catalogTitle: string;
+  /** whole-catalog recency buckets powering the Threat Severity bars */
+  severity: { critical: number; high: number; watch: number };
 }
 
 /** All Live Metrics are computed from the real-time `vulnerabilities` array. */
@@ -143,6 +145,16 @@ export function computeCisaMetrics(catalog: CisaCatalog, now = Date.now()): Cisa
     .sort((a, b) => (a.dateAdded < b.dateAdded ? 1 : a.dateAdded > b.dateAdded ? -1 : 0))
     .slice(0, 5);
 
+  let severityCritical = 0;
+  let severityHigh = 0;
+  let severityWatch = 0;
+  for (const vuln of vulns) {
+    const tone = severityForDate(vuln.dateAdded, now).tone;
+    if (tone === "critical") severityCritical += 1;
+    else if (tone === "high") severityHigh += 1;
+    else severityWatch += 1;
+  }
+
   return {
     total: vulns.length,
     addedThisYear,
@@ -154,5 +166,6 @@ export function computeCisaMetrics(catalog: CisaCatalog, now = Date.now()): Cisa
     catalogVersion: String(catalog.catalogVersion ?? "unknown"),
     dateReleased: String(catalog.dateReleased ?? ""),
     catalogTitle: String(catalog.title ?? "CISA Catalog of Known Exploited Vulnerabilities"),
+    severity: { critical: severityCritical, high: severityHigh, watch: severityWatch },
   };
 }

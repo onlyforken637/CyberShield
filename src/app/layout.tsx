@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+});
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
+  weight: ["500", "700", "900"],
 });
 
 const geistMono = Geist_Mono({
@@ -14,9 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CYBER_SHIELD // LIVE_FEED",
+  title: "CyberShield News — Live Threat Intelligence",
   description:
-    "CyberShield — premium SecOps dashboard streaming live cybersecurity news and the official CISA Known Exploited Vulnerabilities catalog in real time. No mock data.",
+    "CyberShield News — real-time cyber threat intelligence aggregator parsing 20+ cybersecurity research streams and the official CISA Known Exploited Vulnerabilities catalog in real time. No mock data.",
   keywords: [
     "CyberShield",
     "threat intelligence",
@@ -24,6 +30,7 @@ export const metadata: Metadata = {
     "cybersecurity news",
     "SOC dashboard",
     "zero-day",
+    "live feed",
   ],
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
@@ -44,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} font-mono antialiased bg-cyber-bg text-foreground`}
+        className={`${inter.variable} ${orbitron.variable} ${geistMono.variable} font-sans antialiased bg-cyber-bg text-foreground`}
       >
         {children}
         <Toaster theme="dark" position="bottom-right" closeButton />
