@@ -1,7 +1,7 @@
 /**
  * CyberShield — shared stream configuration & UI contracts.
  *
- * The 20 research streams are aggregated SERVER-SIDE by /api/news
+ * The 19 research streams are aggregated SERVER-SIDE by /api/news
  * (see src/lib/cyber/intel.ts): direct RSS/Atom XML parsing first, public
  * RSS→JSON converter fallback — so the browser only ever talks to our own
  * origin while every byte still comes from the live upstream publishers.
@@ -46,13 +46,12 @@ interface SourceSeed {
   rss: string;
 }
 
-/* ── The 20 integrated research streams (open RSS, no keys) ───────── */
+/* ── The 19 integrated research streams (open RSS, no keys) ───────── */
 const SOURCE_SEEDS: readonly SourceSeed[] = [
   { id: "bleepingcomputer", name: "BleepingComputer", short: "BPC", host: "bleepingcomputer.com", rss: "https://www.bleepingcomputer.com/feed/" },
   { id: "thehackernews", name: "The Hacker News", short: "THN", host: "thehackernews.com", rss: "https://feeds.feedburner.com/TheHackersNews" },
   { id: "threatpost", name: "Threatpost", short: "TPOST", host: "threatpost.com", rss: "https://threatpost.com/feed/" },
   { id: "krebsonsecurity", name: "Krebs on Security", short: "KREBS", host: "krebsonsecurity.com", rss: "https://krebsonsecurity.com/feed/" },
-  { id: "darkreading", name: "Dark Reading", short: "DR", host: "darkreading.com", rss: "https://www.darkreading.com/rss.xml" },
   { id: "securityweek", name: "SecurityWeek", short: "SECWK", host: "securityweek.com", rss: "https://www.securityweek.com/feed/" },
   { id: "helpnetsecurity", name: "Help Net Security", short: "HNS", host: "helpnetsecurity.com", rss: "https://www.helpnetsecurity.com/feed/" },
   { id: "infosecurity", name: "Infosecurity Magazine", short: "INFOMAG", host: "infosecurity-magazine.com", rss: "https://www.infosecurity-magazine.com/rss/news/" },

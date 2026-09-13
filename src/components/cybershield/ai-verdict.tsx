@@ -12,6 +12,7 @@ type VerdictState = "loading" | "done" | "error";
 interface VerdictResponse {
   brief?: string;
   cached?: boolean;
+  degraded?: boolean;
   model?: string;
   generatedAt?: string;
   error?: string;
@@ -28,6 +29,7 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
   const [full, setFull] = useState("");
   const [shown, setShown] = useState("");
   const [cached, setCached] = useState(false);
+  const [degraded, setDegraded] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -40,6 +42,7 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
       setFull("");
       setShown("");
       setError("");
+      setDegraded(false);
 
       try {
         const res = await fetch("/api/brief", {
@@ -64,6 +67,7 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
         if (requestId !== requestRef.current) return;
         setFull(data.brief);
         setCached(Boolean(data.cached));
+        setDegraded(Boolean(data.degraded));
         setState("done");
       } catch (err) {
         if (requestId !== requestRef.current) return;
@@ -113,12 +117,14 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
           <span
             className={cn(
               "rounded-sm border px-1.5 py-0.5 text-[8.5px] font-bold tracking-widest",
-              cached
-                ? "border-cyber-border bg-cyber-surface text-slate-500"
-                : "border-cyber-green/40 bg-cyber-green/10 text-cyber-green",
+              degraded
+                ? "border-cyber-amber/40 bg-cyber-amber/10 text-cyber-amber"
+                : cached
+                  ? "border-cyber-border bg-cyber-surface text-slate-500"
+                  : "border-cyber-green/40 bg-cyber-green/10 text-cyber-green",
             )}
           >
-            {cached ? "FROM ARCHIVE" : "LIVE ANALYSIS"}
+            {degraded ? "OFFLINE ANALYST" : cached ? "FROM ARCHIVE" : "LIVE ANALYSIS"}
           </span>
         )}
         <span className="ml-auto flex items-center gap-1.5">
@@ -173,6 +179,13 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
             RETRY ANALYSIS
           </button>
         </div>
+      )}
+
+      {state === "done" && degraded && (
+        <p className="rounded-sm border border-cyber-amber/25 bg-cyber-amber/5 px-2.5 py-1.5 text-[9.5px] leading-relaxed tracking-wide text-cyber-amber/90">
+          LIVE GLM UPLINK UNAVAILABLE FROM THIS DEPLOYMENT — SHOWING ON-DEVICE HEURISTIC ASSESSMENT.
+          HIT REANALYZE TO RETRY THE LIVE UPLINK.
+        </p>
       )}
 
       {state === "done" && <VerdictText text={shown} typing={shown.length < full.length} />}

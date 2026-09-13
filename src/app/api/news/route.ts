@@ -4,7 +4,7 @@ import { getNewsSnapshot } from "@/lib/cyber/intel";
 /**
  * CyberShield — /api/news
  *
- * Single aggregated live-news endpoint. The server pulls all 20 research
+ * Single aggregated live-news endpoint. The server pulls all 19 research
  * streams (direct XML first, public converter fallback), extracts the best
  * thumbnails, distills analyst briefs, dedupes and caches the result.
  * Responses stay fresh for 4 minutes; stale data is served instantly for

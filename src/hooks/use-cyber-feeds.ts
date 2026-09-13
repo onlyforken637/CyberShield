@@ -46,7 +46,7 @@ function initialFeedStates(): Record<string, FeedRuntimeState> {
  * Live cybersecurity news engine (client side).
  *
  * One call to our own /api/news returns the fully aggregated, deduped and
- * enriched stream for all 20 research streams — the server does the heavy
+ * enriched stream for all 19 research streams — the server does the heavy
  * lifting (direct XML → converter failover, thumbnail extraction, analyst
  * briefs), the browser just renders it. Exposes per-feed runtime telemetry
  * so the sidebar tracker can toggle sources in and out of the stream.

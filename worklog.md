@@ -74,3 +74,21 @@ Stage Summary:
 - Shipped: server-enriched intelligence pipeline + 3 new API routes (/api/news, /api/img, /api/brief), IntelBrief Prisma model, redesigned cards with analyst briefs, Ranked Threat Board, Threat Condition gauge, AI Analyst Verdict tab. 12-min auto-sync + toasts preserved; still 100% live data, no mocks.
 - Live truth: 18/20 streams online typical (BleepingComputer bot-blocked upstream; CISA advisories rate-limited this cycle); og:image scraping recovers ~47 images/cycle for imageless feeds; some publisher pages bot-block og scraping → honest SYNTH fallback remains.
 - Artifacts: /tmp/csn3-*.png (desktop initial/v2, gauge v3, AI loading + verdict, drawer summary/raw, search, sync toast, footer, mobile top/cards/footer).
+
+---
+Task ID: 4
+Agent: Z.ai Code (main orchestrator)
+Task: User feedback — (1) AI verdict shows "analyst uplink failed: API request failed with status 401: {"error":"invalid X-Token"}" on the published domain (works in workspace), (2) remove Dark Reading source (shows unnecessary things).
+
+Work Log:
+- Diagnosed the 401: error string matches the z-ai-web-dev-sdk outbound fetch to internal-api.z.ai, i.e. the published-domain runtime's credential file (.z-ai-config, JWT bound to chat_id) is missing/stale/rejected there, while the sandbox copy is currently valid (verified TOKEN_OK via direct SDK call; JWT has no exp, it is session-scoped).
+- Rebuilt /api/brief as a 3-tier resilient uplink chain that can never dead-end on auth: (1) sandbox file config (cwd → home → /etc, same wire format as the SDK, 45s AbortSignal timeout — SDK import removed from the route), (2) gateway-forwarded credentials (x-token / x-z-ai-token / x-auth-token / x-access-token + x-chat-id/x-session-id + x-user-id headers) when the incoming request carries fresher per-user auth, (3) NEW "OFFLINE ANALYST" deterministic heuristic verdict built from the server-side intel pipeline (category→threat class map, severity score/label, lede+highlights, CVE/org-aware WHY IT MATTERS + IMMEDIATE ACTIONS) returned with degraded:true, model:"heuristic" and NOT archived so a later live REANALYZE replaces it.
+- ai-verdict.tsx: handles degraded responses — amber "OFFLINE ANALYST" chip (vs LIVE ANALYSIS/FROM ARCHIVE) + amber explainer line ("LIVE GLM UPLINK UNAVAILABLE FROM THIS DEPLOYMENT — SHOWING ON-DEVICE HEURISTIC ASSESSMENT. HIT REANALYZE TO RETRY."), REANALYZE/COPY preserved.
+- Removed Dark Reading from SOURCE_SEEDS (19 streams now); counts elsewhere are all dynamic (SOURCES.length) — only updated stale "20" comments in feeds.ts, /api/news route and use-cyber-feeds.ts.
+- E2E verified: live GLM verdict via curl (model:"glm", full structured brief); degraded path verified end-to-end by shadowing /etc config with an intentionally broken project-level .z-ai-config (attempt 1 fails fast → heuristic returns degraded:true + usable brief, detail:"fetch failed"), shadow removed and live path re-verified. NOTE: could not move /etc/.z-ai-config directly (read-only) — the shadow test exercises the identical code path as a 401 rejection.
+- Agent-browser E2E on :3000: desktop 1600×900 (19/19 SOURCES ACTIVE, 19+ CYBERSECURITY RESEARCH STREAMS, 199 signals, no DARK READING text anywhere, KEV 1,709, gauge ELEVATED), article drawer → AI ANALYST VERDICT tab → green LIVE ANALYSIS chip + full GLM verdict rendered, mobile 390×844 stacks correctly with bottom nav; zero console/page errors; lint clean.
+
+Stage Summary:
+- The published-domain 401 can no longer surface to users: worst case the verdict panel now shows a clearly-labeled heuristic assessment instead of ANAYLST UPLINK FAILED, and self-heals via REANALYZE once valid credentials exist in that runtime. If the published gateway forwards per-user auth headers, tier 2 restores full GLM verdicts automatically.
+- Streams: 19 sources (Dark Reading removed at user request).
+- Artifacts: /tmp/csr4-desktop.png, csr4-drawer2.png, csr4-ai-state2.png, csr4-mobile.png.
