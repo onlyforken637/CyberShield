@@ -43,12 +43,12 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* ── CyberShield operational palette (latentbox-grade deep black) ─ */
-  --color-cyber-bg: #05070d;
-  --color-cyber-panel: #0c1220;
-  --color-cyber-surface: #111828;
-  --color-cyber-raised: #1a2338;
-  --color-cyber-border: #223050;
+  /* ── CyberShield operational palette (v3) ─ */
+  --color-cyber-bg: #0b0f19;
+  --color-cyber-panel: #10182b;
+  --color-cyber-surface: #141b2d;
+  --color-cyber-raised: #1c2740;
+  --color-cyber-border: #222f47;
   --color-cyber-teal: #00e5ff;
   --color-cyber-amber: #ffb300;
   --color-cyber-crimson: #ff3b30;
@@ -63,11 +63,11 @@
 :root {
   --radius: 0.375rem;
   /* CyberShield is a dark-only SOC surface */
-  --background: #05070d;
+  --background: #0b0f19;
   --foreground: #d9e2f1;
-  --card: #111828;
+  --card: #141b2d;
   --card-foreground: #d9e2f1;
-  --popover: #0c1220;
+  --popover: #10182b;
   --popover-foreground: #d9e2f1;
   --primary: #00e5ff;
   --primary-foreground: #06121a;
@@ -97,11 +97,11 @@
 }
 
 .dark {
-  --background: #05070d;
+  --background: #0b0f19;
   --foreground: #d9e2f1;
-  --card: #111828;
+  --card: #141b2d;
   --card-foreground: #d9e2f1;
-  --popover: #0c1220;
+  --popover: #10182b;
   --popover-foreground: #d9e2f1;
   --primary: #00e5ff;
   --primary-foreground: #06121a;
@@ -139,25 +139,8 @@
   }
   body {
     @apply bg-cyber-bg text-foreground;
-    background-image:
-      radial-gradient(1100px 620px at 78% -12%, rgba(0, 229, 255, 0.075), transparent 60%),
-      radial-gradient(900px 540px at -10% 108%, rgba(232, 121, 249, 0.05), transparent 60%);
+    background-image: radial-gradient(1100px 620px at 78% -12%, rgba(0, 229, 255, 0.07), transparent 60%);
     background-attachment: fixed;
-  }
-  /* latentbox-grade film grain over the entire composition */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    pointer-events: none;
-    opacity: 0.05;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  @media (prefers-reduced-motion: reduce) {
-    body::after {
-      display: none;
-    }
   }
   ::selection {
     background: rgba(0, 229, 255, 0.28);
@@ -186,9 +169,9 @@
   background: transparent;
 }
 .cyber-scroll::-webkit-scrollbar-thumb {
-  background: #223050;
+  background: #222f47;
   border-radius: 6px;
-  border: 2px solid #05070d;
+  border: 2px solid #0b0f19;
 }
 .cyber-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 229, 255, 0.45);
@@ -378,42 +361,6 @@
   }
 }
 
-/* ── Latent-grade gradient display text ─────────────────────────── */
-.text-gradient-cyber {
-  background: linear-gradient(94deg, #00e5ff 8%, #7dd3fc 34%, #e879f9 68%, #ffb300 96%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* ── Cursor-tracked spotlight glow (vars set from JS pointermove) ── */
-.spotlight-card {
-  position: relative;
-}
-.spotlight-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  background: radial-gradient(
-    240px circle at var(--mx, 50%) var(--my, 50%),
-    rgba(0, 229, 255, 0.11),
-    rgba(232, 121, 249, 0.05) 45%,
-    transparent 68%
-  );
-}
-.spotlight-card:hover::before {
-  opacity: 1;
-}
-@media (prefers-reduced-motion: reduce) {
-  .spotlight-card::before {
-    display: none;
-  }
-}
-
 /* ── AI verdict typewriter caret ────────────────────────────────── */
 @keyframes caret-blink {
   0%,
@@ -429,45 +376,6 @@
   background: #e879f9;
   box-shadow: 0 0 8px rgba(232, 121, 249, 0.9);
   animation: caret-blink 0.9s steps(1) infinite;
-}
-
-/* ── Award-grade panel chrome ───────────────────────────────────── */
-/* gradient hairline along the top edge of glass panels */
-.panel-hairline {
-  position: relative;
-}
-.panel-hairline::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 1px;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(0, 229, 255, 0.4) 18%,
-    rgba(232, 121, 249, 0.28) 55%,
-    transparent 92%
-  );
-  border-radius: inherit;
-}
-
-/* shine sweep across display text on hover */
-.shine-sweep {
-  position: relative;
-  overflow: hidden;
-}
-.shine-sweep::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%);
-  transform: translateX(-120%);
-  transition: transform 0.85s ease;
-}
-.shine-sweep:hover::after {
-  transform: translateX(120%);
 }
 
 /* boot overlay shield glow */

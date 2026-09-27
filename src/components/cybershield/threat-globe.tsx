@@ -424,7 +424,7 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
   return (
     <section
       className={cn(
-        "signal-sweep overflow-hidden rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md",
+        "signal-sweep overflow-hidden rounded-2xl border border-cyber-border bg-cyber-surface p-4 shadow-lg",
         className,
       )}
       aria-label="Live threat sphere"

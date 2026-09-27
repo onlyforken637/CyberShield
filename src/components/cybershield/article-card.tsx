@@ -114,7 +114,7 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
   const hot = intel.severity.label === "CRITICAL" || intel.severity.label === "HIGH";
   const cardRef = useRef<HTMLElement>(null);
 
-  /* exhibition-grade hover: cursor-tracked spotlight + subtle GSAP 3D tilt */
+  /* exhibition-grade hover: subtle GSAP 3D tilt */
   useEffect(() => {
     const el = cardRef.current;
     if (!el || prefersReducedMotion()) return;
@@ -125,8 +125,6 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
       const rect = el.getBoundingClientRect();
       const px = (event.clientX - rect.left) / rect.width;
       const py = (event.clientY - rect.top) / rect.height;
-      el.style.setProperty("--mx", `${(px * 100).toFixed(1)}%`);
-      el.style.setProperty("--my", `${(py * 100).toFixed(1)}%`);
       ry((px - 0.5) * 3.6);
       rx((0.5 - py) * 2.8);
     };
@@ -148,7 +146,7 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
       ref={cardRef}
       data-card-reveal
       className={cn(
-        "signal-sweep spotlight-card group relative rounded-md border border-l-2 bg-cyber-surface/75 transition-[border-color,box-shadow,background-color] duration-200",
+        "signal-sweep group relative rounded-md border border-l-2 bg-cyber-surface transition-[border-color,box-shadow,background-color] duration-200",
         tone.edge,
         selected
           ? "border-cyber-teal/70 shadow-[0_0_18px_rgba(0,229,255,0.12)]"

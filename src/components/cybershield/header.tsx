@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { Search, Menu } from "lucide-react";
 import { CategoryBar, type CategoryCount } from "@/components/cybershield/category-bar";
 import { Input } from "@/components/ui/input";
-import { gsap, prefersReducedMotion, whenBooted } from "@/lib/cyber/gsap";
 
 interface DashboardHeaderProps {
   query: string;
@@ -29,45 +27,12 @@ export function DashboardHeader({
   onOpenAbout,
   onOpenMobileNav,
 }: DashboardHeaderProps) {
-  const brandRef = useRef<HTMLAnchorElement>(null);
-
-  /* kinetic brand: masked char rise after boot + hover wave */
-  useEffect(() => {
-    const brand = brandRef.current;
-    if (!brand || prefersReducedMotion()) return;
-    const segs = brand.querySelectorAll<HTMLElement>("[data-kinetic]");
-    whenBooted(() => {
-      gsap.fromTo(
-        segs,
-        { yPercent: 118 },
-        { yPercent: 0, duration: 0.85, ease: "expo.out", stagger: 0.08, delay: 0.2 },
-      );
-    });
-    const wave = () => {
-      gsap.to(segs, {
-        yPercent: -16,
-        duration: 0.22,
-        ease: "power2.out",
-        stagger: 0.05,
-        yoyo: true,
-        repeat: 1,
-        overwrite: true,
-      });
-    };
-    brand.addEventListener("pointerenter", wave);
-    return () => {
-      brand.removeEventListener("pointerenter", wave);
-      gsap.killTweensOf(segs);
-    };
-  }, []);
-
   return (
     <header className="sticky top-0 z-40 w-full border-b border-cyber-border/80 bg-cyber-bg/90 backdrop-blur-xl">
       <div className="mx-auto w-full max-w-[1600px] px-3 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-3">
           {/* Brand */}
           <a
-            ref={brandRef}
             href="#main-feed"
             className="group flex shrink-0 items-center gap-2.5"
             aria-label="CyberShield News home"
@@ -77,13 +42,8 @@ export function DashboardHeader({
                 <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-cyber-teal" />
               </span>
             </span>
-            <span className="shine-sweep whitespace-nowrap font-display text-lg font-black tracking-[0.18em] text-slate-100 sm:text-2xl">
-              <span className="inline-block overflow-hidden align-bottom">
-                <span data-kinetic className="inline-block will-change-transform">CYBER</span>
-              </span>
-              <span className="inline-block overflow-hidden align-bottom">
-                <span data-kinetic className="text-gradient-cyber inline-block will-change-transform">SHIELD</span>
-              </span>
+            <span className="whitespace-nowrap font-display text-lg font-black tracking-[0.18em] text-slate-100 sm:text-2xl">
+              CYBER<span className="neon-teal">SHIELD</span>
             </span>
             <span className="ml-1 hidden border-l border-cyber-border pl-2.5 text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-500 md:inline-block">
               NEWS

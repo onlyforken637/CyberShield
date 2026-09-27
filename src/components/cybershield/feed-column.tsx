@@ -5,7 +5,6 @@ import { Flame, Loader2, RefreshCw, Search, SlidersHorizontal, X } from "lucide-
 import { ArticleCard } from "@/components/cybershield/article-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMagnetic } from "@/hooks/use-magnetic";
 import { CATEGORY_MAP } from "@/lib/cyber/categories";
 import { gsap, ScrollTrigger, prefersReducedMotion, whenBooted } from "@/lib/cyber/gsap";
 import type { FeedItem } from "@/lib/cyber/feeds";
@@ -58,7 +57,6 @@ export function FeedColumn({
   onOpenArticle,
 }: FeedColumnProps) {
   const feedListRef = useRef<HTMLDivElement>(null);
-  const refreshRef = useMagnetic<HTMLButtonElement>(0.25);
   const filtersActive =
     query.trim().length > 0 ||
     activeTopics.length > 0 ||
@@ -143,7 +141,6 @@ export function FeedColumn({
           </p>
         </div>
         <button
-          ref={refreshRef}
           type="button"
           onClick={onManualSync}
           disabled={syncing}
@@ -211,7 +208,7 @@ export function FeedColumn({
       {/* ── Ranked threat board (only on the unfiltered stream) ──── */}
       {!filtersActive && topThreats.length === 3 && (
         <section
-          className="panel-hairline mb-5 rounded-xl border border-cyber-border bg-cyber-panel/60 p-4 shadow-lg"
+          className="mb-5 rounded-xl border border-cyber-border bg-cyber-surface p-4 shadow-lg"
           aria-label="Ranked threat board"
         >
           <header className="mb-3 flex items-center gap-2">

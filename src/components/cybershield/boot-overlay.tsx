@@ -1,31 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { toast } from "sonner";
 import { gsap, markBooted, prefersReducedMotion, isBooted } from "@/lib/cyber/gsap";
 import { SOURCES } from "@/lib/cyber/feeds";
+import { BootScene } from "@/components/cybershield/boot-scene";
 import {
   VOICE_SRC,
   ensureAudioRunning,
   playBlip,
   playBootChime,
-  playConfirm,
   playRevealSweep,
   playVoice,
   isSoundEnabled,
 } from "@/lib/cyber/audio";
 
 /**
- * BootOverlay — the cinematic session preloader, now with voice.
+ * BootOverlay — the cinematic session preloader with automatic JARVIS voice.
  *
- * Deep black, a stroke-drawn shield glyph, the brand wordmark, an honest
- * terminal boot log (each line acknowledged with a synthesized blip once the
- * audio channel is unlocked) and the Lusion-grade giant percentage counter.
+ * Deep-black v3 canvas, a Three.js particle vortex converging around the
+ * shield glyph as progress climbs, the brand wordmark, an honest terminal
+ * boot log (each line acknowledged with a synthesized blip once the audio
+ * channel is unlocked) and the giant percentage counter.
  *
- * When the document is ready the JARVIS welcome voice fires ("Welcome to
- * CyberShield — all systems online…"). Browsers block audio until a user
- * gesture, so if playback is refused the boot holds on a voice-authorization
- * gate: ENGAGE VOICE UPLINK (plays chime + voice, then reveals) or ENTER
- * SILENTLY. Muted users (header toggle) skip the gate and reveal silently.
+ * The moment the counter hits 100 the JARVIS welcome fires automatically —
+ * no click required wherever the browser permits it. Browsers physically
+ * block audio before any user gesture, so if playback is refused the boot
+ * still reveals instantly and the voice engages itself on the first click,
+ * scroll or keypress (a toast announces the armed uplink). Clicking anything
+ * DURING the boot also unlocks the channel so 100% plays clean audio.
  *
  * Plays once per tab session; reduced-motion users skip it entirely.
  */
@@ -41,6 +44,7 @@ const BOOT_LINES = [
 
 const MIN_BOOT_MS = 3000;
 const MAX_WAIT_MS = 6000;
+const VOICE_ARM_TIMEOUT_MS = 120_000;
 
 export function BootOverlay() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -50,11 +54,9 @@ export function BootOverlay() {
   const shieldRef = useRef<SVGPathElement>(null);
   const brandRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
-  const gateRef = useRef<HTMLDivElement>(null);
-  const engageBtnRef = useRef<HTMLButtonElement>(null);
   const exitRan = useRef(false);
-  const exitFnRef = useRef<(() => void) | null>(null);
-  const [gate, setGate] = useState(false);
+  // shared boot progress (0–100) — read by the Three.js scene every frame
+  const bootProgress = useMemo(() => ({ v: 0 }), []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -74,6 +76,8 @@ export function BootOverlay() {
     const state = { loaded: document.readyState === "complete" };
     let finishTimer: ReturnType<typeof setTimeout> | null = null;
     let enterTimer: ReturnType<typeof setTimeout> | null = null;
+    let voiceArmTimer: ReturnType<typeof setTimeout> | null = null;
+    let disarmVoice: (() => void) | null = null;
 
     const onLoad = () => {
       state.loaded = true;
@@ -85,6 +89,14 @@ export function BootOverlay() {
         state.loaded = true;
       }, MAX_WAIT_MS);
     }
+
+    // any interaction during the boot unlocks the audio channel early so the
+    // 100% moment plays clean chime + voice without a second event
+    const unlock = () => {
+      void ensureAudioRunning();
+    };
+    window.addEventListener("pointerdown", unlock, { passive: true });
+    window.addEventListener("keydown", unlock);
 
     /** Curtain lift — the same exit choreography for every entry path. */
     const runExit = () => {
@@ -103,18 +115,37 @@ export function BootOverlay() {
         .to(brandRef.current, { scale: 1.12, opacity: 0, duration: 0.5, ease: "power2.in" }, 0)
         .to(root, { clipPath: "inset(0% 0% 100% 0%)", duration: 0.85, ease: "expo.inOut" }, 0.18);
     };
-    exitFnRef.current = runExit;
 
     /**
-     * The boot moment: chime + JARVIS voice, then the curtain lifts while
-     * the voice keeps rolling over the revealed dashboard.
+     * Fallback for browser autoplay policy: the voice engages itself on the
+     * first interaction of any kind. Disarms after 2 minutes.
      */
-    const engageVoice = () => {
-      playBootChime();
-      void playVoice(audioRef.current);
-      enterTimer = window.setTimeout(runExit, 240);
+    const armVoiceOnFirstInteraction = () => {
+      const events = ["pointerdown", "touchstart", "keydown", "wheel"] as const;
+      const fire = () => {
+        disarmVoice?.();
+        void (async () => {
+          await ensureAudioRunning();
+          playBootChime();
+          void playVoice(audioRef.current);
+        })();
+      };
+      disarmVoice = () => {
+        events.forEach((event) => window.removeEventListener(event, fire));
+        if (voiceArmTimer) {
+          clearTimeout(voiceArmTimer);
+          voiceArmTimer = null;
+        }
+        disarmVoice = null;
+      };
+      events.forEach((event) => window.addEventListener(event, fire, { once: true, passive: true }));
+      voiceArmTimer = setTimeout(disarmVoice, VOICE_ARM_TIMEOUT_MS);
+      toast("VOICE UPLINK ARMED", {
+        description: "Browser audio policy allows sound after one interaction — JARVIS engages on your first click, scroll or keypress.",
+      });
     };
 
+    /** The boot moment — fully automatic at 100%. */
     const enterSequence = async () => {
       if (!isSoundEnabled()) {
         runExit();
@@ -122,15 +153,22 @@ export function BootOverlay() {
       }
       const started = await playVoice(audioRef.current);
       if (started) {
-        engageVoice();
+        playBootChime();
+        enterTimer = window.setTimeout(runExit, 240);
       } else {
-        // autoplay locked → hold on the voice-authorization gate
-        setGate(true);
+        // autoplay locked → reveal immediately, voice self-engages later
+        armVoiceOnFirstInteraction();
+        runExit();
       }
     };
 
     const ctx = gsap.context(() => {
       const counter = { v: 0 };
+      const setPct = () => {
+        const value = Math.floor(counter.v);
+        if (pctRef.current) pctRef.current.textContent = String(value);
+        bootProgress.v = value;
+      };
 
       const tl = gsap.timeline();
 
@@ -169,20 +207,7 @@ export function BootOverlay() {
         });
 
       // percentage counter — 0 → 99 until the document reports loaded
-      tl.to(
-        counter,
-        {
-          v: 99,
-          duration: MIN_BOOT_MS / 1000,
-          ease: "power2.inOut",
-          onUpdate: () => {
-            if (pctRef.current) {
-              pctRef.current.textContent = String(Math.floor(counter.v));
-            }
-          },
-        },
-        0.1,
-      );
+      tl.to(counter, { v: 99, duration: MIN_BOOT_MS / 1000, ease: "power2.inOut", onUpdate: setPct }, 0.1);
       if (barRef.current) {
         tl.fromTo(
           barRef.current,
@@ -193,20 +218,7 @@ export function BootOverlay() {
       }
 
       // hold at 99 until loaded, then finish
-      tl.to(
-        counter,
-        {
-          v: 100,
-          duration: 0.28,
-          ease: "power1.out",
-          onUpdate: () => {
-            if (pctRef.current) {
-              pctRef.current.textContent = String(Math.floor(counter.v));
-            }
-          },
-        },
-        MIN_BOOT_MS / 1000 + 0.12,
-      );
+      tl.to(counter, { v: 100, duration: 0.28, ease: "power1.out", onUpdate: setPct }, MIN_BOOT_MS / 1000 + 0.12);
 
       tl.add(
         () => {
@@ -225,49 +237,16 @@ export function BootOverlay() {
 
     return () => {
       window.removeEventListener("load", onLoad);
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+      disarmVoice?.();
       if (finishTimer) clearTimeout(finishTimer);
       if (enterTimer) clearTimeout(enterTimer);
+      if (voiceArmTimer) clearTimeout(voiceArmTimer);
       document.documentElement.style.overflow = prevOverflow;
       ctx.revert();
     };
-  }, []);
-
-  // voice gate entrance + pulse + focus
-  useEffect(() => {
-    if (!gate || !gateRef.current) return;
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        "[data-gate]",
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.09 },
-      );
-      if (engageBtnRef.current) {
-        gsap.to(engageBtnRef.current, {
-          boxShadow: "0 0 0 1px rgba(0,229,255,0.55), 0 0 34px rgba(0,229,255,0.28)",
-          duration: 0.9,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
-      }
-    }, gateRef);
-    engageBtnRef.current?.focus();
-    return () => ctx.revert();
-  }, [gate]);
-
-  const handleEngage = () => {
-    void (async () => {
-      await ensureAudioRunning();
-      playConfirm();
-      playBootChime();
-      void playVoice(audioRef.current);
-      window.setTimeout(() => exitFnRef.current?.(), 240);
-    })();
-  };
-
-  const handleSilent = () => {
-    exitFnRef.current?.();
-  };
+  }, [bootProgress]);
 
   const brand = "CYBER_SHIELD // LIVE_FEED";
 
@@ -280,11 +259,19 @@ export function BootOverlay() {
         ref={rootRef}
         role="status"
         aria-label="CyberShield is initializing"
-        className="fixed inset-0 z-[90] flex flex-col items-center justify-center bg-[#05070d]"
+        className="fixed inset-0 z-[90] flex flex-col items-center justify-center overflow-hidden bg-cyber-bg"
         style={{ clipPath: "inset(0% 0% 0% 0%)" }}
       >
-        {/* shield glyph + brand + voice gate */}
-        <div ref={brandRef} className="flex flex-col items-center gap-5 px-6 text-center">
+        {/* Three.js particle vortex converging around the shield */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <BootScene
+            progress={bootProgress}
+            className="h-[82vmin] w-[82vmin] -translate-y-[7vmin] opacity-90"
+          />
+        </div>
+
+        {/* shield glyph + brand */}
+        <div ref={brandRef} className="relative z-10 flex flex-col items-center gap-5 px-6 text-center">
           <svg width="64" height="72" viewBox="0 0 64 72" fill="none" aria-hidden="true" className="boot-glow">
             <path
               ref={shieldRef}
@@ -307,32 +294,6 @@ export function BootOverlay() {
               </span>
             ))}
           </div>
-
-          {/* voice-authorization gate — shown only when the browser blocks autoplay */}
-          {gate && (
-            <div ref={gateRef} className="mt-2 flex flex-col items-center gap-3">
-              <p data-gate className="digital text-[9px] tracking-[0.26em] text-slate-500 sm:text-[10px]">
-                AUDIO CHANNEL STANDBY — VOICE UPLINK REQUIRES AUTHORIZATION
-              </p>
-              <button
-                ref={engageBtnRef}
-                data-gate
-                type="button"
-                onClick={handleEngage}
-                className="min-h-[44px] cursor-pointer rounded-md border border-cyber-teal/70 bg-cyber-teal/10 px-7 py-2.5 font-display text-[11px] font-black tracking-[0.22em] text-cyber-teal transition-colors hover:bg-cyber-teal/20 sm:text-xs"
-              >
-                ▶ ENGAGE VOICE UPLINK
-              </button>
-              <button
-                data-gate
-                type="button"
-                onClick={handleSilent}
-                className="min-h-[44px] cursor-pointer px-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 transition-colors hover:text-slate-300"
-              >
-                Enter silently
-              </button>
-            </div>
-          )}
         </div>
 
         {/* giant percentage — Lusion-style, bottom-left */}

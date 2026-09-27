@@ -1,11 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { AboutModal } from "@/components/cybershield/about-modal";
 import { BootOverlay } from "@/components/cybershield/boot-overlay";
-import { CursorGlow } from "@/components/cybershield/cursor-glow";
 import { DashboardHeader } from "@/components/cybershield/header";
 import { FeedColumn } from "@/components/cybershield/feed-column";
 import { InvestigationDrawer, type DrawerTarget } from "@/components/cybershield/investigation-drawer";
@@ -20,12 +18,6 @@ import { HIGH_PRIORITY_CATEGORY_IDS, CATEGORY_MAP } from "@/lib/cyber/categories
 import type { FeedItem } from "@/lib/cyber/feeds";
 import type { CisaVuln } from "@/lib/cyber/cisa";
 import { SOURCES } from "@/lib/cyber/feeds";
-
-/** WebGL layers are client-only (no SSR for three.js). */
-const CyberCanvas = dynamic(
-  () => import("@/components/cybershield/cyber-canvas").then((mod) => mod.CyberCanvas),
-  { ssr: false },
-);
 
 /** Auto-refresh TTL — 12 minutes, per the CyberShield sync engine spec. */
 const SYNC_TTL_MS = 12 * 60 * 1000;
@@ -275,12 +267,8 @@ export default function CyberShieldPage() {
       ref={rootRef}
       className="flex min-h-dvh flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0"
     >
-      {/* cinematic boot preloader (once per session) + cursor light */}
+      {/* cinematic boot preloader (once per session) */}
       <BootOverlay />
-      <CursorGlow />
-
-      {/* WebGL exhibition backdrop (fixed, behind everything) */}
-      <CyberCanvas />
 
       {/* Skip link for keyboard users */}
       <a
@@ -364,7 +352,7 @@ export default function CyberShieldPage() {
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-cyber-teal" />
                 </span>
                 <span className="font-display text-xl font-black tracking-wider text-slate-100">
-                  CYBER<span className="text-gradient-cyber">SHIELD</span>
+                  CYBER<span className="neon-teal">SHIELD</span>
                 </span>
               </div>
               <p className="text-xs leading-relaxed text-slate-400">

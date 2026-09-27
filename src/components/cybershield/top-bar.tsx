@@ -4,7 +4,6 @@ import { Activity, Info } from "lucide-react";
 import { SystemClock } from "@/components/cybershield/clock";
 import { SoundToggle } from "@/components/cybershield/sound-toggle";
 import { useClock } from "@/hooks/use-clock";
-import { useMagnetic } from "@/hooks/use-magnetic";
 import { SOURCES } from "@/lib/cyber/feeds";
 import { pad2 } from "@/lib/cyber/utils";
 
@@ -20,7 +19,6 @@ interface TopBarProps {
  */
 export function TopBar({ onlineCount, nextSyncAt, onOpenAbout }: TopBarProps) {
   const now = useClock(1000);
-  const aboutRef = useMagnetic<HTMLButtonElement>(0.3);
   const remainingMs = nextSyncAt && now ? Math.max(0, nextSyncAt - now.getTime()) : null;
   const remainingMin = remainingMs !== null ? Math.floor(remainingMs / 60_000) : null;
   const remainingSec = remainingMs !== null ? Math.floor((remainingMs % 60_000) / 1000) : null;
@@ -59,7 +57,6 @@ export function TopBar({ onlineCount, nextSyncAt, onOpenAbout }: TopBarProps) {
           )}
           <SoundToggle />
           <button
-            ref={aboutRef}
             type="button"
             onClick={onOpenAbout}
             className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-cyber-teal transition-colors hover:underline"

@@ -191,7 +191,7 @@ function ThreatConditionCard({
   return (
     <section
       data-reveal
-      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 shadow-lg backdrop-blur-md"
+      className="rounded-2xl border border-cyber-border bg-cyber-surface shadow-lg"
       aria-label="Global threat condition"
     >
       <header className="mb-1 flex items-center justify-between gap-2">
@@ -277,7 +277,7 @@ function TopicCloud({
   return (
     <section
       data-reveal
-      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
+      className="rounded-2xl border border-cyber-border bg-cyber-surface p-4 shadow-lg"
       aria-label="Topic intercept cloud"
     >
       <header className="mb-3 flex items-center justify-between gap-2">
@@ -360,7 +360,7 @@ function SourcesTracker({
   return (
     <section
       data-reveal
-      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
+      className="rounded-2xl border border-cyber-border bg-cyber-surface p-4 shadow-lg"
       aria-label="Active sources tracker"
     >
       <header className="mb-1 flex items-center justify-between gap-2">

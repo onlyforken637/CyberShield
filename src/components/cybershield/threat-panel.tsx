@@ -126,7 +126,7 @@ export function KevMetricsCard({ metrics, via, syncing, error, lastSyncAt, onRet
   return (
     <section
       data-reveal
-      className="signal-sweep rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
+      className="signal-sweep rounded-2xl border border-cyber-border bg-cyber-surface p-4 shadow-lg"
       aria-label="Live CISA KEV metrics"
     >
       <header className="mb-3 flex items-center justify-between gap-2">
@@ -263,7 +263,7 @@ export function SeverityBreakdownCard({ metrics, syncing }: { metrics: CisaMetri
   return (
     <section
       data-reveal
-      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
+      className="rounded-2xl border border-cyber-border bg-cyber-surface p-4 shadow-lg"
       aria-label="Threat severity breakdown"
     >
       <header className="mb-3 flex items-center justify-between gap-2">
@@ -323,7 +323,7 @@ export function ExploitMatrixCard({
   return (
     <section
       data-reveal
-      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
+      className="rounded-2xl border border-cyber-border bg-cyber-surface p-4 shadow-lg"
       aria-label="Active exploitation matrix"
     >
       <header className="mb-2.5 flex items-center justify-between gap-2">
