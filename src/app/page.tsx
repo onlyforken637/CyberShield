@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { AboutModal } from "@/components/cybershield/about-modal";
 import { BootOverlay } from "@/components/cybershield/boot-overlay";
@@ -410,6 +411,15 @@ export default function CyberShieldPage() {
                   </div>
                 ))}
               </div>
+              <a
+                href="/cybershield-v3.tar.gz"
+                download
+                aria-label="Download CyberShield v3 source archive (tar.gz)"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-cyber-teal/40 bg-cyber-teal/10 px-3 py-1.5 text-[10px] font-bold tracking-wider text-cyber-teal transition-colors hover:bg-cyber-teal/20"
+              >
+                <Download className="h-3 w-3" />
+                DOWNLOAD SOURCE · V3 .TAR.GZ
+              </a>
             </div>
 
             {/* Col 4: about */}
