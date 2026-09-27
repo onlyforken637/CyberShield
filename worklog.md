@@ -137,3 +137,22 @@ Stage Summary:
 - Files: +3 (boot-overlay.tsx, cursor-glow.tsx, use-magnetic.ts, world-dots.ts, gen-world-dots.ts) ~9 edited; no new runtime deps (sharp dev-use only, script-side).
 - Honest note: boot plays once per tab session; reduced-motion users get an instant dashboard; arcs/hubs are ambient geographic motion, not per-article routing (the sidebar sphere remains the article-driven visual).
 - Artifacts: /tmp/cs5-boot.png, cs5-desktop.png, cs5-scrolled.png, cs5-bottom.png, cs5-drawer.png, cs5-ai.png, cs5-noboot.png, cs5-mob-boot.png, cs5-mob.png, cs5-final.png.
+
+---
+Task ID: 6
+Agent: Z.ai Code (main orchestrator)
+Task: User request — JARVIS-style voice welcome ("Welcome to CyberShield") + a little intro audio when the website fully loads, plus a booting animation (built on the existing boot overlay).
+
+Work Log:
+- Voice asset: generated via TTS skill CLI with the `jam` voice (British-gentleman register = JARVIS), script "Welcome to Cyber Shield. All systems are online. Live threat intelligence feed initialized. Good luck, Analyst." at 0.95 speed; ffmpeg-passed into a comms-style master (silenceremove tightened 0.4–0.6s sentence gaps to 0.30s, atempo 1.06, 130Hz–7.4kHz band, subtle aecho tail, compressor + limiter, fade-in) → public/audio/jarvis-welcome.mp3 (9.74s mono 24kHz, 78KB).
+- NEW src/lib/cyber/audio.ts — audio subsystem: localStorage-backed sound preference ("cs-sound", default on) exposed as a proper external store (SOUND_EVENT dispatch + subscribeSound + getSoundSnapshot for useSyncExternalStore, storage-event multi-tab sync); lazy gesture-resumed AudioContext; synthesized tones (playBlip boot-log ticks, playConfirm two-note ack, playBootChime JARVIS triple chirp + sub swell, playRevealSweep rising filtered sweep) that all no-op silently while the context is still gesture-locked; playVoice() resolves false when the browser blocks autoplay.
+- boot-overlay.tsx upgraded into the boot + voice sequence: 6 honest log lines (mounting N streams, KEV sync, enrichment grid, GLM analyst uplink, AUDIO CHANNEL — VOICE READY, global signal field) each acknowledged by a blip; when the counter hits 100 and the document is loaded, the JARVIS voice fires and the curtain lifts 240ms later while the voice rolls over the reveal. Autoplay-safe: if play() is refused (no gesture yet), the boot HOLDS on a voice-authorization gate — pulsing "▶ ENGAGE VOICE UPLINK" (resumes AudioContext, confirm + chime + voice, then reveals; focus-managed, 44px target) + "ENTER SILENTLY". Muted users skip the gate and reveal silently. Audio element lives outside the animated root so playback survives the wipe.
+- NEW sound-toggle.tsx + TopBar wiring: Volume2/VolumeX header toggle (aria-pressed, amber when muted), persisted via the audio store; enabling plays a confirm chirp through the just-unlocked context.
+- Fixed en route: missing getSoundSnapshot export (build error caught immediately by E2E), Next-16 set-state-in-effect lint violation replaced with useSyncExternalStore, effect-scoping flaw (finishTimer/onLoad referenced across gsap.context closure) restructured so timers/load-handler live in the effect body and the exit timeline is shared via exitFnRef instead of duplicated.
+- E2E (agent-browser, desktop 1600×900 + mobile 390×844): boot render (shield draw, char rise, % counter, log), gate appears when autoplay blocked, ENGAGE → reveal with voice verified playing to completion (audio.currentTime reached full 9.7s), ENTER SILENTLY / muted-boot paths auto-reveal with no gate, boot-skip on same-session reload (display:none, cs-booted=1), toggle off→"off"→icon flips→toggle on→"on", mobile gate layout with 44px targets, zero fresh console/page errors (only stale pre-fix lines in session history), lint clean.
+
+Stage Summary:
+- Shipped: cinematic boot → voice-authorized reveal. JARVIS welcome (jam voice, comms-treated) + synthesized intro audio (chime/blips/sweep) fire when the site fully loads; header mute toggle persists; autoplay policy fully respected via the engage gate.
+- Behavior matrix: fresh session + sound on + autoplay allowed → auto voice; fresh session + blocked (most browsers) → gate; muted → silent boot; repeat visit in tab → no boot, no voice. Reduced-motion users skip everything.
+- Files: +3 new (audio.ts, sound-toggle.tsx, jarvis-welcome.mp3), ~2 edited (boot-overlay.tsx, top-bar.tsx). No new deps.
+- Artifacts: /tmp/cs6-boot-early.png, cs6-boot-gate.png, cs6-engage.png, cs6-revealed.png, cs6-mob-boot.png, cs6-mob-gate.png, cs6-mob-revealed.png, cs6-final.png.

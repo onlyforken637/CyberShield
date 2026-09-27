@@ -2,6 +2,7 @@
 
 import { Activity, Info } from "lucide-react";
 import { SystemClock } from "@/components/cybershield/clock";
+import { SoundToggle } from "@/components/cybershield/sound-toggle";
 import { useClock } from "@/hooks/use-clock";
 import { useMagnetic } from "@/hooks/use-magnetic";
 import { SOURCES } from "@/lib/cyber/feeds";
@@ -56,6 +57,7 @@ export function TopBar({ onlineCount, nextSyncAt, onOpenAbout }: TopBarProps) {
               AUTO-SYNC T-{pad2(remainingMin)}:{pad2(remainingSec)}
             </span>
           )}
+          <SoundToggle />
           <button
             ref={aboutRef}
             type="button"
