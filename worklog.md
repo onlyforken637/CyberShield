@@ -194,3 +194,20 @@ Stage Summary:
 - Files: boot-overlay.tsx rewritten, boot-scene.tsx deleted, public/audio/jarvis-welcome.mp3 replaced. No dependency changes.
 - Note: browsers physically refuse audio before any user gesture; the armed-listener path is the maximum any site can do, and in autoplay-permitted contexts (kiosk/MEI) it is fully automatic.
 - Artifacts: /tmp/cs8-boot-radar.png, cs8-revealed.png, cs8-mob-radar.png, cs8-mob-final.png, cs8-desktop-final.png, cs8-final-clean.png. Voice QA files: /tmp/vo/ (candidates, f0.py, master.wav, final.mp3).
+
+---
+Task ID: 9
+Agent: Z.ai Code (main orchestrator)
+Task: User feedback — "that threat sphere sucks, use something like this but in 3d: https://fortiguard.fortinet.com/threat-map" (FortiGuard live attack map).
+
+Work Log:
+- Recovered prior map assets from git history: `git log --all` located world-dots.ts / gen-world-dots.ts / cyber-canvas.tsx (added 8cb88c6, deleted by the Task 7 revert in f8c43a7); restored src/lib/cyber/world-dots.ts (NASA-derived 216×108 land bitmask, 7,666 geo-referenced cells, decodeMapDots() returns lon/lat per dot) and scripts/gen-world-dots.ts, and extracted the 33 real city hubs [lon,lat] from the old canvas.
+- threat-globe.tsx REWRITTEN as a FortiGuard-style attack map in 3D: occluded dark globe; landmasses as a twinkling dot matrix (custom ShaderMaterial, round points, per-dot phase; uSize tuned to 9.5×dpr); 33 hub points at true WGS84 coordinates (lonLatToVec3 three-globe convention); each live article ≤48h (max 26, newest first, deterministic hash of article id — unchanged data honesty) becomes a severity-colored QuadraticBezier attack arc between two real hubs (lift ∝ angular distance), a travelling packet with sin-fade, and expanding impact rings at BOTH endpoints (destination ring phase-lagged 0.62 to sync with packet arrival); teal atmosphere halo. Opens centered on the Atlantic corridor (rotation.y −1.1, tilt 0.16) like the FortiGuard view; slow auto-rotation + drag with inertia preserved; 30fps budget, DPR ≤1.5, IntersectionObserver + hidden-tab pause, reduced-motion static frame, full disposal.
+- HUD upgraded: header "LIVE THREAT MAP" + N ARCS counter, new severity legend row (CRITICAL/HIGH/ELEVATED/MODERATE with live per-stream counts), footer "DRAG TO ROTATE · ARCS = LIVE ARTICLES ≤48H · REAL GEOGRAPHY". aria-labels updated; WebGL-fail fallback card kept.
+- Tuning pass via screenshots: first render showed Americas/Pacific bias → set initial rotation to Atlantic corridor; dot size refined.
+- E2E (agent-browser): globe renders with recognizable dot-matrix continents (NA right, Europe/Africa left, SA bottom), multiple colored arcs + packets + impact rings visible; drag test (CDP mouse down/move/up) rotated the globe with inertia to the Pacific side; console clean (only HMR logs); mobile 390×844 shows header, live legend counts (2/3/4/17), full globe, gauge below untouched; desktop 1600×900 dashboard intact; lint clean.
+
+Stage Summary:
+- The rejected abstract wireframe sphere is now a real-world 3D attack map in the FortiGuard idiom: real geography from NASA land data, 33 real city hubs, arcs driven by the live article stream (deterministic, no runtime randomness), severity colors from the real pipeline. Zero data-layer changes; all motion/perf guards retained.
+- Files: threat-globe.tsx rewritten (~1 file), +world-dots.ts and +scripts/gen-world-dots.ts restored from git history. No new deps.
+- Artifacts: /tmp/cs9-globe.png, cs9-globe2-crop.png (Atlantic corridor), cs9-drag-crop.png (post-drag Pacific view), cs9-mob-globe.png (mobile with legend), cs9-desktop.png.
