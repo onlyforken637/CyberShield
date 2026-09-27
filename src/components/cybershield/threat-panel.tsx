@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   Activity,
   Bug,
@@ -18,36 +18,38 @@ import {
   type CisaVuln,
   type CisaVia,
 } from "@/lib/cyber/cisa";
+import { gsap, prefersReducedMotion } from "@/lib/cyber/gsap";
 import { cn } from "@/lib/utils";
 
-/** Animated digital readout — counts smoothly to the live target value. */
+/** Animated digital readout — GSAP tweens the count to the live value. */
 export function NeonNumber({ value, className }: { value: number; className?: string }) {
-  const [display, setDisplay] = useState(0);
-  const displayRef = useRef(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const current = useRef(0);
 
   useEffect(() => {
-    const from = displayRef.current;
-    if (from === value) return;
-    let raf = 0;
-    const start = performance.now();
-    const duration = 900;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      const next = Math.round(from + (value - from) * eased);
-      displayRef.current = next;
-      setDisplay(next);
-      if (p < 1) raf = requestAnimationFrame(tick);
+    const el = ref.current;
+    if (!el) return;
+    const write = (v: number) => {
+      current.current = v;
+      el.textContent = Math.round(v).toLocaleString("en-US");
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    if (prefersReducedMotion()) {
+      write(value);
+      return;
+    }
+    const proxy = { v: current.current };
+    const tween = gsap.to(proxy, {
+      v: value,
+      duration: 1.15,
+      ease: "power3.out",
+      onUpdate: () => write(proxy.v),
+    });
+    return () => {
+      tween.kill();
+    };
   }, [value]);
 
-  return (
-    <span className={cn("digital tabular-nums", className)}>
-      {display.toLocaleString("en-US")}
-    </span>
-  );
+  return <span ref={ref} className={cn("digital tabular-nums", className)}>0</span>;
 }
 
 export interface KevPanelProps {
@@ -80,7 +82,7 @@ export function KevUnavailable({
   lastSyncAt,
   onRetry,
   compact = false,
-}: KevPanelProps & { compact?: boolean }) {
+}: Omit<KevPanelProps, "metrics" | "via"> & { compact?: boolean }) {
   return (
     <div className={cn("flex flex-col items-center justify-center text-center", compact ? "py-8" : "py-10")}>
       {syncing ? (
@@ -123,7 +125,8 @@ export function KevUnavailable({
 export function KevMetricsCard({ metrics, via, syncing, error, lastSyncAt, onRetry }: KevPanelProps) {
   return (
     <section
-      className="signal-sweep rounded-2xl border border-cyber-border bg-cyber-panel p-4 shadow-lg"
+      data-reveal
+      className="signal-sweep rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
       aria-label="Live CISA KEV metrics"
     >
       <header className="mb-3 flex items-center justify-between gap-2">
@@ -259,7 +262,8 @@ export function SeverityBreakdownCard({ metrics, syncing }: { metrics: CisaMetri
 
   return (
     <section
-      className="rounded-2xl border border-cyber-border bg-cyber-panel p-4 shadow-lg"
+      data-reveal
+      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
       aria-label="Threat severity breakdown"
     >
       <header className="mb-3 flex items-center justify-between gap-2">
@@ -318,7 +322,8 @@ export function ExploitMatrixCard({
 }) {
   return (
     <section
-      className="rounded-2xl border border-cyber-border bg-cyber-panel p-4 shadow-lg"
+      data-reveal
+      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
       aria-label="Active exploitation matrix"
     >
       <header className="mb-2.5 flex items-center justify-between gap-2">

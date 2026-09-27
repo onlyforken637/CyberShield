@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronRight, Clock3, ImageOff, Zap } from "lucide-react";
 import { MatrixThumb } from "@/components/cybershield/matrix-thumb";
+import { gsap, prefersReducedMotion } from "@/lib/cyber/gsap";
 import type { ArticleIntel, FeedItem, IntelSeverityLabel } from "@/lib/cyber/feeds";
 import { timeAgo } from "@/lib/cyber/utils";
 import { cn } from "@/lib/utils";
@@ -113,12 +114,43 @@ export function ArticleCard({ item, selected, onOpen, entranceDelay = 0 }: Artic
   const intel = item.intel;
   const tone = severityTone(intel);
   const hot = intel.severity.label === "CRITICAL" || intel.severity.label === "HIGH";
+  const cardRef = useRef<HTMLElement>(null);
+
+  /* exhibition-grade hover: cursor-tracked spotlight + subtle GSAP 3D tilt */
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el || prefersReducedMotion()) return;
+    gsap.set(el, { transformPerspective: 950 });
+    const rx = gsap.quickTo(el, "rotationX", { duration: 0.5, ease: "power3.out" });
+    const ry = gsap.quickTo(el, "rotationY", { duration: 0.5, ease: "power3.out" });
+    const onMove = (event: PointerEvent) => {
+      const rect = el.getBoundingClientRect();
+      const px = (event.clientX - rect.left) / rect.width;
+      const py = (event.clientY - rect.top) / rect.height;
+      el.style.setProperty("--mx", `${(px * 100).toFixed(1)}%`);
+      el.style.setProperty("--my", `${(py * 100).toFixed(1)}%`);
+      ry((px - 0.5) * 3.6);
+      rx((0.5 - py) * 2.8);
+    };
+    const onLeave = () => {
+      rx(0);
+      ry(0);
+    };
+    el.addEventListener("pointermove", onMove, { passive: true });
+    el.addEventListener("pointerleave", onLeave);
+    return () => {
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerleave", onLeave);
+      gsap.killTweensOf(el);
+    };
+  }, []);
 
   return (
     <article
+      ref={cardRef}
       style={entranceDelay > 0 ? { animationDelay: `${entranceDelay}ms` } : undefined}
       className={cn(
-        "signal-sweep card-in group relative rounded-md border border-l-2 bg-cyber-surface/70 transition-all duration-200",
+        "signal-sweep card-in spotlight-card group relative rounded-md border border-l-2 bg-cyber-surface/75 transition-[border-color,box-shadow,background-color] duration-200",
         tone.edge,
         selected
           ? "border-cyber-teal/70 shadow-[0_0_18px_rgba(0,229,255,0.12)]"

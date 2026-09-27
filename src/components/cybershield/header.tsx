@@ -43,7 +43,7 @@ export function DashboardHeader({
               </span>
             </span>
             <span className="whitespace-nowrap font-display text-lg font-black tracking-[0.18em] text-slate-100 sm:text-2xl">
-              CYBER<span className="text-cyber-teal">SHIELD</span>
+              CYBER<span className="text-gradient-cyber">SHIELD</span>
             </span>
             <span className="ml-1 hidden border-l border-cyber-border pl-2.5 text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-500 md:inline-block">
               NEWS

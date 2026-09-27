@@ -43,12 +43,12 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* ── CyberShield operational palette ─────────────────────────── */
-  --color-cyber-bg: #0b0f19;
-  --color-cyber-panel: #0f1626;
-  --color-cyber-surface: #141b2d;
+  /* ── CyberShield operational palette (latentbox-grade deep black) ─ */
+  --color-cyber-bg: #05070d;
+  --color-cyber-panel: #0c1220;
+  --color-cyber-surface: #111828;
   --color-cyber-raised: #1a2338;
-  --color-cyber-border: #222f47;
+  --color-cyber-border: #223050;
   --color-cyber-teal: #00e5ff;
   --color-cyber-amber: #ffb300;
   --color-cyber-crimson: #ff3b30;
@@ -63,11 +63,11 @@
 :root {
   --radius: 0.375rem;
   /* CyberShield is a dark-only SOC surface */
-  --background: #0b0f19;
+  --background: #05070d;
   --foreground: #d9e2f1;
-  --card: #141b2d;
+  --card: #111828;
   --card-foreground: #d9e2f1;
-  --popover: #101728;
+  --popover: #0c1220;
   --popover-foreground: #d9e2f1;
   --primary: #00e5ff;
   --primary-foreground: #06121a;
@@ -97,11 +97,11 @@
 }
 
 .dark {
-  --background: #0b0f19;
+  --background: #05070d;
   --foreground: #d9e2f1;
-  --card: #141b2d;
+  --card: #111828;
   --card-foreground: #d9e2f1;
-  --popover: #101728;
+  --popover: #0c1220;
   --popover-foreground: #d9e2f1;
   --primary: #00e5ff;
   --primary-foreground: #06121a;
@@ -140,9 +140,24 @@
   body {
     @apply bg-cyber-bg text-foreground;
     background-image:
-      radial-gradient(1100px 620px at 78% -12%, rgba(0, 229, 255, 0.055), transparent 60%),
-      radial-gradient(900px 540px at -10% 108%, rgba(255, 179, 0, 0.035), transparent 60%);
+      radial-gradient(1100px 620px at 78% -12%, rgba(0, 229, 255, 0.075), transparent 60%),
+      radial-gradient(900px 540px at -10% 108%, rgba(232, 121, 249, 0.05), transparent 60%);
     background-attachment: fixed;
+  }
+  /* latentbox-grade film grain over the entire composition */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body::after {
+      display: none;
+    }
   }
   ::selection {
     background: rgba(0, 229, 255, 0.28);
@@ -171,9 +186,9 @@
   background: transparent;
 }
 .cyber-scroll::-webkit-scrollbar-thumb {
-  background: #222f47;
+  background: #223050;
   border-radius: 6px;
-  border: 2px solid #0b0f19;
+  border: 2px solid #05070d;
 }
 .cyber-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 229, 255, 0.45);
@@ -342,7 +357,8 @@
   transform: translateX(110%);
 }
 
-/* ── Staggered card entrance ────────────────────────────────────── */
+/* ── Staggered card entrance (fill backwards so GSAP can own the
+      transform after the intro lands — required for hover tilt) ── */
 @keyframes card-in {
   from {
     opacity: 0;
@@ -354,11 +370,47 @@
   }
 }
 .card-in {
-  animation: card-in 0.38s ease both;
+  animation: card-in 0.38s ease backwards;
 }
 @media (prefers-reduced-motion: reduce) {
   .card-in {
     animation: none;
+  }
+}
+
+/* ── Latent-grade gradient display text ─────────────────────────── */
+.text-gradient-cyber {
+  background: linear-gradient(94deg, #00e5ff 8%, #7dd3fc 34%, #e879f9 68%, #ffb300 96%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Cursor-tracked spotlight glow (vars set from JS pointermove) ── */
+.spotlight-card {
+  position: relative;
+}
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(0, 229, 255, 0.11),
+    rgba(232, 121, 249, 0.05) 45%,
+    transparent 68%
+  );
+}
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-card::before {
+    display: none;
   }
 }
 

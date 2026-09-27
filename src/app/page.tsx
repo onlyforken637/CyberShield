@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { AboutModal } from "@/components/cybershield/about-modal";
 import { DashboardHeader } from "@/components/cybershield/header";
@@ -12,10 +13,17 @@ import { Ticker } from "@/components/cybershield/ticker";
 import { TopBar } from "@/components/cybershield/top-bar";
 import { useCyberFeeds } from "@/hooks/use-cyber-feeds";
 import { useCisaCatalog } from "@/hooks/use-cisa-catalog";
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/cyber/gsap";
 import { HIGH_PRIORITY_CATEGORY_IDS, CATEGORY_MAP } from "@/lib/cyber/categories";
 import type { FeedItem } from "@/lib/cyber/feeds";
 import type { CisaVuln } from "@/lib/cyber/cisa";
 import { SOURCES } from "@/lib/cyber/feeds";
+
+/** WebGL layers are client-only (no SSR for three.js). */
+const CyberCanvas = dynamic(
+  () => import("@/components/cybershield/cyber-canvas").then((mod) => mod.CyberCanvas),
+  { ssr: false },
+);
 
 /** Auto-refresh TTL — 12 minutes, per the CyberShield sync engine spec. */
 const SYNC_TTL_MS = 12 * 60 * 1000;
@@ -47,6 +55,55 @@ export default function CyberShieldPage() {
 
   const bootRef = useRef(false);
   const chainRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  /* ── GSAP exhibition choreography ───────────────────────────── */
+  // intro cascade: utility bar → ticker → feed+analytics → footer
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        "[data-intro]",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.09,
+          delay: 0.05,
+          clearProps: "transform,opacity",
+        },
+      );
+    }, rootRef);
+    return () => ctx.revert();
+  }, []);
+
+  // scroll reveals for the analytics cards (sidebar + below-fold panels)
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const elements = gsap.utils.toArray<HTMLElement>("[data-reveal]");
+    if (elements.length === 0) return;
+    gsap.set(elements, { opacity: 0, y: 28 });
+    const batch = ScrollTrigger.batch(elements, {
+      start: "top 94%",
+      once: true,
+      onEnter: (nodes) =>
+        gsap.to(nodes, {
+          opacity: 1,
+          y: 0,
+          duration: 0.85,
+          ease: "power3.out",
+          stagger: 0.09,
+          overwrite: true,
+        }),
+    });
+    return () => {
+      batch.forEach((trigger) => trigger.kill());
+      gsap.set(elements, { clearProps: "all" });
+      ScrollTrigger.refresh();
+    };
+  }, []);
 
   /* ── sync orchestration ──────────────────────────────────────── */
   const syncAll = useCallback(
@@ -207,7 +264,13 @@ export default function CyberShieldPage() {
   const syncing = feedsSyncing || cisaSyncing;
 
   return (
-    <div className="flex min-h-dvh flex-col bg-cyber-bg pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
+    <div
+      ref={rootRef}
+      className="flex min-h-dvh flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0"
+    >
+      {/* WebGL exhibition backdrop (fixed, behind everything) */}
+      <CyberCanvas />
+
       {/* Skip link for keyboard users */}
       <a
         href="#main-feed"
@@ -231,7 +294,7 @@ export default function CyberShieldPage() {
       <Ticker items={items} onOpenArticle={openArticle} />
 
       {/* ── Main layout: feed + sidebar analytics ─────────────────── */}
-      <main className="mx-auto w-full max-w-[1600px] flex-1 px-3 py-6 sm:px-6 lg:px-8">
+      <main data-intro className="mx-auto w-full max-w-[1600px] flex-1 px-3 py-6 sm:px-6 lg:px-8">
         <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] lg:gap-8 xl:grid-cols-[1fr_360px]">
           {/* Feed column */}
           <section id="main-feed" className="w-full min-w-0 scroll-mt-36" aria-label="Threat feed">
@@ -280,7 +343,7 @@ export default function CyberShieldPage() {
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="mt-auto w-full border-t border-cyber-border/80 bg-cyber-panel/50 py-10">
+      <footer data-intro className="mt-auto w-full border-t border-cyber-border/80 bg-cyber-panel/50 py-10 backdrop-blur-sm">
         <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8">
           <div className="mb-10 grid grid-cols-1 gap-8 border-b border-cyber-border/60 pb-10 md:grid-cols-2 lg:grid-cols-4">
             {/* Col 1: brand & status */}
@@ -290,7 +353,7 @@ export default function CyberShieldPage() {
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-cyber-teal" />
                 </span>
                 <span className="font-display text-xl font-black tracking-wider text-slate-100">
-                  CYBER<span className="text-cyber-teal">SHIELD</span>
+                  CYBER<span className="text-gradient-cyber">SHIELD</span>
                 </span>
               </div>
               <p className="text-xs leading-relaxed text-slate-400">

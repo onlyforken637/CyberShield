@@ -26,6 +26,7 @@ export function Ticker({ items, onOpenArticle }: TickerProps) {
 
   return (
     <div
+      data-intro
       className="w-full overflow-hidden border-b border-cyber-border/80 bg-cyber-panel/70 py-2"
       role="region"
       aria-label="Live alerts ticker"

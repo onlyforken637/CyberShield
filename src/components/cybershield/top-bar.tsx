@@ -23,7 +23,7 @@ export function TopBar({ onlineCount, nextSyncAt, onOpenAbout }: TopBarProps) {
   const remainingSec = remainingMs !== null ? Math.floor((remainingMs % 60_000) / 1000) : null;
 
   return (
-    <div className="w-full border-b border-cyber-border/60 bg-cyber-panel/90 py-1.5 text-[11px] text-slate-400">
+    <div data-intro className="w-full border-b border-cyber-border/60 bg-cyber-panel/90 py-1.5 text-[11px] text-slate-400 backdrop-blur-md">
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3 px-3 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <span className="digital shrink-0 font-bold text-cyber-teal">LIVE FEED</span>

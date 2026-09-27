@@ -27,6 +27,7 @@ import {
   type FeedVia,
   type IntelSeverityLabel,
   type RawRss2JsonItem,
+  type RawRss2JsonResponse,
   type SourceConfig,
 } from "@/lib/cyber/feeds";
 import {
@@ -776,12 +777,16 @@ export async function getNewsSnapshot(): Promise<NewsSnapshot> {
   if (cache && now - cache.at < CACHE_STALE_MS) {
     // serve stale instantly, refresh in the background
     if (!inflight) {
-      inflight = aggregateNews()
+      const task = aggregateNews();
+      inflight = task;
+      void task
         .then((payload) => {
           cache = { at: Date.now(), payload };
-          inflight = null;
         })
         .catch(() => {
+          // background refresh failed — keep serving stale
+        })
+        .finally(() => {
           inflight = null;
         });
     }

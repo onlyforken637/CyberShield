@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Filter, Gauge, Radio, Rss, Tags } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ThreatGlobe } from "@/components/cybershield/threat-globe";
 import {
   ExploitMatrixCard,
   KevMetricsCard,
   SeverityBreakdownCard,
   type KevPanelProps,
 } from "@/components/cybershield/threat-panel";
+import { gsap, prefersReducedMotion } from "@/lib/cyber/gsap";
 import { SOURCES } from "@/lib/cyber/feeds";
 import { KEYWORD_LEXICON } from "@/lib/cyber/keywords";
 import type { CisaMetrics, CisaVuln } from "@/lib/cyber/cisa";
@@ -75,6 +77,9 @@ export function Sidebar({
 
   return (
     <div className="space-y-5">
+      <div data-reveal>
+        <ThreatGlobe items={items} />
+      </div>
       <ThreatConditionCard items={items} metrics={metrics} />
       <KevMetricsCard {...kevPanel} />
       <SeverityBreakdownCard metrics={metrics} syncing={syncing} />
@@ -162,10 +167,31 @@ function ThreatConditionCard({
   }, [items, metrics]);
 
   const needleAngle = -90 + (condition.score / 100) * 180;
+  const needleRef = useRef<SVGLineElement>(null);
+
+  // GSAP elastic swing whenever the live score moves
+  useEffect(() => {
+    const needle = needleRef.current;
+    if (!needle) return;
+    if (prefersReducedMotion()) {
+      needle.style.transform = `rotate(${needleAngle}deg)`;
+      return;
+    }
+    const tween = gsap.to(needle, {
+      rotation: needleAngle,
+      svgOrigin: "60 60",
+      duration: 1.7,
+      ease: "elastic.out(1, 0.55)",
+    });
+    return () => {
+      tween.kill();
+    };
+  }, [needleAngle]);
 
   return (
     <section
-      className="rounded-2xl border border-cyber-border bg-cyber-panel p-4 shadow-lg"
+      data-reveal
+      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 shadow-lg backdrop-blur-md"
       aria-label="Global threat condition"
     >
       <header className="mb-1 flex items-center justify-between gap-2">
@@ -199,6 +225,7 @@ function ThreatConditionCard({
           />
           {/* needle */}
           <line
+            ref={needleRef}
             x1="60"
             y1="60"
             x2="60"
@@ -206,12 +233,6 @@ function ThreatConditionCard({
             stroke="#d9e2f1"
             strokeWidth="2.5"
             strokeLinecap="round"
-            style={{
-              transform: `rotate(${needleAngle}deg)`,
-              transformOrigin: "60px 60px",
-              transformBox: "view-box",
-              transition: "transform 1.4s cubic-bezier(0.22, 1, 0.36, 1)",
-            }}
           />
           <circle cx="60" cy="60" r="4.5" fill="#d9e2f1" />
         </svg>
@@ -255,7 +276,8 @@ function TopicCloud({
 }) {
   return (
     <section
-      className="rounded-2xl border border-cyber-border bg-cyber-panel p-4 shadow-lg"
+      data-reveal
+      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
       aria-label="Topic intercept cloud"
     >
       <header className="mb-3 flex items-center justify-between gap-2">
@@ -337,7 +359,8 @@ function SourcesTracker({
 
   return (
     <section
-      className="rounded-2xl border border-cyber-border bg-cyber-panel p-4 shadow-lg"
+      data-reveal
+      className="rounded-2xl border border-cyber-border bg-cyber-panel/85 p-4 shadow-lg backdrop-blur-md"
       aria-label="Active sources tracker"
     >
       <header className="mb-1 flex items-center justify-between gap-2">
