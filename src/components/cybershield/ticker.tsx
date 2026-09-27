@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { gsap, prefersReducedMotion } from "@/lib/cyber/gsap";
 import type { FeedItem } from "@/lib/cyber/feeds";
 import { timeAgo } from "@/lib/cyber/utils";
 import { cn } from "@/lib/utils";
@@ -13,16 +14,45 @@ interface TickerProps {
 const MAX_TICKER_ITEMS = 14;
 
 /**
- * High-tech live alerts ticker — the newest signals scroll marquee-style.
- * Hover pauses the track; every alert opens the Threat Brief drawer.
+ * High-tech live alerts ticker — the newest signals scroll marquee-style,
+ * GSAP-driven so hover glides the track to a near-stop instead of hard
+ * pausing (award-site motion language). Every alert opens the drawer.
  */
 export function Ticker({ items, onOpenArticle }: TickerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const alerts = useMemo(() => {
     const cutoff = Date.now() - 24 * 60 * 60 * 1000;
     const recent = items.filter((item) => item.publishedAt >= cutoff);
     const pool = recent.length >= 4 ? recent : items;
     return pool.slice(0, MAX_TICKER_ITEMS);
   }, [items]);
+
+  // GSAP marquee with hover timeScale glide (replaces the CSS animation)
+  useEffect(() => {
+    const container = containerRef.current;
+    const track = container?.querySelector<HTMLElement>(".marquee-track");
+    if (!container || !track || alerts.length === 0 || prefersReducedMotion()) return;
+
+    track.style.animation = "none";
+    const half = track.scrollWidth / 2;
+    if (half <= 0) return;
+
+    const tween = gsap.to(track, {
+      xPercent: -50,
+      ease: "none",
+      duration: Math.max(14, half / 62),
+      repeat: -1,
+    });
+    const onEnter = () => gsap.to(tween, { timeScale: 0.14, duration: 0.6, ease: "power2.out" });
+    const onLeave = () => gsap.to(tween, { timeScale: 1, duration: 0.8, ease: "power2.out" });
+    container.addEventListener("pointerenter", onEnter);
+    container.addEventListener("pointerleave", onLeave);
+    return () => {
+      container.removeEventListener("pointerenter", onEnter);
+      container.removeEventListener("pointerleave", onLeave);
+      tween.kill();
+    };
+  }, [alerts]);
 
   return (
     <div
@@ -39,7 +69,7 @@ export function Ticker({ items, onOpenArticle }: TickerProps) {
           </span>
         </div>
 
-        <div className="marquee-container no-scrollbar flex-1 overflow-hidden">
+        <div ref={containerRef} className="marquee-container no-scrollbar flex-1 overflow-hidden">
           {alerts.length === 0 ? (
             <p className="digital pl-4 text-[10.5px] tracking-widest text-slate-600">
               AWAITING FIRST ALERTS FROM THE UPSTREAM GRID…

@@ -430,3 +430,47 @@
   box-shadow: 0 0 8px rgba(232, 121, 249, 0.9);
   animation: caret-blink 0.9s steps(1) infinite;
 }
+
+/* ── Award-grade panel chrome ───────────────────────────────────── */
+/* gradient hairline along the top edge of glass panels */
+.panel-hairline {
+  position: relative;
+}
+.panel-hairline::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 229, 255, 0.4) 18%,
+    rgba(232, 121, 249, 0.28) 55%,
+    transparent 92%
+  );
+  border-radius: inherit;
+}
+
+/* shine sweep across display text on hover */
+.shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.shine-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.85s ease;
+}
+.shine-sweep:hover::after {
+  transform: translateX(120%);
+}
+
+/* boot overlay shield glow */
+.boot-glow {
+  filter: drop-shadow(0 0 14px rgba(0, 229, 255, 0.55));
+}

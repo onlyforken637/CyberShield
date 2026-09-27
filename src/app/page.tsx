@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { AboutModal } from "@/components/cybershield/about-modal";
+import { BootOverlay } from "@/components/cybershield/boot-overlay";
+import { CursorGlow } from "@/components/cybershield/cursor-glow";
 import { DashboardHeader } from "@/components/cybershield/header";
 import { FeedColumn } from "@/components/cybershield/feed-column";
 import { InvestigationDrawer, type DrawerTarget } from "@/components/cybershield/investigation-drawer";
@@ -13,7 +15,7 @@ import { Ticker } from "@/components/cybershield/ticker";
 import { TopBar } from "@/components/cybershield/top-bar";
 import { useCyberFeeds } from "@/hooks/use-cyber-feeds";
 import { useCisaCatalog } from "@/hooks/use-cisa-catalog";
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/cyber/gsap";
+import { gsap, ScrollTrigger, prefersReducedMotion, whenBooted } from "@/lib/cyber/gsap";
 import { HIGH_PRIORITY_CATEGORY_IDS, CATEGORY_MAP } from "@/lib/cyber/categories";
 import type { FeedItem } from "@/lib/cyber/feeds";
 import type { CisaVuln } from "@/lib/cyber/cisa";
@@ -57,24 +59,25 @@ export default function CyberShieldPage() {
   const chainRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  /* ── GSAP exhibition choreography ───────────────────────────── */
+  /* ── GSAP exhibition choreography (gated on the boot overlay) ── */
   // intro cascade: utility bar → ticker → feed+analytics → footer
   useEffect(() => {
     if (prefersReducedMotion()) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        "[data-intro]",
-        { opacity: 0, y: 20 },
-        {
+      const targets = gsap.utils.toArray<HTMLElement>("[data-intro]");
+      if (targets.length === 0) return;
+      gsap.set(targets, { opacity: 0, y: 24 });
+      whenBooted(() => {
+        gsap.to(targets, {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          ease: "power3.out",
+          duration: 0.95,
+          ease: "expo.out",
           stagger: 0.09,
-          delay: 0.05,
+          delay: 0.3,
           clearProps: "transform,opacity",
-        },
-      );
+        });
+      });
     }, rootRef);
     return () => ctx.revert();
   }, []);
@@ -84,19 +87,23 @@ export default function CyberShieldPage() {
     if (prefersReducedMotion()) return;
     const elements = gsap.utils.toArray<HTMLElement>("[data-reveal]");
     if (elements.length === 0) return;
-    gsap.set(elements, { opacity: 0, y: 28 });
-    const batch = ScrollTrigger.batch(elements, {
-      start: "top 94%",
-      once: true,
-      onEnter: (nodes) =>
-        gsap.to(nodes, {
-          opacity: 1,
-          y: 0,
-          duration: 0.85,
-          ease: "power3.out",
-          stagger: 0.09,
-          overwrite: true,
-        }),
+    let batch: ScrollTrigger[] = [];
+    gsap.set(elements, { opacity: 0, y: 30 });
+    whenBooted(() => {
+      batch = ScrollTrigger.batch(elements, {
+        start: "top 94%",
+        once: true,
+        onEnter: (nodes) =>
+          gsap.to(nodes, {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            ease: "expo.out",
+            stagger: 0.09,
+            overwrite: true,
+            clearProps: "transform",
+          }),
+      });
     });
     return () => {
       batch.forEach((trigger) => trigger.kill());
@@ -268,6 +275,10 @@ export default function CyberShieldPage() {
       ref={rootRef}
       className="flex min-h-dvh flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0"
     >
+      {/* cinematic boot preloader (once per session) + cursor light */}
+      <BootOverlay />
+      <CursorGlow />
+
       {/* WebGL exhibition backdrop (fixed, behind everything) */}
       <CyberCanvas />
 

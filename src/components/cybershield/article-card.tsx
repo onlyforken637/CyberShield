@@ -100,8 +100,6 @@ interface ArticleCardProps {
   item: FeedItem;
   selected: boolean;
   onOpen: (item: FeedItem) => void;
-  /** staggered entrance delay in ms (list position) */
-  entranceDelay?: number;
 }
 
 /**
@@ -110,7 +108,7 @@ interface ArticleCardProps {
  * (punchy lede, intel highlights, CVE / org chips, read time, severity
  * meter) instead of a flat gray excerpt.
  */
-export function ArticleCard({ item, selected, onOpen, entranceDelay = 0 }: ArticleCardProps) {
+export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
   const intel = item.intel;
   const tone = severityTone(intel);
   const hot = intel.severity.label === "CRITICAL" || intel.severity.label === "HIGH";
@@ -148,9 +146,9 @@ export function ArticleCard({ item, selected, onOpen, entranceDelay = 0 }: Artic
   return (
     <article
       ref={cardRef}
-      style={entranceDelay > 0 ? { animationDelay: `${entranceDelay}ms` } : undefined}
+      data-card-reveal
       className={cn(
-        "signal-sweep card-in spotlight-card group relative rounded-md border border-l-2 bg-cyber-surface/75 transition-[border-color,box-shadow,background-color] duration-200",
+        "signal-sweep spotlight-card group relative rounded-md border border-l-2 bg-cyber-surface/75 transition-[border-color,box-shadow,background-color] duration-200",
         tone.edge,
         selected
           ? "border-cyber-teal/70 shadow-[0_0_18px_rgba(0,229,255,0.12)]"

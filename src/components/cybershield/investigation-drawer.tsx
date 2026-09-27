@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   Braces,
   CalendarClock,
@@ -20,6 +20,7 @@ import { AIVerdictPanel } from "@/components/cybershield/ai-verdict";
 import { ArticleThumb } from "@/components/cybershield/article-card";
 import { SEVERITY_STYLES, severityForDate, type CisaVuln } from "@/lib/cyber/cisa";
 import type { FeedItem } from "@/lib/cyber/feeds";
+import { gsap, prefersReducedMotion } from "@/lib/cyber/gsap";
 import { htmlToParagraphs } from "@/lib/cyber/utils";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,16 @@ type TabKey = "summary" | "ai" | "raw";
  * Tab 1: Executive Summary. Tab 2: Raw Stream Telemetry (live JSON payload).
  */
 export function InvestigationDrawer({ target, open, onClose }: InvestigationDrawerProps) {
+  const panelRef = useRef<HTMLElement>(null);
+
+  // key remounts the body per target, resetting the active tab automatically
+  const targetKey =
+    target === null
+      ? "none"
+      : target.kind === "article"
+        ? `article:${target.item.id}`
+        : `vuln:${target.item.cveID}`;
+
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
@@ -49,6 +60,24 @@ export function InvestigationDrawer({ target, open, onClose }: InvestigationDraw
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  /* drawer content choreography — header, tabs and body land in sequence */
+  useEffect(() => {
+    if (!open || prefersReducedMotion()) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+    const nodes = panel.querySelectorAll<HTMLElement>("[data-drawer-stagger]");
+    if (nodes.length === 0) return;
+    const tl = gsap.timeline({ delay: 0.1 });
+    tl.fromTo(
+      nodes,
+      { opacity: 0, x: 30 },
+      { opacity: 1, x: 0, duration: 0.55, ease: "expo.out", stagger: 0.08, clearProps: "all" },
+    );
+    return () => {
+      tl.kill();
+    };
+  }, [open, targetKey]);
+
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
@@ -57,14 +86,6 @@ export function InvestigationDrawer({ target, open, onClose }: InvestigationDraw
       document.body.style.overflow = previous;
     };
   }, [open]);
-
-  // key remounts the body per target, resetting the active tab automatically
-  const targetKey =
-    target === null
-      ? "none"
-      : target.kind === "article"
-        ? `article:${target.item.id}`
-        : `vuln:${target.item.cveID}`;
 
   return (
     <div aria-hidden={!open} className={cn(!open && "pointer-events-none")}>
@@ -79,6 +100,7 @@ export function InvestigationDrawer({ target, open, onClose }: InvestigationDraw
 
       {/* panel */}
       <aside
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label="Investigation drawer"
@@ -88,7 +110,7 @@ export function InvestigationDrawer({ target, open, onClose }: InvestigationDraw
         )}
       >
         {/* header */}
-        <header className="flex shrink-0 items-center gap-2.5 border-b border-cyber-border bg-cyber-panel/80 px-4 py-3">
+        <header data-drawer-stagger className="flex shrink-0 items-center gap-2.5 border-b border-cyber-border bg-cyber-panel/80 px-4 py-3">
           {target?.kind === "vuln" ? (
             <Fingerprint className="h-4 w-4 shrink-0 text-cyber-crimson" />
           ) : (
@@ -128,7 +150,7 @@ function DrawerBody({ target }: { target: DrawerTarget | null }) {
 
   return (
     <>
-      <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-cyber-border bg-cyber-panel/40 px-3 pt-2.5 no-scrollbar">
+      <div data-drawer-stagger className="flex shrink-0 gap-1 overflow-x-auto border-b border-cyber-border bg-cyber-panel/40 px-3 pt-2.5 no-scrollbar">
         <TabButton
           active={tab === "summary"}
           onClick={() => setTab("summary")}
@@ -151,7 +173,7 @@ function DrawerBody({ target }: { target: DrawerTarget | null }) {
         />
       </div>
 
-      <div className="cyber-scroll min-h-0 flex-1 overflow-y-auto p-4">
+      <div data-drawer-stagger className="cyber-scroll min-h-0 flex-1 overflow-y-auto p-4">
         {target?.kind === "article" && (
           <ArticleSummary item={target.item} visible={tab === "summary"} />
         )}

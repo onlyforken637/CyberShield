@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Flame, Loader2, RefreshCw, Search, SlidersHorizontal, X } from "lucide-react";
 import { ArticleCard } from "@/components/cybershield/article-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMagnetic } from "@/hooks/use-magnetic";
 import { CATEGORY_MAP } from "@/lib/cyber/categories";
+import { gsap, ScrollTrigger, prefersReducedMotion, whenBooted } from "@/lib/cyber/gsap";
 import type { FeedItem } from "@/lib/cyber/feeds";
 import { formatUtc } from "@/lib/cyber/utils";
 import { cn } from "@/lib/utils";
@@ -55,6 +57,8 @@ export function FeedColumn({
   selectedId,
   onOpenArticle,
 }: FeedColumnProps) {
+  const feedListRef = useRef<HTMLDivElement>(null);
+  const refreshRef = useMagnetic<HTMLButtonElement>(0.25);
   const filtersActive =
     query.trim().length > 0 ||
     activeTopics.length > 0 ||
@@ -83,6 +87,43 @@ export function FeedColumn({
         lastSyncAt ? ` · synced ${formatUtc(lastSyncAt, false)} UTC` : ""
       }`;
 
+  /* GSAP card choreography — the feed assembles after boot, then new
+     batches reveal on scroll. Re-runs on filter changes so every slice
+     of the stream lands with the same staggered entrance. */
+  useEffect(() => {
+    const root = feedListRef.current;
+    if (!root || prefersReducedMotion()) return;
+    const cards = Array.from(root.querySelectorAll<HTMLElement>("[data-card-reveal]"));
+    if (cards.length === 0) return;
+
+    let batch: ScrollTrigger[] = [];
+    let cancelled = false;
+    whenBooted(() => {
+      if (cancelled) return;
+      gsap.set(cards, { opacity: 0, y: 26 });
+      batch = ScrollTrigger.batch(cards, {
+        start: "top 97%",
+        once: true,
+        onEnter: (nodes) =>
+          gsap.to(nodes, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "expo.out",
+            stagger: 0.07,
+            overwrite: true,
+            clearProps: "transform",
+          }),
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      batch.forEach((trigger) => trigger.kill());
+      gsap.set(cards, { clearProps: "all" });
+    };
+  }, [items, booting]);
+
   return (
     <div className="flex min-w-0 flex-col">
       {/* ── Feed masthead ────────────────────────────────────────── */}
@@ -102,6 +143,7 @@ export function FeedColumn({
           </p>
         </div>
         <button
+          ref={refreshRef}
           type="button"
           onClick={onManualSync}
           disabled={syncing}
@@ -169,7 +211,7 @@ export function FeedColumn({
       {/* ── Ranked threat board (only on the unfiltered stream) ──── */}
       {!filtersActive && topThreats.length === 3 && (
         <section
-          className="mb-5 rounded-xl border border-cyber-border bg-cyber-panel/60 p-4 shadow-lg"
+          className="panel-hairline mb-5 rounded-xl border border-cyber-border bg-cyber-panel/60 p-4 shadow-lg"
           aria-label="Ranked threat board"
         >
           <header className="mb-3 flex items-center gap-2">
@@ -256,7 +298,7 @@ export function FeedColumn({
         </section>
       )}
 
-      <div className="w-full space-y-2.5" aria-label="Live cybersecurity news feed" role="feed">
+      <div ref={feedListRef} className="w-full space-y-2.5" aria-label="Live cybersecurity news feed" role="feed">
         {booting ? (
           <>
             {Array.from({ length: 6 }).map((_, index) => (
@@ -297,13 +339,12 @@ export function FeedColumn({
             </button>
           </div>
         ) : (
-          items.map((item, index) => (
+          items.map((item) => (
             <ArticleCard
               key={item.id}
               item={item}
               selected={selectedId === item.id}
               onOpen={onOpenArticle}
-              entranceDelay={Math.min(index, 10) * 45}
             />
           ))
         )}
