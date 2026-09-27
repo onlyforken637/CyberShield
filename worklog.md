@@ -229,3 +229,22 @@ Stage Summary:
 - Files: page.tsx edited (+import Download, +footer anchor), +public/cybershield-v3.tar.gz. No dependency changes.
 - Note for running the tar outside the sandbox: bun install, bun run db:push (DATABASE_URL already relative in the archived .env), bun run dev.
 - Artifacts: /tmp/v3-footer.png, /tmp/v3-top.png, /tmp/v3-mob-footer.png, /tmp/v3-dl-test.tar.gz.
+
+---
+Task ID: 11
+Agent: Z.ai Code (main orchestrator)
+Task: User correction — "that still isn't v3, v3 does not have threat globe." The delivered tar contained the CURRENT code; the user's "v3" means the actual published version BEFORE the Three.js rework introduced the threat globe.
+
+Work Log:
+- Git archaeology over all 12 commits: threat-globe.tsx first appears in 815e443 (09-27 06:36, the Task 5 Three.js rework). The last commit before it — 61e72b0 (09-13 17:23) — is the true v3: pre-globe, pre-boot, pre-voice.
+- Verified 61e72b0: zero files matching threat-globe/boot-overlay/boot-scene/jarvis/audio.ts; package.json has NO three and NO gsap; prisma/schema.prisma unchanged since (so the tracked db/custom.db is compatible); bun.lock, db/custom.db, worklog.md all tracked at that commit → a complete runnable snapshot via git archive.
+- Rebuilt public/cybershield-v3.tar.gz from `git archive 61e72b0` (previous/current-state tar preserved at /tmp/cybershield-current-snapshot.tar.gz). Added portable .env (DATABASE_URL=file:../db/custom.db). Result: 228KB, 142 entries, zero globe/three/gsap/jarvis entries.
+- RUNTIME PROOF, not just content checks: extracted the tar to /tmp/v3true, ran the user's actual flow — bun install --frozen-lockfile (835 pkgs, 4.76s) → next dev → "Ready in 1417ms" → GET / = HTTP 200 with CyberShield HTML. (First attempt with a symlinked node_modules failed: Turbopack rejects symlinks pointing outside the project root — resolved by a real install.)
+- Collateral fixed: pkill of the smoke server also took down the main dev server (and truncated one verification run); restarted via bun run dev → / = 200, APIs healthy.
+- Final: /cybershield-v3.tar.gz served HTTP 200 (230,656 bytes), round-trip byte-identical, 0 globe/three/gsap/jarvis entries. Footer button unchanged — it now serves the TRUE v3.
+
+Stage Summary:
+- "v3" = the site state the user liked: the clean dashboard with live feeds, thumbnails, enriched briefs, 401-fixed uplink, NO threat globe, NO boot animation, NO JARVIS voice, NO three/gsap. That exact snapshot is now what the download button serves, and it is proven to install and boot.
+- The LIVE site remains the latest code (FortiGuard 3D map etc.) — untouched by this task. If the user wants the live site reverted to v3 (optionally keeping the JARVIS voice/boot), that is a separate revert to offer.
+- Note: the v3 tar is a clean source snapshot (git archive → no .git history inside).
+- Artifacts: /tmp/cybershield-current-snapshot.tar.gz (previous current-state archive), /tmp/v3-dl2.tar.gz (round-trip proof).
