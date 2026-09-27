@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { gsap, markBooted, prefersReducedMotion, isBooted } from "@/lib/cyber/gsap";
 import { SOURCES } from "@/lib/cyber/feeds";
-import { BootScene } from "@/components/cybershield/boot-scene";
 import {
   VOICE_SRC,
   ensureAudioRunning,
@@ -18,17 +17,18 @@ import {
 /**
  * BootOverlay — the cinematic session preloader with automatic JARVIS voice.
  *
- * Deep-black v3 canvas, a Three.js particle vortex converging around the
- * shield glyph as progress climbs, the brand wordmark, an honest terminal
- * boot log (each line acknowledged with a synthesized blip once the audio
- * channel is unlocked) and the giant percentage counter.
+ * Deep-black canvas, a THREAT RADAR as the centerpiece: GSAP draws the range
+ * rings outward, a conic sweep rotates endlessly, and deterministic "contacts"
+ * ping in lock-step with the honest terminal boot log. For a global threat
+ * feed a radar is the one image that needs no explanation — and the shield
+ * glyph sits in its eye while the giant percentage counter anchors the corner.
  *
  * The moment the counter hits 100 the JARVIS welcome fires automatically —
  * no click required wherever the browser permits it. Browsers physically
- * block audio before any user gesture, so if playback is refused the boot
- * still reveals instantly and the voice engages itself on the first click,
- * scroll or keypress (a toast announces the armed uplink). Clicking anything
- * DURING the boot also unlocks the channel so 100% plays clean audio.
+ * block audio before any user gesture; if playback is refused the boot still
+ * reveals instantly and the voice engages itself on the first click, scroll
+ * or keypress (a toast announces the armed uplink). Interacting DURING the
+ * boot pre-unlocks the audio channel so the 100% moment plays clean.
  *
  * Plays once per tab session; reduced-motion users skip it entirely.
  */
@@ -39,8 +39,18 @@ const BOOT_LINES = [
   "ENRICHMENT GRID — SERVER PIPELINE",
   "ANALYST UPLINK — GLM ONLINE",
   "AUDIO CHANNEL — VOICE READY",
-  "RENDERING GLOBAL SIGNAL FIELD",
+  "THREAT RADAR — SWEEP ONLINE",
 ];
+
+/** Deterministic radar contacts (x/y in % of the disc) — SSR-safe, no RNG. */
+const CONTACTS = [
+  { x: 68, y: 27, tone: "teal" },
+  { x: 31, y: 39, tone: "amber" },
+  { x: 73, y: 59, tone: "teal" },
+  { x: 45, y: 19, tone: "teal" },
+  { x: 23, y: 67, tone: "amber" },
+  { x: 57, y: 75, tone: "teal" },
+] as const;
 
 const MIN_BOOT_MS = 3000;
 const MAX_WAIT_MS = 6000;
@@ -52,16 +62,22 @@ export function BootOverlay() {
   const pctRef = useRef<HTMLSpanElement>(null);
   const lineRefs = useRef<Array<HTMLLIElement | null>>([]);
   const shieldRef = useRef<SVGPathElement>(null);
+  const checkRef = useRef<SVGPathElement>(null);
   const brandRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
+  const radarRef = useRef<HTMLDivElement>(null);
+  const sweepRef = useRef<HTMLDivElement>(null);
+  const ringRefs = useRef<Array<SVGCircleElement | null>>([]);
+  const contactRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const rippleRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const centerRippleRef = useRef<HTMLSpanElement>(null);
+  const flashRef = useRef<HTMLDivElement>(null);
   const exitRan = useRef(false);
-  // shared boot progress (0–100) — read by the Three.js scene every frame
-  const bootProgress = useMemo(() => ({ v: 0 }), []);
 
   useEffect(() => {
     const root = rootRef.current;
 
-    // once-per-session + reduced-motion → skip entirely, release the gate
+    // once-per-session + reduced-motion → skip entirely
     if (isBooted() || prefersReducedMotion()) {
       markBooted();
       if (root) root.style.display = "none";
@@ -98,6 +114,33 @@ export function BootOverlay() {
     window.addEventListener("pointerdown", unlock, { passive: true });
     window.addEventListener("keydown", unlock);
 
+    /** The 100% moment — one lock pulse across the whole radar. */
+    const lockRadar = () => {
+      if (flashRef.current) {
+        gsap.fromTo(
+          flashRef.current,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.16, yoyo: true, repeat: 1, ease: "power1.inOut" },
+        );
+      }
+      if (centerRippleRef.current) {
+        gsap.fromTo(
+          centerRippleRef.current,
+          { scale: 0.15, opacity: 0.85 },
+          { scale: 3.6, opacity: 0, duration: 1.2, ease: "power2.out" },
+        );
+      }
+      if (radarRef.current) {
+        gsap.to(radarRef.current, {
+          filter: "brightness(1.45)",
+          duration: 0.18,
+          yoyo: true,
+          repeat: 1,
+          ease: "power1.inOut",
+        });
+      }
+    };
+
     /** Curtain lift — the same exit choreography for every entry path. */
     const runExit = () => {
       if (exitRan.current) return;
@@ -112,6 +155,7 @@ export function BootOverlay() {
       });
       exit
         .to("[data-boot-hud]", { yPercent: 60, opacity: 0, duration: 0.45, ease: "power2.in" }, 0)
+        .to(radarRef.current, { scale: 1.14, opacity: 0, duration: 0.55, ease: "power2.in" }, 0)
         .to(brandRef.current, { scale: 1.12, opacity: 0, duration: 0.5, ease: "power2.in" }, 0)
         .to(root, { clipPath: "inset(0% 0% 100% 0%)", duration: 0.85, ease: "expo.inOut" }, 0.18);
     };
@@ -141,12 +185,14 @@ export function BootOverlay() {
       events.forEach((event) => window.addEventListener(event, fire, { once: true, passive: true }));
       voiceArmTimer = setTimeout(disarmVoice, VOICE_ARM_TIMEOUT_MS);
       toast("VOICE UPLINK ARMED", {
-        description: "Browser audio policy allows sound after one interaction — JARVIS engages on your first click, scroll or keypress.",
+        description:
+          "Browser audio policy allows sound after one interaction — JARVIS engages on your first click, scroll or keypress.",
       });
     };
 
     /** The boot moment — fully automatic at 100%. */
     const enterSequence = async () => {
+      lockRadar();
       if (!isSoundEnabled()) {
         runExit();
         return;
@@ -167,16 +213,49 @@ export function BootOverlay() {
       const setPct = () => {
         const value = Math.floor(counter.v);
         if (pctRef.current) pctRef.current.textContent = String(value);
-        bootProgress.v = value;
       };
 
       const tl = gsap.timeline();
 
-      // shield glyph draws itself
+      // radar rises into place
+      if (radarRef.current) {
+        tl.fromTo(
+          radarRef.current,
+          { scale: 0.82, opacity: 0, rotation: -10 },
+          { scale: 1, opacity: 1, rotation: 0, duration: 1, ease: "expo.out" },
+          0,
+        );
+      }
+
+      // range rings draw outward, outer → inner
+      ringRefs.current.forEach((ring, index) => {
+        if (!ring) return;
+        const len = ring.getTotalLength?.() ?? 600;
+        gsap.set(ring, { strokeDasharray: `${len}`, strokeDashoffset: len });
+        tl.to(ring, { strokeDashoffset: 0, duration: 0.8, ease: "power2.out" }, 0.12 + index * 0.14);
+      });
+
+      // endless radar sweep — created inside the context so cleanup reverts it
+      if (sweepRef.current) {
+        gsap.to(sweepRef.current, { rotation: 360, duration: 3.1, ease: "none", repeat: -1 });
+      }
+
+      // graticule (ticks + crosshair) fades in under the sweep
+      tl.fromTo(
+        "[data-radar-grid]",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.7, ease: "power1.out" },
+        0.3,
+      );
+
+      // shield glyph draws itself in the eye of the radar, check confirms
       if (shieldRef.current) {
         const len = shieldRef.current.getTotalLength?.() ?? 300;
         gsap.set(shieldRef.current, { strokeDasharray: len, strokeDashoffset: len });
-        tl.to(shieldRef.current, { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut" }, 0);
+        tl.to(shieldRef.current, { strokeDashoffset: 0, duration: 1, ease: "power2.inOut" }, 0.35);
+      }
+      if (checkRef.current) {
+        tl.fromTo(checkRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 1.3);
       }
 
       // brand chars rise
@@ -184,16 +263,16 @@ export function BootOverlay() {
         "[data-boot-char]",
         { yPercent: 120 },
         { yPercent: 0, duration: 0.7, ease: "expo.out", stagger: 0.045 },
-        0.35,
+        0.5,
       );
 
-      // boot log lines tick in — one synthesized blip per line (audible once
-      // the audio channel has been unlocked by a gesture)
-      lineRefs.current
-        .filter((line): line is HTMLLIElement => Boolean(line))
-        .forEach((line, index) => {
+      // boot log ticks in — each line pings a radar contact at the same instant
+      BOOT_LINES.forEach((line, index) => {
+        const at = 0.55 + index * 0.34;
+        const lineEl = lineRefs.current[index];
+        if (lineEl) {
           tl.fromTo(
-            line,
+            lineEl,
             { opacity: 0, x: -8 },
             {
               opacity: 1,
@@ -202,9 +281,28 @@ export function BootOverlay() {
               ease: "power2.out",
               onStart: () => playBlip(),
             },
-            0.55 + index * 0.34,
+            at,
           );
-        });
+        }
+        const contact = contactRefs.current[index];
+        const ripple = rippleRefs.current[index];
+        if (contact) {
+          tl.fromTo(
+            contact,
+            { scale: 0, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.28, ease: "back.out(3)" },
+            at + 0.05,
+          );
+        }
+        if (ripple) {
+          tl.fromTo(
+            ripple,
+            { scale: 0.2, opacity: 0.75 },
+            { scale: 2.8, opacity: 0, duration: 0.85, ease: "power2.out" },
+            at + 0.05,
+          );
+        }
+      });
 
       // percentage counter — 0 → 99 until the document reports loaded
       tl.to(counter, { v: 99, duration: MIN_BOOT_MS / 1000, ease: "power2.inOut", onUpdate: setPct }, 0.1);
@@ -243,10 +341,16 @@ export function BootOverlay() {
       if (finishTimer) clearTimeout(finishTimer);
       if (enterTimer) clearTimeout(enterTimer);
       if (voiceArmTimer) clearTimeout(voiceArmTimer);
+      gsap.killTweensOf([
+        sweepRef.current,
+        flashRef.current,
+        centerRippleRef.current,
+        radarRef.current,
+      ]);
       document.documentElement.style.overflow = prevOverflow;
       ctx.revert();
     };
-  }, [bootProgress]);
+  }, []);
 
   const brand = "CYBER_SHIELD // LIVE_FEED";
 
@@ -262,27 +366,143 @@ export function BootOverlay() {
         className="fixed inset-0 z-[90] flex flex-col items-center justify-center overflow-hidden bg-cyber-bg"
         style={{ clipPath: "inset(0% 0% 0% 0%)" }}
       >
-        {/* Three.js particle vortex converging around the shield */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <BootScene
-            progress={bootProgress}
-            className="h-[82vmin] w-[82vmin] -translate-y-[7vmin] opacity-90"
+        {/* THREAT RADAR — the boot centerpiece */}
+        <div
+          ref={radarRef}
+          aria-hidden="true"
+          className="relative z-0 h-[56vmin] w-[56vmin] opacity-0 sm:h-[62vmin] sm:w-[62vmin] lg:h-[540px] lg:w-[540px]"
+        >
+          {/* rotating sweep wedge + leading edge */}
+          <div
+            ref={sweepRef}
+            className="absolute inset-0 rounded-full"
+            style={{
+              background:
+                "conic-gradient(from 0deg, transparent 0deg, rgba(0,229,255,0.02) 295deg, rgba(0,229,255,0.09) 335deg, rgba(0,229,255,0.28) 355deg, rgba(0,229,255,0.6) 359.5deg, transparent 360deg)",
+            }}
+          >
+            <span className="absolute left-1/2 top-[2%] h-[48%] w-[2px] -translate-x-1/2 rounded-full bg-cyber-teal/70 shadow-[0_0_12px_rgba(0,229,255,0.8)]" />
+          </div>
+
+          {/* range rings, tick marks and graticule */}
+          <svg viewBox="0 0 200 200" fill="none" aria-hidden="true" className="absolute inset-0 h-full w-full">
+            <circle
+              ref={(node) => {
+                ringRefs.current[0] = node;
+              }}
+              cx="100"
+              cy="100"
+              r="96"
+              stroke="#00e5ff"
+              strokeOpacity="0.42"
+              strokeWidth="1"
+            />
+            <circle
+              ref={(node) => {
+                ringRefs.current[1] = node;
+              }}
+              cx="100"
+              cy="100"
+              r="66"
+              stroke="#00e5ff"
+              strokeOpacity="0.26"
+              strokeWidth="0.8"
+            />
+            <circle
+              ref={(node) => {
+                ringRefs.current[2] = node;
+              }}
+              cx="100"
+              cy="100"
+              r="36"
+              stroke="#00e5ff"
+              strokeOpacity="0.2"
+              strokeWidth="0.8"
+            />
+            <g data-radar-grid>
+              <circle cx="100" cy="100" r="81" stroke="#00e5ff" strokeOpacity="0.2" strokeWidth="5" strokeDasharray="0.9 9.7" />
+              <line x1="100" y1="4" x2="100" y2="196" stroke="#00e5ff" strokeOpacity="0.1" strokeWidth="0.6" />
+              <line x1="4" y1="100" x2="196" y2="100" stroke="#00e5ff" strokeOpacity="0.1" strokeWidth="0.6" />
+              <line x1="32" y1="32" x2="168" y2="168" stroke="#00e5ff" strokeOpacity="0.06" strokeWidth="0.6" />
+              <line x1="168" y1="32" x2="32" y2="168" stroke="#00e5ff" strokeOpacity="0.06" strokeWidth="0.6" />
+            </g>
+          </svg>
+
+          {/* radar contacts — one ping per boot log line */}
+          {CONTACTS.map((contact, index) => (
+            <span
+              key={index}
+              className="absolute"
+              style={{ left: `${contact.x}%`, top: `${contact.y}%` }}
+            >
+              <span
+                ref={(node) => {
+                  contactRefs.current[index] = node;
+                }}
+                className={`absolute block rounded-full ${
+                  contact.tone === "amber"
+                    ? "bg-cyber-amber shadow-[0_0_10px_rgba(255,179,0,0.9)]"
+                    : "bg-cyber-teal shadow-[0_0_10px_rgba(0,229,255,0.9)]"
+                }`}
+                style={{ width: 7, height: 7, left: -3.5, top: -3.5 }}
+              />
+              <span
+                ref={(node) => {
+                  rippleRefs.current[index] = node;
+                }}
+                className={`absolute block rounded-full border-2 ${
+                  contact.tone === "amber" ? "border-cyber-amber/70" : "border-cyber-teal/70"
+                }`}
+                style={{ width: 22, height: 22, left: -11, top: -11 }}
+              />
+            </span>
+          ))}
+
+          {/* 100% lock ripple from the center */}
+          <span className="absolute left-1/2 top-1/2">
+            <span
+              ref={centerRippleRef}
+              className="absolute block rounded-full border-2 border-cyber-teal/80"
+              style={{ width: 40, height: 40, left: -20, top: -20, opacity: 0 }}
+            />
+          </span>
+
+          {/* shield glyph in the eye of the radar */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <svg width="52" height="58" viewBox="0 0 64 72" fill="none" aria-hidden="true" className="boot-glow">
+              <path
+                ref={shieldRef}
+                d="M32 4 L58 14 V38 C58 54 46 64 32 68 C18 64 6 54 6 38 V14 Z"
+                stroke="#00e5ff"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+                fill="none"
+              />
+              <path
+                ref={checkRef}
+                d="M22 36 L29 43 L43 27"
+                stroke="#ffb300"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </svg>
+          </div>
+
+          {/* lock flash overlay */}
+          <div
+            ref={flashRef}
+            className="absolute inset-0 rounded-full opacity-0"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(0,229,255,0.28) 0%, rgba(0,229,255,0.05) 45%, transparent 70%)",
+            }}
           />
         </div>
 
-        {/* shield glyph + brand */}
-        <div ref={brandRef} className="relative z-10 flex flex-col items-center gap-5 px-6 text-center">
-          <svg width="64" height="72" viewBox="0 0 64 72" fill="none" aria-hidden="true" className="boot-glow">
-            <path
-              ref={shieldRef}
-              d="M32 4 L58 14 V38 C58 54 46 64 32 68 C18 64 6 54 6 38 V14 Z"
-              stroke="#00e5ff"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-              fill="none"
-            />
-            <path d="M22 36 L29 43 L43 27" stroke="#ffb300" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          </svg>
+        {/* brand wordmark */}
+        <div ref={brandRef} className="relative z-10 -mt-[1vmin] flex px-6 text-center">
           <div className="flex overflow-hidden">
             {brand.split("").map((char, index) => (
               <span
