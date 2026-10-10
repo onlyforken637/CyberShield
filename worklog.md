@@ -248,3 +248,19 @@ Stage Summary:
 - The LIVE site remains the latest code (FortiGuard 3D map etc.) — untouched by this task. If the user wants the live site reverted to v3 (optionally keeping the JARVIS voice/boot), that is a separate revert to offer.
 - Note: the v3 tar is a clean source snapshot (git archive → no .git history inside).
 - Artifacts: /tmp/cybershield-current-snapshot.tar.gz (previous current-state archive), /tmp/v3-dl2.tar.gz (round-trip proof).
+
+---
+Task ID: 12
+Agent: Z.ai Code (main orchestrator)
+Task: User question — "how can I host this v3 on a website flawlessly for free on my own domain using this tar?"
+
+Work Log:
+- Portability audit of the v3 snapshot (61e72b0) before writing instructions: only /api/brief touches SQLite and BOTH its read and write are try/caught with fall-through ("archive unavailable" comments); every other route caches purely in-memory (module Maps in intel.ts, /api/img LRU); /api/rss2json relays to public api.rss2json.com; /api/cisa uses CISA JSON + GitHub mirror; next.config already outputs "standalone". Conclusion: v3 runs on any Node/bun host with zero infrastructure.
+- AI verdict on a foreign host: the route's 3-layer chain ends in a deterministic OFFLINE ANALYST (degraded:true) so it can never dead-end without sandbox credentials. Also discovered the wire call is generic OpenAI-compatible (baseUrl/apiKey from a .z-ai-config JSON), so users can restore LIVE verdicts with any OpenAI-compatible provider (Groq/OpenRouter/local) by mounting that file.
+- Deploy kit (additive only — zero app-code changes): DEPLOY.md (feature matrix; Path A Vercel free + custom domain steps incl. DNS table; Path B Docker anywhere + Render free; AI re-enable recipe; troubleshooting), Dockerfile (bun build → standalone run; prisma schema copied before install so postinstall generate succeeds; db baked in with absolute DATABASE_URL so the SQLite verdict cache WORKS in containers), .dockerignore (excludes .z-ai-config/.env so sandbox creds can never leak into images), vercel.json (explicit maxDuration 60 for the 5 API routes so the initial 19-source sync is never killed by the 10s Hobby default).
+- One-line package.json change in BOTH live project and tar: "postinstall": "prisma generate" — bun blocks dependency postinstalls (trustedDependencies) so Vercel's bun install would otherwise skip Prisma client generation; root scripts always run. Everything else in the tar remains the exact 61e72b0 snapshot.
+- Rebuilt public/cybershield-v3.tar.gz (232KB, 146 entries): verified staged scripts contain postinstall and NO three/gsap deps, kit files present, 0 globe/three/gsap/jarvis entries, HTTP 200 (234,132 bytes), round-trip byte-identical. Live app re-checked healthy (HTTP 200) with the kit files in root (inert for next dev).
+
+Stage Summary:
+- v3 tar is now a deploy-ready package: extract → GitHub → Vercel import → add domain = live on your own domain free in ~10 min; or docker build/run for full features (verdict archive + optional live AI via any OpenAI-compatible key). DEPLOY.md inside the tar is the authoritative guide.
+- Files: +DEPLOY.md, +Dockerfile, +.dockerignore, +vercel.json, package.json +1 script line, public/cybershield-v3.tar.gz rebuilt. No runtime/app changes; live site untouched.

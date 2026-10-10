@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.gitignore
+dev.log
+server.log
+*.tar.gz
+.z-ai-config
+.env
+.DS_Store
+upload
+download
+tests
+.claude
