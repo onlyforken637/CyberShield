@@ -280,3 +280,34 @@ Stage Summary:
 - Two frozen, hosting-ready archives now exist side by side: /cybershield-v3.tar.gz (clean pre-Three.js dashboard, 61e72b0) and /cybershield-v9.tar.gz (full experience: 3D FortiGuard threat map + JARVIS + radar boot, 2729880). Both include DEPLOY.md/Dockerfile/vercel.json and the postinstall fix; both proven byte-identical over HTTP. Live site = latest code with both buttons in the footer.
 - Files: page.tsx footer edited (two-button row), +public/cybershield-v9.tar.gz. DEPLOY-v9.md written temporarily to project root for staging and removed after copying into the tar.
 - Artifacts: /tmp/v9-buttons.png, /tmp/v9-dl.tar.gz.
+
+---
+Task ID: 14
+Agent: Z.ai Code (main orchestrator)
+Task: User hit Vercel build error publishing v9: "The pattern src/app/api/news/route.ts defined in `functions` doesn't match any Serverless Functions inside the `api` directory."
+
+Work Log:
+- Root cause: the vercel.json shipped in the v3/v9 deploy kits used a `functions` block with src/app/api/... paths. Vercel only accepts `functions` patterns for the legacy root `api/` directory; Next.js App Router route handlers must configure duration via Route Segment Config (export const maxDuration) inside each route file, so the Vercel build failed on the pattern.
+- Main project fixed: deleted root vercel.json; baked `export const maxDuration = 60` into news/brief/cisa/rss2json routes (30 for img) next to their existing runtime/dynamic segment configs; git diff 2729880..HEAD src/app/api is empty so the same patch applies to v9 verbatim.
+- DEPLOY.md updated (both variants): removed the vercel.json claim, documented the segment-config approach + warning against `functions` blocks with App Router paths, added a troubleshooting row for this exact error message.
+- Rebuilt BOTH tars via fresh git archive staging (/home/z/.stage/v9fix from 2729880, /home/z/.stage/v3fix from 61e72b0) + patch-stage.ts (postinstall, maxDuration x5, portable .env, DEPLOY.md/Dockerfile/.dockerignore copied, vercel.json force-absent, identity assertions globe/gsap/three for v9 and their absence for v3).
+- Verified: v9 = 155 entries (was 156), v3 = 145 (was 146), vercel.json count 0/0, maxDuration present in all 5 routes in both tars, postinstall + deps identity OK, DEPLOY.md contains new note and not the old claim, HTTP 200 round-trip BYTE-IDENTICAL for both tars, app / and /api/news healthy.
+
+Stage Summary:
+- The Vercel error is fixed at the source: both /cybershield-v9.tar.gz and /cybershield-v3.tar.gz now deploy cleanly. User-side unblock without re-download: delete vercel.json in their GitHub repo (or replace content with {}) and let Vercel redeploy.
+- Files: -vercel.json (root), 5 route files +1 export each, DEPLOY.md rewritten sections, public/cybershield-v9.tar.gz + public/cybershield-v3.tar.gz rebuilt. Artifacts: /home/z/.stage/{patch-stage.ts,DEPLOY-v9.md,v9fix/,v3fix/}.
+
+---
+Task ID: 15
+Agent: Z.ai Code (main orchestrator)
+Task: User request — "create a documentation for v9 and just call it as cybershield, dont mention any previous version, documentation what is it how it works and what is it for, beautiful looking and a suitable theme in pdf".
+
+Work Log:
+- Routed to pdf skill Creative Flow brief (guide/handbook, text-heavy + design); read fonts.md + creative-flow.md + referenced overflow.md and palette.md per loading protocol.
+- Wrote docs/cybershield-documentation.html: 720x1020 full-bleed dark cyber theme (teal #2dd4bf family + amber accent per cascade tier rules, Space Grotesk + JetBrains Mono only), cover with radar motif + stat chips, 7 flowing sections (what is it / what is it for / how it works: pipeline + analysis / experience / under the hood / deployment), pipeline diagram, 3 uniform tables, fixed ending page. Zero version references — content describes the product as "CyberShield" only.
+- poster_validate found COVER_TEXT_OVERLAP: dividers as standalone 2px divs were flagged (cover_validate scanned the whole doc incl. body-section heading underlines and table th siblings = false positives per the tool's cover-only scope). Fixed properly: dividers became border-image gradient underlines on .section-title/.cover-sub, cover-rule gap widened to 42px, 9px micro-labels bumped to 9.5px. Pass 1 (real text/line collisions) then passed; remaining pass-2 flags are th/td same-row and inline-b false positives, documented as out-of-scope.
+- Rendered via html2pdf-next.js --nopaged (pagedjs not installed; Chromium native @page fallback): 9 pages, 493KB, vector (page.pdf), ~2071 words, 3 tables. pdf_qa.py --no-tables: PASS with 1 warning (missing author) -> fixed via meta.set (Title/Author=Z.ai/Subject/Creator).
+- Verified visually (pages 1,2,4,6,9 rendered to PNG): cover, spec panel, pipeline diagram, caching table, feature cards, ending page all clean; text extraction 14587 chars with 0 U+FFFD; regex scan confirms 0 version mentions (v1-v9) in extracted text; HTTP 200 served at /cybershield-documentation.pdf.
+
+Stage Summary:
+- Deliverables: /home/z/my-project/public/cybershield-documentation.pdf (9-page branded "CyberShield" manual, downloadable via app URL) + editable source /home/z/my-project/docs/cybershield-documentation.html. No app code touched; tars and live site unaffected.

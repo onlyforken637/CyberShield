@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield — Real-Time Cyber Threat Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ================= PAGE GEOMETRY ================= */
+@page {
+  size: 720px 1020px;
+  margin: 0;
+}
+:root {
+  --c-bg:     #060b0e;                     /* XL · page background, teal-tinted near-black */
+  --c-panel:  #0c1418;                     /* L  · card background */
+  --c-panel2: #0a1114;                     /* L  · table stripe / deeper panel */
+  --c-head:   #0e1a1c;                     /* M  · table header fill (low saturation) */
+  --c-border: rgba(45, 212, 191, 0.16);    /* S  · hairline borders */
+  --c-border2: rgba(45, 212, 191, 0.34);   /* S  · emphasized borders */
+  --c-teal:   #2dd4bf;                     /* XS · primary accent */
+  --c-amber:  #e8a33d;                     /* XS · secondary accent (sparing) */
+  --c-text:   #d9e5e2;                     /* neutral · primary text */
+  --c-muted:  #7e938f;                     /* neutral · secondary text */
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 720px;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+  line-break: strict;
+  word-break: normal;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+@media screen {
+  html {
+    height: auto;
+    display: flex;
+    justify-content: center;
+    background: var(--c-bg);
+  }
+  body {
+    transform: scale(1);
+    transform-origin: top center;
+    margin: 20px auto;
+    box-shadow: 0 0 60px rgba(45, 212, 191, 0.08);
+  }
+}
+p, td, li, .content { overflow-wrap: break-word; word-break: break-word; }
+
+/* ================= COVER (fixed page) ================= */
+.cover {
+  width: 720px;
+  height: 1020px;
+  box-sizing: border-box;
+  break-after: page;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse 560px 420px at 88% 12%, rgba(45, 212, 191, 0.07), transparent 65%),
+    repeating-linear-gradient(0deg,  rgba(45, 212, 191, 0.035) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg, rgba(45, 212, 191, 0.035) 0 1px, transparent 1px 48px),
+    var(--c-bg);
+}
+.cover-badge {
+  position: absolute;
+  top: 56px; left: 64px; right: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 2.5px;
+  color: var(--c-muted);
+}
+.cover-badge .dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--c-teal);
+  margin-right: 8px;
+  vertical-align: 1px;
+}
+.cover-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--c-teal);
+  margin-bottom: 18px;
+}
+.cover-title {
+  font-size: 88px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -2.5px;
+  color: #f2faf8;
+  margin: 0 0 10px 0;
+}
+.cover-title .shield { color: var(--c-teal); }
+.cover-sub {
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--c-text);
+  max-width: 480px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--c-teal);
+  border-image: linear-gradient(90deg, var(--c-teal), transparent 70%) 1;
+  margin-bottom: 42px;
+}
+.cover-abstract {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--c-muted);
+  max-width: 540px;
+  margin-bottom: 40px;
+}
+.cover-abstract b { color: var(--c-text); font-weight: 600; }
+.cover-chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 540px;
+}
+.chip {
+  border: 1px solid var(--c-border);
+  background: rgba(12, 20, 24, 0.82);
+  padding: 14px 18px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.chip .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--c-teal);
+}
+.chip .num.amber { color: var(--c-amber); }
+.chip .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 1.8px;
+  color: var(--c-muted);
+  line-height: 1.5;
+}
+.radar {
+  position: absolute;
+  top: 104px;
+  right: 64px;
+  width: 210px;
+  height: 210px;
+  border: 1px solid var(--c-border2);
+  border-radius: 50%;
+  background:
+    conic-gradient(from 0deg, rgba(45, 212, 191, 0.14), transparent 22%),
+    radial-gradient(circle, rgba(45, 212, 191, 0.05), transparent 70%);
+}
+.radar::before {
+  content: '';
+  position: absolute;
+  inset: 34px;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+}
+.radar::after {
+  content: '';
+  position: absolute;
+  inset: 70px;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+}
+.radar .blip {
+  position: absolute;
+  top: 26px; right: 48px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--c-amber);
+  box-shadow: 0 0 10px rgba(232, 163, 61, 0.8);
+}
+.cover-foot {
+  position: absolute;
+  bottom: 56px; left: 64px; right: 64px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-border);
+  padding-top: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  color: var(--c-muted);
+}
+
+/* ================= FLOWING CONTENT ================= */
+.main-content {
+  padding: 58px 64px 44px 64px;
+}
+.chapter-header {
+  break-after: avoid;
+  break-inside: avoid;
+  margin-top: 26px;
+  margin-bottom: 16px;
+}
+.chapter-header:first-child { margin-top: 0; }
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  color: var(--c-teal);
+  margin-bottom: 8px;
+}
+.section-title {
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #f2faf8;
+  line-height: 1.15;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--c-teal);
+  border-image: linear-gradient(90deg, rgba(45, 212, 191, 0.85), rgba(45, 212, 191, 0) 65%) 1;
+}
+.body-text {
+  font-size: 14px;
+  line-height: 1.72;
+  color: var(--c-text);
+  margin-bottom: 12px;
+}
+.body-text b { color: #f2faf8; font-weight: 600; }
+.body-text .mono { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--c-teal); }
+.lead { font-size: 14.5px; }
+
+/* spec panel */
+.spec {
+  break-inside: avoid;
+  border: 1px solid var(--c-border);
+  background: var(--c-panel);
+  margin: 14px 0;
+}
+.spec-row {
+  display: flex;
+  border-bottom: 1px solid var(--c-border);
+}
+.spec-row:last-child { border-bottom: none; }
+.spec-key {
+  flex: 0 0 190px;
+  padding: 11px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  color: var(--c-teal);
+  border-right: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+}
+.spec-val {
+  flex: 1;
+  padding: 11px 16px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--c-text);
+}
+
+/* cards */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 100%;
+  margin: 14px 0 4px 0;
+}
+.card {
+  break-inside: avoid;
+  background: var(--c-panel);
+  border: 1px solid var(--c-border);
+  border-top: 2px solid var(--c-border2);
+  padding: 16px 18px 14px 18px;
+}
+.card .idx {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-teal);
+  letter-spacing: 2px;
+  margin-bottom: 7px;
+}
+.card h3 {
+  margin: 0 0 7px 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #f2faf8;
+  letter-spacing: 0.2px;
+}
+.card p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.62;
+  color: var(--c-muted);
+}
+
+/* pipeline diagram — block level, vertical, wrap-safe */
+.diagram {
+  break-inside: avoid;
+  margin: 16px 0;
+  max-width: 100%;
+}
+.pipe-node {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--c-teal);
+  background: var(--c-panel);
+  max-width: 100%;
+}
+.pipe-link {
+  width: 2px;
+  height: 16px;
+  margin-left: 36px;
+  background: linear-gradient(180deg, var(--c-teal), rgba(45, 212, 191, 0.25));
+}
+.pipe-idx {
+  flex: 0 0 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-teal);
+  border-right: 1px solid var(--c-border);
+  background: var(--c-panel2);
+}
+.pipe-body { padding: 12px 18px; }
+.pipe-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: #f2faf8;
+  margin-bottom: 4px;
+}
+.pipe-desc {
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--c-muted);
+}
+
+/* chain steps */
+.chain {
+  break-inside: avoid;
+  margin: 14px 0;
+  border: 1px solid var(--c-border);
+  background: var(--c-panel);
+}
+.chain-step {
+  display: flex;
+  border-bottom: 1px solid var(--c-border);
+}
+.chain-step:last-child { border-bottom: none; }
+.chain-num {
+  flex: 0 0 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c-teal);
+  border-right: 1px solid var(--c-border);
+  background: var(--c-panel2);
+}
+.chain-body { padding: 12px 16px; }
+.chain-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #f2faf8;
+  margin-bottom: 4px;
+}
+.chain-desc { font-size: 12px; line-height: 1.6; color: var(--c-muted); }
+
+/* tables — one uniform style document-wide */
+table.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin: 14px 0 6px 0;
+  font-size: 11.5px;
+}
+.tbl thead { display: table-header-group; }
+.tbl th {
+  background: var(--c-head);
+  color: #cfe8e2;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-align: left;
+  padding: 9px 12px;
+  border: 1px solid var(--c-border);
+}
+.tbl td {
+  padding: 9px 12px;
+  border: 1px solid var(--c-border);
+  color: var(--c-text);
+  line-height: 1.55;
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+.tbl tr:nth-child(even) td { background: var(--c-panel2); }
+.tbl td.k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--c-teal);
+}
+.tbl-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  color: var(--c-muted);
+  margin: 4px 0 12px 0;
+}
+
+/* callout */
+.callout {
+  break-inside: avoid;
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--c-amber);
+  background: var(--c-panel2);
+  padding: 13px 16px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--c-text);
+}
+.callout .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--c-amber);
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* ================= ENDING (fixed page) ================= */
+.ending {
+  width: 720px;
+  height: 1020px;
+  box-sizing: border-box;
+  break-before: page;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse 600px 460px at 12% 88%, rgba(45, 212, 191, 0.06), transparent 65%),
+    repeating-linear-gradient(0deg,  rgba(45, 212, 191, 0.03) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg, rgba(45, 212, 191, 0.03) 0 1px, transparent 1px 48px),
+    var(--c-bg);
+}
+.ending .ring {
+  position: absolute;
+  bottom: 96px;
+  right: 72px;
+  width: 240px;
+  height: 240px;
+  border: 1px solid var(--c-border2);
+  border-radius: 50%;
+}
+.ending .ring::before {
+  content: '';
+  position: absolute;
+  inset: 38px;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+}
+.ending .ring::after {
+  content: '';
+  position: absolute;
+  inset: 78px;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+}
+.ending-title {
+  font-size: 54px;
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -1.5px;
+  color: #f2faf8;
+  max-width: 460px;
+}
+.ending-title .shield { color: var(--c-teal); }
+.ending-sub {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--c-muted);
+  max-width: 440px;
+  margin-top: 26px;
+}
+.ending-sign {
+  margin-top: 40px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--c-teal);
+}
+.ending-foot {
+  position: absolute;
+  bottom: 56px; left: 64px; right: 64px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--c-border);
+  padding-top: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  color: var(--c-muted);
+}
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <div class="cover-badge">
+    <span><span class="dot"></span>THREAT INTELLIGENCE // PRODUCT DOCUMENTATION</span>
+    <span>OPS-READY</span>
+  </div>
+  <div class="radar"><div class="blip"></div></div>
+  <div class="cover-eyebrow">REAL-TIME CYBER THREAT INTELLIGENCE</div>
+  <h1 class="cover-title">Cyber<span class="shield">Shield</span></h1>
+  <div class="cover-sub">One screen. Every signal that matters — collected, ranked and explained as it happens.</div>
+  <div class="cover-abstract">
+    <b>CyberShield is a self-contained cyber threat intelligence dashboard.</b> It continuously
+    harvests nineteen research streams from across the security internet, cross-checks every story
+    against the official known-exploited vulnerability catalog, and distills the noise into a
+    ranked, explainable operational picture — complete with an AI analyst that turns any headline
+    into a structured threat brief. This manual explains what CyberShield is, what it is for, and
+    exactly how it works.
+  </div>
+  <div class="cover-chips">
+    <div class="chip"><span class="num">19</span><span class="lbl">LIVE RESEARCH<br>STREAMS</span></div>
+    <div class="chip"><span class="num">3D</span><span class="lbl">GLOBAL THREAT<br>MAP (WEBGL)</span></div>
+    <div class="chip"><span class="num amber">AI</span><span class="lbl">ANALYST<br>VERDICTS</span></div>
+    <div class="chip"><span class="num amber">KEV</span><span class="lbl">EXPLOIT<br>TRACKING</span></div>
+  </div>
+  <div class="cover-foot">
+    <span>OPERATIONS &amp; REFERENCE MANUAL</span>
+    <span>SELF-HOSTABLE · ZERO-INFRA</span>
+  </div>
+</div>
+
+<!-- ============ FLOWING BODY ============ -->
+<div class="main-content">
+
+  <!-- SECTION 01 -->
+  <div class="chapter-header">
+    <div class="section-tag">// SECTION 01</div>
+    <div class="section-title">What is CyberShield?</div>
+  </div>
+  <div class="body-text lead">
+    CyberShield is a <b>real-time cyber threat intelligence dashboard</b>: a single, always-on screen
+    that turns the constant churn of security reporting into an ordered, prioritized picture. Instead
+    of juggling a dozen feeds, bookmarks and mailing lists, an operator opens one page and sees what
+    is happening across the global threat landscape right now — already collected, deduplicated,
+    ranked by severity, and enriched with context.
+  </div>
+  <div class="body-text">
+    Everything runs on its own server layer. The dashboard is fully self-sufficient: it needs no
+    external database service, no paid API subscriptions and no third-party aggregation account.
+    Feeds are fetched from the public internet at request time, cached intelligently in memory, and
+    served through a small set of purpose-built API routes. Drop it on any host and it simply works —
+    the first visit triggers a full harvest of all sources, and every visit after that is instant.
+  </div>
+  <div class="body-text">
+    It is also designed to be <b>honest about its own state</b>. Pipeline status tells you when data
+    is fresh and when a background refresh is running; the known-exploited catalog carries a visible
+    sync indicator; and the AI analyst clearly labels any verdict produced by its deterministic
+    fallback engine rather than a live model. Nothing on the screen pretends to be more current or
+    more certain than it actually is.
+  </div>
+  <div class="spec">
+    <div class="spec-row"><div class="spec-key">WHAT IT IS</div><div class="spec-val">A live, self-updating threat intelligence dashboard for teams, researchers and enthusiasts</div></div>
+    <div class="spec-row"><div class="spec-key">WHAT IT SHOWS</div><div class="spec-val">19 aggregated research streams, a severity-ranked threat board, KEV exposure tracking and a 3D global attack map</div></div>
+    <div class="spec-row"><div class="spec-key">WHAT IT EXPLAINS</div><div class="spec-val">Per-story analyst verdicts: threat class, severity rating, impact summary and recommended immediate actions</div></div>
+    <div class="spec-row"><div class="spec-key">WHAT IT NEEDS</div><div class="spec-val">Any Node or bun host. No external database service, no paid APIs, no credentials required to run</div></div>
+    <div class="spec-row"><div class="spec-key">HOW IT IS BUILT</div><div class="spec-val">Next.js 16 App Router + TypeScript server layer, WebGL threat map, memory-first caching with optional SQLite archive</div></div>
+  </div>
+
+  <!-- SECTION 02 -->
+  <div class="chapter-header">
+    <div class="section-tag">// SECTION 02</div>
+    <div class="section-title">What is it for?</div>
+  </div>
+  <div class="body-text">
+    CyberShield is built for anyone who needs <b>situational awareness without an enterprise
+    threat-intelligence budget</b>. Security teams use it as a shared wall display; researchers use
+    it to watch campaigns develop; educators use it to demonstrate how a real intelligence pipeline
+    behaves. In every case the value is the same: the signal-to-noise work is done once, server-side,
+    so that looking at the screen is enough.
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="idx">01</div>
+      <h3>SOC &amp; Operations Walls</h3>
+      <p>Pin it to the big screen in the war room. The ranked board keeps attention on the stories that actually matter, and known-exploited hits surface immediately instead of hiding in a list.</p>
+    </div>
+    <div class="card">
+      <div class="idx">02</div>
+      <h3>Vulnerability Watch</h3>
+      <p>The official Known Exploited Vulnerabilities catalog is tracked next to live reporting, with an exposure gauge — so "is this being exploited in the wild?" is answered at a glance.</p>
+    </div>
+    <div class="card">
+      <div class="idx">03</div>
+      <h3>Research &amp; Due Diligence</h3>
+      <p>Investigate any story in one click. The analyst verdict expands a headline into threat class, severity, impact and concrete immediate actions — a starting brief, not just a link.</p>
+    </div>
+    <div class="card">
+      <div class="idx">04</div>
+      <h3>Training &amp; Education</h3>
+      <p>A safe, realistic environment for teaching how intel pipelines work: sources, parsing, deduplication, ranking, enrichment and graceful fallbacks — all visible in one product.</p>
+    </div>
+    <div class="card">
+      <div class="idx">05</div>
+      <h3>Incident Context</h3>
+      <p>When something breaks, check within seconds whether the wider internet is already reporting related campaign activity — before you write the first incident note.</p>
+    </div>
+    <div class="card">
+      <div class="idx">06</div>
+      <h3>Portfolio &amp; Demonstration</h3>
+      <p>A fully working, deployable product that demonstrates modern full-stack engineering: streaming data, WebGL visualization, AI integration and zero-infrastructure operations.</p>
+    </div>
+  </div>
+
+  <!-- SECTION 03 -->
+  <div class="chapter-header">
+    <div class="section-tag">// SECTION 03</div>
+    <div class="section-title">How it works — the intelligence pipeline</div>
+  </div>
+  <div class="body-text">
+    Collection happens <b>server-side, on every refresh</b>. Nineteen curated streams — vendor
+    advisories, CERT bulletins, research labs and security aggregators — are polled by the server,
+    parsed from their native XML first. If a source refuses a direct fetch, the request falls through
+    a public RSS-to-JSON converter and then a server-side relay, so a single blocked host never
+    blanks the picture.
+  </div>
+  <div class="body-text">
+    Each story is then <b>normalized and enriched</b>: the best available thumbnail is extracted
+    through a hotlink-safe image relay, per-story analyst briefs are distilled, duplicates across
+    sources are collapsed, and everything is ranked by severity, recency and known-exploitation.
+    The result is cached in memory and served as one aggregated snapshot.
+  </div>
+  <div class="diagram">
+    <div class="pipe-node">
+      <div class="pipe-idx">01</div>
+      <div class="pipe-body">
+        <div class="pipe-title">COLLECT</div>
+        <div class="pipe-desc">19 research streams polled server-side — direct XML first, public converter and server relay as fallback</div>
+      </div>
+    </div>
+    <div class="pipe-link"></div>
+    <div class="pipe-node">
+      <div class="pipe-idx">02</div>
+      <div class="pipe-body">
+        <div class="pipe-title">PROCESS</div>
+        <div class="pipe-desc">Parse · extract thumbnails · distill analyst briefs · dedupe across sources · rank by severity, recency and KEV presence</div>
+      </div>
+    </div>
+    <div class="pipe-link"></div>
+    <div class="pipe-node">
+      <div class="pipe-idx">03</div>
+      <div class="pipe-body">
+        <div class="pipe-title">CACHE</div>
+        <div class="pipe-desc">Memory-first snapshots — fresh for minutes, instantly available when stale, refreshed in the background</div>
+      </div>
+    </div>
+    <div class="pipe-link"></div>
+    <div class="pipe-node">
+      <div class="pipe-idx">04</div>
+      <div class="pipe-body">
+        <div class="pipe-title">SERVE</div>
+        <div class="pipe-desc">One aggregated snapshot feeds the dashboard, the ranked board, the 3D map and every connected client</div>
+      </div>
+    </div>
+  </div>
+  <table class="tbl">
+    <colgroup><col style="width:19%"><col style="width:25%"><col style="width:17%"><col style="width:39%"></colgroup>
+    <thead>
+      <tr><th>LAYER</th><th>ENDPOINT / STORE</th><th>FRESH WINDOW</th><th>BEHAVIOR WHEN STALE</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">Intel snapshot</td><td class="k">/api/news · memory</td><td>4 minutes</td><td>Serves the stale snapshot instantly while a background refresh runs — for up to 30 minutes</td></tr>
+      <tr><td class="k">KEV catalog</td><td class="k">/api/cisa · memory</td><td>Session-long</td><td>Serves the cached catalog and re-syncs from the official source or its 1:1 mirror</td></tr>
+      <tr><td class="k">Thumbnails</td><td class="k">/api/img · LRU (250)</td><td>30 minutes</td><td>Re-fetches through the hotlink relay on demand; private-network targets are blocked</td></tr>
+      <tr><td class="k">Verdict archive</td><td class="k">/api/brief · SQLite</td><td>Permanent</td><td>Instant re-open of past investigations; REANALYZE forces a fresh verdict</td></tr>
+      <tr><td class="k">Converter relay</td><td class="k">/api/rss2json · memory</td><td>4 minutes</td><td>A short TTL shields the public converter from request storms</td></tr>
+    </tbody>
+  </table>
+  <div class="tbl-caption">TABLE 01 — CACHING LAYERS AND STALE-HANDLING BEHAVIOR</div>
+  <div class="body-text">
+    The fallback philosophy runs through the whole pipeline: <b>every external dependency has a
+    second path</b>. Hotlink-protected thumbnails are proxied with a same-origin referer and strict
+    image validation; the KEV catalog has a mirror; feed conversion has a relay. The dashboard keeps
+    rendering even when individual sources misbehave — a degraded source simply drops out of the
+    ranking until it recovers.
+  </div>
+
+  <!-- SECTION 04 -->
+  <div class="chapter-header">
+    <div class="section-tag">// SECTION 04</div>
+    <div class="section-title">How it works — analysis &amp; context</div>
+  </div>
+  <div class="body-text">
+    Two context systems sit on top of the raw stream. The first is <b>ground truth</b>: the official
+    CISA Known Exploited Vulnerabilities catalog. The full catalog is fetched server-side and cached,
+    with an auto-synced mirror as fallback, so the multi-megabyte download never blocks the hot path.
+    Stories referencing cataloged CVEs are ranked up, and the exposure gauge at the top of the board
+    summarizes the current exploited-vulnerability load at a glance.
+  </div>
+  <div class="body-text">
+    The second is the <b>AI Analyst</b>. Clicking any story opens the investigation drawer and
+    produces a structured, SOC-grade threat brief: threat class, severity rating, what happened, why
+    it matters, and immediate recommended actions. The analysis walks a three-layer chain so it can
+    never dead-end:
+  </div>
+  <div class="chain">
+    <div class="chain-step">
+      <div class="chain-num">1</div>
+      <div class="chain-body">
+        <div class="chain-title">LIVE MODEL</div>
+        <div class="chain-desc">Configured credentials — any OpenAI-compatible provider — generate the full verdict in real time.</div>
+      </div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-num">2</div>
+      <div class="chain-body">
+        <div class="chain-title">FORWARDED AUTHENTICATION</div>
+        <div class="chain-desc">If the hosting gateway injects fresh per-user credentials into the request, those are used instead of a possibly stale file token.</div>
+      </div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-num">3</div>
+      <div class="chain-body">
+        <div class="chain-title">OFFLINE ANALYST</div>
+        <div class="chain-desc">A deterministic heuristic brief distilled from the server-side intel pipeline — lede, highlights, CVEs, organizations, severity. Clearly marked as degraded, and never archived in place of a live verdict.</div>
+      </div>
+    </div>
+  </div>
+  <div class="body-text">
+    Completed verdicts are <b>archived in SQLite</b>, keyed by the normalized article URL, so
+    re-opening a past investigation is instant. Degraded fallback verdicts are not archived — a later
+    live re-analysis replaces them. The feature is therefore fully usable out of the box, and becomes
+    sharper the moment real model credentials are provided.
+  </div>
+
+  <!-- SECTION 05 -->
+  <div class="chapter-header">
+    <div class="section-tag">// SECTION 05</div>
+    <div class="section-title">The experience</div>
+  </div>
+  <div class="body-text">
+    CyberShield is deliberately theatrical about security operations — <b>the interface behaves like
+    a mission system, not a blog list</b>. Every dramatic element is backed by a real function: the
+    animations cover real sync time, the voice marks a ready state, and the map renders the live
+    feed itself.
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="idx">01</div>
+      <h3>Threat-Radar Boot Sequence</h3>
+      <p>While the first 19-source sync runs, a radar calibration animation takes over the screen. Cold starts feel intentional — the system visibly comes online while real work happens underneath.</p>
+    </div>
+    <div class="card">
+      <div class="idx">02</div>
+      <h3>JARVIS Voice Welcome</h3>
+      <p>A synthesized welcome voice greets visitors when the dashboard reaches readiness. It plays automatically where browser autoplay policy allows, and on first interaction everywhere else.</p>
+    </div>
+    <div class="card">
+      <div class="idx">03</div>
+      <h3>3D Global Threat Map</h3>
+      <p>Continents rendered as a dot-matrix from real coastline data. Live stories trace attack arcs across the globe with impact rings — the map is driven by the same feed that powers the board.</p>
+    </div>
+    <div class="card">
+      <div class="idx">04</div>
+      <h3>Live Feed Columns</h3>
+      <p>Dense, scannable columns with real thumbnails, source tags, keyword chips and age stamps. Thumbnails are fetched through the hotlink relay, so images that break elsewhere render here.</p>
+    </div>
+    <div class="card">
+      <div class="idx">05</div>
+      <h3>Ranked Threat Board</h3>
+      <p>Severity-ranked stories with category filters and keyword tracking, anchored by the KEV exposure gauge. The ranking is computed server-side from the same intelligence snapshot.</p>
+    </div>
+    <div class="card">
+      <div class="idx">06</div>
+      <h3>Investigation Drawer</h3>
+      <p>One click turns any headline into a structured analyst brief. A world clock, live ticker, sound toggle and a fully responsive mobile layout keep the whole room — and every device — oriented.</p>
+    </div>
+  </div>
+
+  <!-- SECTION 06 -->
+  <div class="chapter-header">
+    <div class="section-tag">// SECTION 06</div>
+    <div class="section-title">Under the hood</div>
+  </div>
+  <div class="body-text">
+    The stack is intentionally boring where it should be boring and modern where it pays off: a
+    typed, server-rendered application with a small API surface, hardware-accelerated visualization,
+    and memory-first persistence. Nothing needs to be provisioned to run it.
+  </div>
+  <table class="tbl">
+    <colgroup><col style="width:20%"><col style="width:32%"><col style="width:48%"></colgroup>
+    <thead>
+      <tr><th>LAYER</th><th>TECHNOLOGY</th><th>ROLE</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">Application</td><td class="k">Next.js 16 · App Router</td><td>Server layer + dashboard UI, standalone build output</td></tr>
+      <tr><td class="k">Language</td><td class="k">TypeScript (strict)</td><td>End-to-end typing across routes, libraries and components</td></tr>
+      <tr><td class="k">Styling</td><td class="k">Tailwind CSS</td><td>Cyber palette, responsive layout system, dark-first design</td></tr>
+      <tr><td class="k">3D Map</td><td class="k">Three.js · WebGL</td><td>Dot-matrix Earth, attack arcs, impact rings, real land data</td></tr>
+      <tr><td class="k">Motion</td><td class="k">GSAP</td><td>Boot choreography, drawer and panel transitions</td></tr>
+      <tr><td class="k">Persistence</td><td class="k">Prisma + SQLite</td><td>Optional verdict archive; every other cache is memory-first</td></tr>
+      <tr><td class="k">Runtime</td><td class="k">bun</td><td>Development, dependency management and standalone serving</td></tr>
+    </tbody>
+  </table>
+  <div class="tbl-caption">TABLE 02 — TECHNOLOGY STACK</div>
+  <table class="tbl">
+    <colgroup><col style="width:21%"><col style="width:38%"><col style="width:41%"></colgroup>
+    <thead>
+      <tr><th>ENDPOINT</th><th>PURPOSE</th><th>RESILIENCE</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">/api/news</td><td>Aggregated 19-stream intelligence snapshot</td><td>Three-layer fetch fallback, dual-TTL cache</td></tr>
+      <tr><td class="k">/api/brief</td><td>AI analyst verdicts with archival</td><td>Three-layer model chain, SQLite archive</td></tr>
+      <tr><td class="k">/api/cisa</td><td>Known Exploited Vulnerabilities relay</td><td>Official source + mirror, memory cached</td></tr>
+      <tr><td class="k">/api/img</td><td>Hotlink-safe thumbnail relay</td><td>Referer handling, validation, LRU cache</td></tr>
+      <tr><td class="k">/api/rss2json</td><td>RSS-to-JSON conversion relay</td><td>TTL cache shields the public converter</td></tr>
+    </tbody>
+  </table>
+  <div class="tbl-caption">TABLE 03 — API SURFACE</div>
+  <div class="body-text">
+    Long-running routes declare <b>60-second execution ceilings</b> in the route files themselves, so
+    the initial full sync is never cut off by conservative platform defaults on metered hosting
+    tiers. The build produces a standalone server bundle, which is what makes container deployments
+    so small and predictable.
+  </div>
+
+  <!-- SECTION 07 -->
+  <div class="chapter-header">
+    <div class="section-tag">// SECTION 07</div>
+    <div class="section-title">Deployment &amp; operations</div>
+  </div>
+  <div class="body-text">
+    CyberShield ships as <b>a single deployable unit</b>. Because caching is memory-first and the
+    only database touchpoint is the optional verdict archive, there is no infrastructure to
+    provision: no managed database, no message queue, no worker fleet. Three deployment paths cover
+    every realistic budget, and all of them support custom domains.
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="idx">PATH A</div>
+      <h3>Vercel — Free Tier</h3>
+      <p>Push the project to GitHub, import it on Vercel, deploy. Framework preset auto-detects; no environment variables are required. Function time limits are already baked into the routes, so the first sync survives the free plan's defaults.</p>
+    </div>
+    <div class="card">
+      <div class="idx">PATH B</div>
+      <h3>Docker — Any Host</h3>
+      <p>A self-contained container image: build it, run it on port 3000, done. The included SQLite file makes the verdict archive work inside the container, giving the full feature set on any VPS or container platform.</p>
+    </div>
+    <div class="card">
+      <div class="idx">PATH C</div>
+      <h3>Render — Free Tier</h3>
+      <p>Connect the repository as a Docker web service. Free instances sleep when idle and wake in roughly forty seconds — the threat-radar boot sequence covers the wake-up, exactly as designed.</p>
+    </div>
+    <div class="card">
+      <div class="idx">NOTE</div>
+      <h3>Restoring Live AI</h3>
+      <p>The analysis uplink reads a provider config (baseUrl + apiKey) and speaks the OpenAI-compatible format — point it at any compatible provider, including local models, to upgrade verdicts from the Offline Analyst to live generation.</p>
+    </div>
+  </div>
+  <div class="callout">
+    <span class="tag">OPERATIONS NOTE</span>
+    The first visit after a cold start triggers a full 19-source sync — a few seconds, covered by the
+    boot sequence. Every visit afterwards is served from cache and feels instant. There is no cron,
+    no worker and no maintenance: idle hosts simply start cold, and warm hosts stay warm on traffic.
+  </div>
+
+</div>
+
+<!-- ============ ENDING ============ -->
+<div class="ending">
+  <div class="ring"></div>
+  <div class="ending-title">Stay ahead<br>of <span class="shield">the breach.</span></div>
+  <div class="ending-sub">
+    CyberShield turns nineteen scattered research streams into one ranked, explainable, always-on
+    operational picture — on hardware you control, with nothing to provision and nothing to pay for
+    before it earns its keep.
+  </div>
+  <div class="ending-sign">CYBERSHIELD // REAL-TIME CYBER THREAT INTELLIGENCE</div>
+  <div class="ending-foot">
+    <span>OPERATIONS &amp; REFERENCE MANUAL</span>
+    <span>END OF DOCUMENT</span>
+  </div>
+</div>
+
+</body>
+</html>
