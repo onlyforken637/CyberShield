@@ -411,15 +411,26 @@ export default function CyberShieldPage() {
                   </div>
                 ))}
               </div>
-              <a
-                href="/cybershield-v3.tar.gz"
-                download
-                aria-label="Download CyberShield v3 source archive (tar.gz)"
-                className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-cyber-teal/40 bg-cyber-teal/10 px-3 py-1.5 text-[10px] font-bold tracking-wider text-cyber-teal transition-colors hover:bg-cyber-teal/20"
-              >
-                <Download className="h-3 w-3" />
-                DOWNLOAD SOURCE · V3 .TAR.GZ
-              </a>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a
+                  href="/cybershield-v3.tar.gz"
+                  download
+                  aria-label="Download CyberShield v3 source archive (tar.gz)"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-cyber-teal/40 bg-cyber-teal/10 px-3 py-1.5 text-[10px] font-bold tracking-wider text-cyber-teal transition-colors hover:bg-cyber-teal/20"
+                >
+                  <Download className="h-3 w-3" />
+                  SOURCE · V3 .TAR.GZ
+                </a>
+                <a
+                  href="/cybershield-v9.tar.gz"
+                  download
+                  aria-label="Download CyberShield v9 source archive (tar.gz)"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-300 transition-colors hover:bg-amber-400/20"
+                >
+                  <Download className="h-3 w-3" />
+                  SOURCE · V9 .TAR.GZ
+                </a>
+              </div>
             </div>
 
             {/* Col 4: about */}

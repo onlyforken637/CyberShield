@@ -264,3 +264,19 @@ Work Log:
 Stage Summary:
 - v3 tar is now a deploy-ready package: extract → GitHub → Vercel import → add domain = live on your own domain free in ~10 min; or docker build/run for full features (verdict archive + optional live AI via any OpenAI-compatible key). DEPLOY.md inside the tar is the authoritative guide.
 - Files: +DEPLOY.md, +Dockerfile, +.dockerignore, +vercel.json, package.json +1 script line, public/cybershield-v3.tar.gz rebuilt. No runtime/app changes; live site untouched.
+
+---
+Task ID: 13
+Agent: Z.ai Code (main orchestrator)
+Task: User request — "also give me the tar file of v9 (2729880)" (user now references versions by commit hash).
+
+Work Log:
+- Verified 2729880 (the Task 9 FortiGuard-map commit, pre-Task-10-footer-button): threat-globe.tsx / boot-overlay.tsx (radar) / world-dots.ts / public/audio/jarvis-welcome.mp3 / audio.ts all present; package.json has gsap ^3.15.0 + three ^0.186.1; page.tsx has NO download button (pure snapshot); same 6 API routes as v3; /api/brief byte-identical to v3 (diff empty) so the hosting matrix applies unchanged.
+- Built public/cybershield-v9.tar.gz with the same deploy kit as v3: git archive 2729880 + package.json postinstall (prisma generate) + DEPLOY.md (v9 variant: title/snapshot hash, 3D-map + JARVIS rows, v9 tar/image names, autoplay note) + Dockerfile + .dockerignore + vercel.json + portable .env. 344KB, 156 entries.
+- Verified: all kit + identity files present; staged scripts contain postinstall, deps contain gsap/three; no footer-button code inside the snapshot; served HTTP 200 (351,254 bytes) and round-trip byte-identical.
+- Live footer: replaced the single V3 anchor with a flex-wrap row of two buttons — "SOURCE · V3 .TAR.GZ" (teal) and "SOURCE · V9 .TAR.GZ" (amber). Lint clean; agent-browser: both hrefs present ([/cybershield-v3.tar.gz, /cybershield-v9.tar.gz]), screenshot verified, zero page errors.
+
+Stage Summary:
+- Two frozen, hosting-ready archives now exist side by side: /cybershield-v3.tar.gz (clean pre-Three.js dashboard, 61e72b0) and /cybershield-v9.tar.gz (full experience: 3D FortiGuard threat map + JARVIS + radar boot, 2729880). Both include DEPLOY.md/Dockerfile/vercel.json and the postinstall fix; both proven byte-identical over HTTP. Live site = latest code with both buttons in the footer.
+- Files: page.tsx footer edited (two-button row), +public/cybershield-v9.tar.gz. DEPLOY-v9.md written temporarily to project root for staging and removed after copying into the tar.
+- Artifacts: /tmp/v9-buttons.png, /tmp/v9-dl.tar.gz.
