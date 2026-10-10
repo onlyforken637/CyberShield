@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>CyberShield — 05 Core Feature 01</title>
+<link rel="stylesheet" href="global.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:#05080d;}
+  .src-chip{display:flex;align-items:center;gap:10px;height:46px;background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;padding:0 13px;min-width:0;}
+  .src-code{font-family:var(--font-num);font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--primary);background:var(--primary-soft);border:1px solid var(--line);border-radius:6px;padding:3px 7px;flex-shrink:0;}
+  .src-name{font-size:13px;font-weight:500;color:#dce8e5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="relative h-full flex flex-col" style="padding:56px 64px 46px;">
+
+    <!-- Kicker -->
+    <div class="flex items-center" style="gap:16px;">
+      <span class="kicker" style="font-size:12px;">CORE FEATURE 01</span>
+      <span data-decor aria-hidden="true" class="flex-1" style="height:1px;background:linear-gradient(90deg, rgba(45,212,191,.4), rgba(45,212,191,0));"></span>
+    </div>
+
+    <!-- Title + intro -->
+    <h1 style="margin:12px 0 0;font-family:var(--font-heading);font-weight:700;font-size:40px;line-height:1.1;letter-spacing:-0.015em;color:var(--text);">
+      Every stream that matters, <span style="color:var(--primary);">on one wall.</span>
+    </h1>
+    <p style="margin:10px 0 0;font-size:15.5px;line-height:1.5;color:#b7c9c5;max-width:1120px;">
+      The aggregation engine monitors 19 research streams — direct XML first, with a public-converter relay
+      as automatic fallback so a blocked host never blanks the wall.
+    </p>
+
+    <!-- 19-source grid: 18 chips + full-width CISA row -->
+    <div class="grid grid-cols-3" style="gap:10px 12px;margin-top:20px;">
+
+      <div class="src-chip"><span class="src-code">BPC</span><span class="src-name">BleepingComputer</span></div>
+      <div class="src-chip"><span class="src-code">THN</span><span class="src-name">The Hacker News</span></div>
+      <div class="src-chip"><span class="src-code">TPOST</span><span class="src-name">Threatpost</span></div>
+
+      <div class="src-chip"><span class="src-code">KREBS</span><span class="src-name">Krebs on Security</span></div>
+      <div class="src-chip"><span class="src-code">SECWK</span><span class="src-name">SecurityWeek</span></div>
+      <div class="src-chip"><span class="src-code">HNS</span><span class="src-name">Help Net Security</span></div>
+
+      <div class="src-chip"><span class="src-code">INFOMAG</span><span class="src-name">Infosecurity Magazine</span></div>
+      <div class="src-chip"><span class="src-code">SCOOP</span><span class="src-name">CyberScoop</span></div>
+      <div class="src-chip"><span class="src-code">RECORD</span><span class="src-name">The Record</span></div>
+
+      <div class="src-chip"><span class="src-code">CLULEY</span><span class="src-name">Graham Cluley</span></div>
+      <div class="src-chip"><span class="src-code">MBLabs</span><span class="src-name">Malwarebytes Labs</span></div>
+      <div class="src-chip"><span class="src-code">SECLST</span><span class="src-name">Securelist</span></div>
+
+      <div class="src-chip"><span class="src-code">U42</span><span class="src-name">Unit 42</span></div>
+      <div class="src-chip"><span class="src-code">MSFT</span><span class="src-name">Microsoft Security</span></div>
+      <div class="src-chip"><span class="src-code">S1</span><span class="src-name">SentinelOne Labs</span></div>
+
+      <div class="src-chip"><span class="src-code">SCHNEIER</span><span class="src-name">Schneier on Security</span></div>
+      <div class="src-chip"><span class="src-code">ARS</span><span class="src-name">Ars Technica Security</span></div>
+      <div class="src-chip"><span class="src-code">ZDI</span><span class="src-name">Zero Day Initiative</span></div>
+
+      <div class="col-span-3 flex items-center justify-between" style="height:46px;background:linear-gradient(90deg, rgba(245,158,11,.07), var(--surface) 55%);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:0 14px;">
+        <div class="flex items-center" style="gap:10px;">
+          <span class="src-code" style="color:#fbbf24;background:var(--accent-soft);border-color:rgba(245,158,11,.3);">CISA</span>
+          <span class="src-name">CISA Advisories</span>
+        </div>
+        <span class="material-icons" aria-hidden="true" style="font-size:17px;color:rgba(251,191,36,.85);">account_balance</span>
+      </div>
+
+    </div>
+
+    <!-- Footer bullets -->
+    <div class="flex items-center justify-between" style="margin-top:auto;border-top:1px solid var(--line-soft);padding-top:16px;">
+      <div class="flex items-center" style="gap:9px;">
+        <span class="material-icons" aria-hidden="true" style="font-size:15px;color:var(--primary);">check_circle</span>
+        <span style="font-family:var(--font-num);font-size:12px;letter-spacing:.05em;color:#b7c9c5;">Duplicate collapse across outlets</span>
+      </div>
+      <div class="flex items-center" style="gap:9px;">
+        <span class="material-icons" aria-hidden="true" style="font-size:15px;color:var(--primary);">check_circle</span>
+        <span style="font-family:var(--font-num);font-size:12px;letter-spacing:.05em;color:#b7c9c5;">Best-thumbnail extraction per article</span>
+      </div>
+      <div class="flex items-center" style="gap:9px;">
+        <span class="material-icons" aria-hidden="true" style="font-size:15px;color:var(--primary);">check_circle</span>
+        <span style="font-family:var(--font-num);font-size:12px;letter-spacing:.05em;color:#b7c9c5;">Per-story severity + read-time</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

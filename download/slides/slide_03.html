@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>CyberShield — 03 Why It Exists</title>
+<link rel="stylesheet" href="global.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:#05080d;}
+  .sev-c{color:var(--danger);} .sev-h{color:var(--accent);} .sev-e{color:var(--primary);} .sev-m{color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="relative h-full flex flex-col" style="padding:58px 64px 54px;">
+
+    <!-- Kicker -->
+    <div class="flex items-center" style="gap:16px;">
+      <span class="kicker" style="font-size:12px;">WHY IT EXISTS</span>
+      <span data-decor aria-hidden="true" class="flex-1" style="height:1px;background:linear-gradient(90deg, rgba(45,212,191,.4), rgba(45,212,191,0));"></span>
+    </div>
+
+    <!-- Title -->
+    <h1 style="margin:14px 0 0;font-family:var(--font-heading);font-weight:700;font-size:42px;line-height:1.1;letter-spacing:-0.015em;color:var(--text);">
+      Threat intel is scattered. <span style="color:var(--text-dim);">Decisions are slow.</span>
+    </h1>
+
+    <!-- Two-column comparison -->
+    <div class="flex-1 grid grid-cols-2 relative" style="gap:30px;margin-top:28px;">
+
+      <!-- transformation badge on the seam -->
+      <div data-decor aria-hidden="true" class="absolute" style="left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:9999px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:0 0 26px rgba(45,212,191,.28);z-index:20;">
+        <span class="material-icons" style="font-size:20px;color:var(--primary);">east</span>
+      </div>
+
+      <!-- WITHOUT -->
+      <div class="flex flex-col" style="background:linear-gradient(165deg, rgba(248,113,113,.06), var(--surface));border:1px solid rgba(248,113,113,.32);border-radius:14px;padding:24px 28px;">
+        <div class="flex items-center" style="gap:12px;padding-bottom:16px;border-bottom:1px solid rgba(248,113,113,.22);">
+          <span class="material-icons" style="font-size:20px;color:var(--danger);">warning_amber</span>
+          <span style="font-family:var(--font-num);font-size:13px;font-weight:700;letter-spacing:.2em;color:var(--danger);">WITHOUT CYBERSHIELD</span>
+        </div>
+        <div class="flex-1 flex flex-col">
+          <div class="flex-1 flex items-center" style="gap:16px;border-bottom:1px solid var(--line-soft);">
+            <span style="font-family:var(--font-num);font-size:12px;font-weight:700;color:rgba(248,113,113,.8);">01</span>
+            <p style="margin:0;font-size:15.5px;line-height:1.5;color:#ccd9d5;">Reporting scattered across dozens of blogs, vendor advisories and government feeds</p>
+          </div>
+          <div class="flex-1 flex items-center" style="gap:16px;border-bottom:1px solid var(--line-soft);">
+            <span style="font-family:var(--font-num);font-size:12px;font-weight:700;color:rgba(248,113,113,.8);">02</span>
+            <p style="margin:0;font-size:15.5px;line-height:1.5;color:#ccd9d5;">Triage means opening 10+ tabs every morning</p>
+          </div>
+          <div class="flex-1 flex items-center" style="gap:16px;border-bottom:1px solid var(--line-soft);">
+            <span style="font-family:var(--font-num);font-size:12px;font-weight:700;color:rgba(248,113,113,.8);">03</span>
+            <p style="margin:0;font-size:15.5px;line-height:1.5;color:#ccd9d5;">Severity is guesswork — a scary headline is not a severity score</p>
+          </div>
+          <div class="flex-1 flex items-center" style="gap:16px;">
+            <span style="font-family:var(--font-num);font-size:12px;font-weight:700;color:rgba(248,113,113,.8);">04</span>
+            <p style="margin:0;font-size:15.5px;line-height:1.5;color:#ccd9d5;">Non-specialists freeze at jargon and CVE soup.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- WITH -->
+      <div class="card-glow flex flex-col" style="border-color:var(--line);padding:24px 28px;box-shadow:0 0 34px rgba(45,212,191,.1);">
+        <div class="flex items-center" style="gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line);">
+          <span class="material-icons" style="font-size:20px;color:var(--primary);">verified_user</span>
+          <span style="font-family:var(--font-num);font-size:13px;font-weight:700;letter-spacing:.2em;color:var(--primary);">WITH CYBERSHIELD</span>
+        </div>
+        <div class="flex-1 flex flex-col">
+          <div class="flex-1 flex items-center" style="gap:16px;border-bottom:1px solid var(--line-soft);">
+            <span style="font-family:var(--font-num);font-size:12px;font-weight:700;color:rgba(45,212,191,.85);">01</span>
+            <p style="margin:0;font-size:15.5px;line-height:1.5;color:#ccd9d5;">One wall: 19 streams merged, deduplicated and cached</p>
+          </div>
+          <div class="flex-1 flex items-center" style="gap:16px;border-bottom:1px solid var(--line-soft);">
+            <span style="font-family:var(--font-num);font-size:12px;font-weight:700;color:rgba(45,212,191,.85);">02</span>
+            <p style="margin:0;font-size:15.5px;line-height:1.5;color:#ccd9d5;">Machine-speed scoring: every story rated <span class="sev-c" style="font-weight:600;">CRITICAL</span> / <span class="sev-h" style="font-weight:600;">HIGH</span> / <span class="sev-e" style="font-weight:600;">ELEVATED</span> / <span class="sev-m" style="font-weight:600;">MODERATE</span></p>
+          </div>
+          <div class="flex-1 flex items-center" style="gap:16px;border-bottom:1px solid var(--line-soft);">
+            <span style="font-family:var(--font-num);font-size:12px;font-weight:700;color:rgba(45,212,191,.85);">03</span>
+            <p style="margin:0;font-size:15.5px;line-height:1.5;color:#ccd9d5;">10 threat categories for instant triage</p>
+          </div>
+          <div class="flex-1 flex items-center" style="gap:16px;">
+            <span style="font-family:var(--font-num);font-size:12px;font-weight:700;color:rgba(45,212,191,.85);">04</span>
+            <p style="margin:0;font-size:15.5px;line-height:1.5;color:#ccd9d5;">Plain-language AI verdict tells you what happened, why it matters, what to do.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

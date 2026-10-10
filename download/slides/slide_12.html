@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield — Deploy Anywhere</title>
+<link rel="stylesheet" href="global.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--bg); overflow: hidden; }
+  .stat-num { font-family: var(--font-num); font-size: 58px; font-weight: 700; color: var(--primary); line-height: 1; min-width: 148px; flex: none; }
+  .stat-label { font-family: var(--font-body); font-size: 14.5px; line-height: 1.55; color: var(--text-dim); }
+  .stat-label strong { color: var(--text); font-weight: 600; }
+  .path-chip { font-family: var(--font-num); font-size: 11px; letter-spacing: 0.14em; color: var(--primary); background: var(--primary-soft); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; white-space: nowrap; min-width: 128px; text-align: center; flex: none; }
+  .path-chip-accent { color: var(--accent); background: var(--accent-soft); border-color: rgba(245, 158, 11, 0.3); }
+  .path-desc { font-family: var(--font-body); font-size: 14.5px; line-height: 1.5; color: var(--text-dim); }
+</style>
+</head>
+<body>
+<div class="slide scanlines">
+  <!-- decorative glow -->
+  <div data-decor aria-hidden="true" style="position:absolute; top:-240px; left:38%; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle, rgba(45,212,191,0.06) 0%, rgba(45,212,191,0) 70%);"></div>
+
+  <div style="position:absolute; inset:0; padding:52px 64px 44px; display:flex; flex-direction:column;">
+    <!-- header -->
+    <div class="flex items-end justify-between">
+      <div>
+        <div class="kicker">RUN IT YOUR WAY</div>
+        <h1 style="font-family:var(--font-heading); font-size:40px; font-weight:700; line-height:1.1; margin:12px 0 0; color:var(--text);">Free-tier friendly by design, <span class="text-primary-c">not by accident</span>.</h1>
+      </div>
+      <div style="font-family:var(--font-num); font-size:12px; letter-spacing:0.22em; color:var(--text-dim); padding-bottom:8px;">SERVERLESS // DOCKER // SELF-HOST</div>
+    </div>
+    <div class="rule" style="margin:22px 0 26px;"></div>
+
+    <!-- body: stats left, paths right -->
+    <div style="flex:1; display:flex; gap:32px; min-height:0;">
+
+      <!-- left: 3 big stat blocks -->
+      <div style="width:430px; flex:none; display:flex; flex-direction:column; justify-content:space-between; padding:6px 0;">
+        <div class="flex items-center" style="gap:22px;">
+          <div class="stat-num">60s</div>
+          <div class="stat-label"><strong>function ceilings</strong> baked into every route — survives Vercel Hobby limits</div>
+        </div>
+        <div style="height:1px; background:var(--line-soft);"></div>
+        <div class="flex items-center" style="gap:22px;">
+          <div class="stat-num">0</div>
+          <div class="stat-label"><strong>paid dependencies</strong> — public RSS, converter relay and mirror fallbacks only</div>
+        </div>
+        <div style="height:1px; background:var(--line-soft);"></div>
+        <div class="flex items-center" style="gap:22px;">
+          <div class="stat-num">1</div>
+          <div class="stat-label"><strong>file SQLite database</strong> — copy the folder, move the deployment</div>
+        </div>
+      </div>
+
+      <!-- right: deployment paths card -->
+      <div class="card-glow" style="flex:1; padding:24px 28px; display:flex; flex-direction:column; min-width:0;">
+        <div style="font-family:var(--font-num); font-size:11px; letter-spacing:0.28em; color:var(--primary);">DEPLOYMENT PATHS</div>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:space-evenly; margin-top:6px;">
+          <div class="flex items-center" style="gap:16px; padding:10px 0;">
+            <span class="path-chip">VERCEL</span>
+            <span class="path-desc">push, import, deploy; time limits pre-configured in the route files</span>
+          </div>
+          <div style="height:1px; background:var(--line-soft);"></div>
+          <div class="flex items-center" style="gap:16px; padding:10px 0;">
+            <span class="path-chip">DOCKER</span>
+            <span class="path-desc">single Dockerfile, .dockerignore included</span>
+          </div>
+          <div style="height:1px; background:var(--line-soft);"></div>
+          <div class="flex items-center" style="gap:16px; padding:10px 0;">
+            <span class="path-chip">SELF-HOST</span>
+            <span class="path-desc">any Node/Bun runtime; portable .env with a relative database path</span>
+          </div>
+          <div style="height:1px; background:var(--line-soft);"></div>
+          <div class="flex items-center" style="gap:16px; padding:10px 0;">
+            <span class="path-chip path-chip-accent">DATA OWNERSHIP</span>
+            <span class="path-desc">self-host and your reading history stays yours.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- footer mono strip -->
+    <div style="border-top:1px solid var(--line-soft); margin-top:24px; padding-top:14px; display:flex; align-items:center; gap:12px;">
+      <span class="material-icons" style="font-size:16px; color:var(--primary);">terminal</span>
+      <span style="font-family:var(--font-num); font-size:11.5px; letter-spacing:0.14em; color:var(--text-dim);">NO VERCEL.JSON NEEDED — DURATIONS LIVE IN THE ROUTES <span style="color:var(--primary);">·</span> POSTINSTALL RUNS PRISMA GENERATE</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

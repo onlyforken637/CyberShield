@@ -311,3 +311,67 @@ Work Log:
 
 Stage Summary:
 - Deliverables: /home/z/my-project/public/cybershield-documentation.pdf (9-page branded "CyberShield" manual, downloadable via app URL) + editable source /home/z/my-project/docs/cybershield-documentation.html. No app code touched; tars and live site unaffected.
+
+---
+Task ID: 16
+Agent: ppt-expert (group C, slides 10-13)
+Task: Render CyberShield deck slides 10-13 from slides_brief.json
+
+Work Log:
+- slide_10.html "Who It's For": 2×3 bento grid of 6 audience tiles (Material icon + mono index + bold title + one-line use), kicker WHO IT'S FOR, teal-highlighted title, SEGMENTS // 06 header tag.
+- slide_11.html "Use-Case Scenarios": 2×2 workflow cards (mono numerals 01-04, no icons to contrast slide 10) each with verbatim input→output line (teal mono arrows) and teal RESULT chip, kicker HOW TEAMS USE IT.
+- slide_12.html "Deploy Anywhere": split layout — left 3 hero mono stats (60s / 0 / 1) with hairline separators, right DEPLOYMENT PATHS card (VERCEL/DOCKER/SELF-HOST chips + amber DATA OWNERSHIP chip), bottom mono footer strip NO VERCEL.JSON NEEDED….
+- slide_13.html "Closing": centered typographic hero — CYBERSHIELD kicker with rules, 78px "Stay ahead of the threat." (teal "threat"), sub-line, 6 mono recap chips in one row, amber-arrow CTA line, dim footer line, mission-control corner brackets (data-decor).
+- QA via agent-browser at 1280×720: document scroll size exactly 1280×720 on all four slides; zero out-of-bounds content elements and zero clipped text blocks; verbatim string spot-checks passed; palette/typography limited to global.css tokens (teal/amber contrast ≥7:1); speaker_notes=none so no notes asides added.
+
+Stage Summary:
+- Committed 4 standalone 1280×720 slides (slide_10–slide_13.html) in /home/z/my-project/download/slides/, each linking global.css relatively + Tailwind CDN + Material Icons, rendering every brief fact/stat/quote verbatim with 4 distinct non-repeating layouts (bento grid / 2×2 scenario cards / stat+paths split / centered closing). No images used (typographic slides per brief). Artifacts: /tmp/cs_slide_{10..13}.png QA screenshots.
+
+---
+Task ID: 16
+Agent: ppt-expert (group A, slides 1-5)
+Task: Render CyberShield deck slides 1-5 from slides_brief.json
+
+Work Log:
+- slide_01.html (Cover): full-bleed control-room image under the mandated 0.82→0.95 dark gradient (+ extra bottom scrim for AA), 136px Space Grotesk "Cyber/Shield" wordmark with teal underline accent, kicker rule, 3 mono stat chips (19 / 10 / 4 MIN) and SELF-HOSTED // FREE-HOST READY tag.
+- slide_02.html (What It Is): typographic key-message layout — teal-emphasized 58px statement, verbatim 48-word paragraph with mono "19", three icon definition cards (feed/AGGREGATOR, psychology/EXPLAINER, radar/AWARENESS LAYER) and mono free-tier footnote.
+- slide_03.html (Why It Exists): split comparison — danger-tinted WITHOUT card vs teal-glow WITH card, 4 tight bullets each with mono 01-04 step numbers, severity words color-coded, circular east-arrow badge on the center seam.
+- slide_04.html (Pipeline): five equal card-glow stage cards (AGGREGATE→DISTILL→SCORE→CLASSIFY→SERVE) joined by mono → glyphs (no SVG), severity ratings tinted in SCORE, amber-accented STACK mono strip at bottom.
+- slide_05.html (Live Intelligence Feed): 3-column grid of 18 source chips with mono short-codes plus full-width amber-accented CISA Advisories row, verbatim intro line, and 3-item check-circle footer strip.
+
+Stage Summary:
+- Slides 1-5 of the CyberShield deck committed to /home/z/my-project/download/slides/ as standalone 1280×720 HTML pages linking global.css relatively; only brief-supplied image URL used, palette/typography tokens respected (#05080d/#2dd4bf/#f59e0b, Space Grotesk/Inter/JetBrains Mono), no speaker notes per manifest, layouts diversified (cover / typographic / split / pipeline / grid).
+
+---
+Task ID: 16
+Agent: ppt-expert (group B, slides 6-9)
+Task: Render CyberShield deck slides 6-9 from slides_brief.json
+
+Work Log:
+- slide_06.html "AI Analyst Verdict": 54/46 split — left paragraph + 3-layer uplink resilience list (L1/L2/L3 mono badges), right terminal-style verdict report card (teal field labels, CRITICAL 92/100 hero with danger progress bar, ▸ action lines) with dim "CACHED VERDICTS · FORCE REANALYZE · NO INVENTED FACTS" label beneath.
+- slide_07.html "CISA KEV Integration": typographic layout with 3 mono reliability chips (1.7 MB CATALOG / PRIMARY: cisa.gov / FALLBACK mirror), then RECENCY SCALE as 3 stacked tone cards (CRITICAL ≤30d danger, HIGH ≤180d amber, WATCH older teal) with segmented recency bars, mirror-fallback footnote, ghost "03" numeral (data-decor).
+- slide_08.html "Global Situational Awareness": three equal capability tiles (public/radar/graphic_eq icons, ghost numerals 01-03, bottom-anchored micro footers) + full-width mono strip "WEBGL GLOBE · GSAP CHOREOGRAPHY · PRIVACY-SAFE AUDIO TOGGLE · REDUCED-MOTION SUPPORTED", decorative radar rings top-right.
+- slide_09.html "Investigation & Triage": 55/45 split with the brief's image URL (601e9f74a4a9.jpg) in a bordered card with dark gradient overlays, left paragraph, 10 category-filter chips (All Signals active in teal, "&" escaped), severity swatch strip CRITICAL→HIGH→ELEVATED→MODERATE, teal-ruled closing line "filtering beats scrolling."
+- All four use only global.css tokens (bg #05080d / teal #2dd4bf / amber #f59e0b; Space Grotesk + Inter + JetBrains Mono), link global.css relatively + Tailwind CDN + Material Icons, fixed 1280×720 with overflow hidden, no SVG connectors, no notes asides (speaker_notes=none), and four distinct non-repeating layouts (split+terminal panel / stacked tone rows / 3-tile row / split+image).
+
+Stage Summary:
+- Committed slide_06.html, slide_07.html, slide_08.html, slide_09.html to /home/z/my-project/download/slides/, rendering every brief fact/stat/chip/label verbatim with ≥4.5:1 contrast (teal ~10:1, amber ~9:1, dim ~7:1 on all surfaces) and 60-120 words of substantive copy per slide.
+
+---
+Task ID: 16
+Agent: Z.ai Code (main orchestrator)
+Task: User request — "also a pptx of whole presentation but it doesnot include the designing or website, it is mainly focused on uses features and like that".
+
+Work Log:
+- Confirmed Task 14 (tars) and Task 15 (PDF manual) deliverables intact post-interruption: tars verified (no vercel.json, maxDuration in all 5 routes, HTTP 200), PDF served at /cybershield-documentation.pdf.
+- Loaded pptx skill; skipped Stage 1 questions (continuation session, no AskUserQuestion tool; user's prior "beautiful + suitable theme" choice carried over) — locked dark-cyber palette (#05080d / #2dd4bf teal / #f59e0b amber, Space Grotesk + Inter + JetBrains Mono), EN, 13 slides, no speaker notes.
+- Verified product facts from source: 19 named feed streams (feeds.ts), 3-layer AI verdict chain (brief/route.ts), CISA KEV mirror fallback + recency tones (cisa/route.ts, cisa.ts), 10 categories (categories.ts), severity scale CRITICAL/HIGH/ELEVATED/MODERATE.
+- 3 image-search calls (of 6 limit); 3 usable non-watermarked URLs selected (SOC control room cover, analyst-at-night for investigation slide); watermarked results discarded; globe slide made typographic.
+- Stage 3: wrote download/slides/global.css (palette + typography tokens only) and slides_brief.json (13 self-contained task_briefs: cover, what-is, problem split, 5-stage pipeline, 19-source grid, AI verdict panel, KEV recency scale, situational-awareness tiles, investigation split, 6-tile audience bento, 4 scenario cards, deploy-anywhere stats, closing).
+- Stage 4: fanned out 3 ppt-expert subagents (slides 0:5, 5:9, 9:13) in parallel; all 13 slide_*.html committed.
+- Exported via skills/pptx/batch_html2pptx.js -> download/CyberShield-Presentation.pptx (13 slides, 6.0 MB, 10x5.6 in); no CRITICAL warnings; flagged BOUNDS items confirmed decorative bleeds via playwright screenshots of all 13 slides; python-pptx validation passed (13 slides).
+- Zero version-history references; content is uses/features-focused per user constraint.
+
+Stage Summary:
+- Deliverables: /home/z/my-project/download/CyberShield-Presentation.pptx (13-slide features/uses deck) + editable sources in /home/z/my-project/download/slides/ (global.css, slides_brief.json, slide_01..13.html).
+- App unchanged; tars/PDF untouched.

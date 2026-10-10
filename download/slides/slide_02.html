@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>CyberShield — 02 What It Is</title>
+<link rel="stylesheet" href="global.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:#05080d;}
+</style>
+</head>
+<body>
+<div class="slide scanlines">
+  <div class="relative h-full flex flex-col" style="padding:62px 72px 50px;">
+
+    <!-- Kicker -->
+    <div class="flex items-center" style="gap:16px;">
+      <span class="kicker" style="font-size:12px;">WHAT IT IS</span>
+      <span data-decor aria-hidden="true" class="flex-1" style="height:1px;background:linear-gradient(90deg, rgba(45,212,191,.4), rgba(45,212,191,0));"></span>
+    </div>
+
+    <!-- Big statement -->
+    <h1 style="margin:30px 0 0;font-family:var(--font-heading);font-weight:700;font-size:58px;line-height:1.14;letter-spacing:-0.018em;color:var(--text);max-width:1060px;">
+      <span style="color:var(--primary);">One live wall</span> for the world&rsquo;s cybersecurity reporting.
+    </h1>
+
+    <!-- Supporting paragraph -->
+    <p style="margin:24px 0 0;font-size:18px;line-height:1.62;color:#b7c9c5;max-width:1075px;">
+      CyberShield is a self-hosted threat-intelligence dashboard. It pulls cybersecurity news from
+      <span style="font-family:var(--font-num);color:var(--primary);">19</span> trusted research streams into a single real-time feed —
+      automatically scoring every story for severity, classifying it into threat categories, and explaining
+      what it means on demand with an AI analyst verdict.
+    </p>
+
+    <!-- Three definition cards -->
+    <div class="grid grid-cols-3" style="gap:24px;margin-top:36px;">
+      <div class="card" style="padding:22px 24px;">
+        <div class="flex items-center" style="gap:14px;">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span class="material-icons" style="font-size:22px;color:var(--primary);">feed</span>
+          </div>
+          <div style="font-family:var(--font-num);font-size:13px;font-weight:700;letter-spacing:.18em;color:var(--text);">AGGREGATOR</div>
+        </div>
+        <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:var(--text-dim);">
+          19 streams, one deduplicated wall, refreshed every 4 minutes.
+        </p>
+      </div>
+
+      <div class="card" style="padding:22px 24px;">
+        <div class="flex items-center" style="gap:14px;">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span class="material-icons" style="font-size:22px;color:var(--primary);">psychology</span>
+          </div>
+          <div style="font-family:var(--font-num);font-size:13px;font-weight:700;letter-spacing:.18em;color:var(--text);">EXPLAINER</div>
+        </div>
+        <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:var(--text-dim);">
+          AI verdicts in SOC format: threat class, severity, immediate actions.
+        </p>
+      </div>
+
+      <div class="card" style="padding:22px 24px;">
+        <div class="flex items-center" style="gap:14px;">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span class="material-icons" style="font-size:22px;color:var(--primary);">radar</span>
+          </div>
+          <div style="font-family:var(--font-num);font-size:13px;font-weight:700;letter-spacing:.18em;color:var(--text);">AWARENESS LAYER</div>
+        </div>
+        <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:var(--text-dim);">
+          Not a scanner or firewall — it keeps you informed, not the network patched.
+        </p>
+      </div>
+    </div>
+
+    <!-- Mono footnote -->
+    <div class="flex items-center" style="gap:10px;margin-top:auto;">
+      <span class="material-icons" aria-hidden="true" style="font-size:15px;color:var(--primary);">lock</span>
+      <span style="font-family:var(--font-num);font-size:11px;letter-spacing:.18em;color:var(--text-dim);">RUNS ON A FREE HOSTING TIER — NO PAID SERVICES REQUIRED.</span>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
