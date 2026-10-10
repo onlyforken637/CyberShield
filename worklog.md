@@ -375,3 +375,23 @@ Work Log:
 Stage Summary:
 - Deliverables: /home/z/my-project/download/CyberShield-Presentation.pptx (13-slide features/uses deck) + editable sources in /home/z/my-project/download/slides/ (global.css, slides_brief.json, slide_01..13.html).
 - App unchanged; tars/PDF untouched.
+
+---
+Task ID: 17
+Agent: Z.ai Code (main orchestrator)
+Task: User request — "create a vox style video animation of explain this its features and how to use it with audio".
+
+Work Log:
+- Produced a 2:36 Vox-style motion-graphics explainer entirely from code (no AI video gen — exact feature names and beat-synced kinetic typography required deterministic rendering).
+- Narration: 8-section Vox-style script (cold open → what it is → how it works → AI verdict → KEV → how to use (4 steps) → deploy → outro); TTS via z-ai CLI, voice "jam" (British English), 8 WAV segments measured with ffprobe (150.22s total; durations.json).
+- Engine: /home/z/.stage/vox/{engine.html,vox.css,engine.js,timings.js} — 1280x720 deterministic seek(t) renderer; every frame a pure function of t; CyberShield branding (dark + teal/amber, Space Grotesk/Inter/JetBrains Mono); scenes: word-slam kinetic type, highlight-box wipes, count-ups, typewriter verdict panel, severity meter, KEV wire draw, 4-step how-to wall mock, deploy tiles, fade-out; teal panel wipes between sections; progress bar + section counter chrome.
+- Bugs fixed during build: eOutBack(0) float epsilon made elements visible pre-scene (guarded p<=0); vis() overrode flex containers with display:block (switched to visibility); scene-3 stage overlaps remapped (sources below the 19; meter fades before categories; categories fade before refresh clock); ¥→$ glyph.
+- Capture: Playwright, 3758 frames @24fps JPEG q95, chunked synchronously (sandbox reaps background processes — nohup approach failed twice; chunked resume via capture.js from/to args).
+- Audio: assemble-audio.sh — narration segments adelay'd to section starts, 880Hz ping at each section boundary, dark ambient bed (55/82.4/110Hz aevalsrc drone + brown noise lowpass, fades), amix -> alimiter -> stereo master.wav 156.57s.
+- Encode: x264 OOM-killed at default threads; fixed with -threads 2 + ultrafast; 4 chunks -> concat demuxer -> mux with AAC 192k + faststart. Output public/cybershield-explainer.mp4 (22MB, 1280x720, 156.54s).
+- Verified: ffprobe streams (h264+aac), volumedetect (mean -27.7dB / max -9.2dB), 8 frames decoded from the final MP4 at section boundaries all match the engine state, HTTP 200 serving via /cybershield-explainer.mp4. Intermediates cleaned (frames dir removed); vox sources + audio retained at /home/z/.stage/vox/ (36MB) for future edits.
+
+Stage Summary:
+- Deliverable: /home/z/my-project/public/cybershield-explainer.mp4 — Vox-style CyberShield explainer with full voiceover, ambient bed and section pings; also reachable in the app at /cybershield-explainer.mp4.
+- Editable pipeline retained: narration script (gen-tts.sh), timeline (timings.js/gen-timings.ts), motion engine (engine.html/css/js), capture (capture.js), audio mix (assemble-audio.sh).
+- No app code touched; tars/PDF/PPTX unaffected.
