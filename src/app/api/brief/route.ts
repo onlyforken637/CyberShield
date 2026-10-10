@@ -31,6 +31,9 @@ import { hashCode, normalizeKey } from "@/lib/cyber/utils";
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Vercel function ceiling (Hobby max = 60s) — keeps the 3-layer AI verdict
+// chain alive on the free plan.
+export const maxDuration = 60;
 
 interface BriefRequest {
   link?: string;

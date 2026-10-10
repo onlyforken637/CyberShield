@@ -11,6 +11,8 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Vercel function ceiling for the thumbnail relay.
+export const maxDuration = 30;
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const CACHE_TTL_MS = 30 * 60 * 1000;

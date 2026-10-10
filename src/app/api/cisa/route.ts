@@ -12,6 +12,9 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Vercel function ceiling (Hobby max = 60s) — keeps the 1.7 MB KEV catalog
+// fetch + mirror fallback alive on the free plan.
+export const maxDuration = 60;
 
 const OFFICIAL_URL =
   "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";

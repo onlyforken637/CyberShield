@@ -11,6 +11,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Vercel function ceiling (Hobby max = 60s) — keeps the public converter
+// relay alive on the free plan.
+export const maxDuration = 60;
 
 const UPSTREAM = "https://api.rss2json.com/v1/api.json";
 const CACHE_TTL_MS = 4 * 60 * 1000;

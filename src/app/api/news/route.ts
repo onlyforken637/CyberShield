@@ -12,6 +12,9 @@ import { getNewsSnapshot } from "@/lib/cyber/intel";
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Vercel function ceiling (Hobby max = 60s) — keeps the initial 19-source
+// sync alive on the free plan. Replaces the old vercel.json functions block.
+export const maxDuration = 60;
 
 export async function GET() {
   try {

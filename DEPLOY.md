@@ -56,8 +56,14 @@ git push -u origin main
 3. Wait for DNS to propagate (minutes to a few hours). HTTPS certificates are
    issued automatically. Done — `https://yourdomain.com` is live.
 
-> The included `vercel.json` raises the API function time limit to 60s so the
-> initial 19-source sync is never cut off on the free plan.
+> No `vercel.json` is needed: API time limits are baked into the routes
+> themselves (`export const maxDuration = 60` inside `src/app/api/*/route.ts`),
+> so the initial 19-source sync is never cut off on the free plan.
+>
+> ⚠️ If you add your own `vercel.json`, do NOT put a `functions` block with
+> `src/app/api/...` paths in it — Vercel only accepts `functions` patterns for
+> the legacy `api/` directory and fails the build with: `The pattern ...
+> doesn't match any Serverless Functions inside the `api` directory`.
 
 ---
 
@@ -124,6 +130,7 @@ bun .next/standalone/server.js   # or: node .next/standalone/server.js
 |---|---|
 | First load takes seconds, "SYNCING" chips | Normal — 19 feeds are being fetched; the 12-min TTL cache takes over afterwards |
 | Vercel build fails on Prisma | Build Command → `bunx prisma generate && bun run build` |
+| Vercel build fails with `The pattern "src/app/api/..." defined in functions doesn't match any Serverless Functions` | A `functions` block for App Router routes in `vercel.json` is not supported by Vercel — delete `vercel.json` (or remove its `functions` key) and redeploy. Time limits are already handled inside the route files |
 | DNS not resolving yet | New records can take up to a few hours; check with `dig yourdomain.com` |
 | AI verdict says nothing live | Expected without credentials — add a provider config (see above) or enjoy the Offline Analyst |
 | Render build killed | 512 MB build OOM — build the image elsewhere and deploy from a registry |
