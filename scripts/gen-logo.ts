@@ -5,7 +5,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import sharp from "sharp";
 
-const svgPath = "src/app/icon.svg";
+const svgPath = "public/icon.svg";
 const svg = readFileSync(svgPath);
 
 // High-density vector render -> crisp downscale
@@ -16,9 +16,6 @@ async function emit(size: number, out: string) {
   console.log(`✓ ${out} (${size}×${size})`);
 }
 
-await emit(180, "src/app/apple-icon.png");
-await emit(48, "src/app/icon.png");
-// preview copy for visual check
-await emit(256, "tool-results/logo-preview-256.png");
-await emit(32, "tool-results/logo-preview-32.png");
+await emit(180, "public/apple-touch-icon.png");
+await emit(32, "public/favicon.png");
 console.log("done");

@@ -471,3 +471,19 @@ Stage Summary:
 - Browser icon is now a crisp C+S character monogram (favicon/apple-touch only); the website UI carries no logo imagery — the blinking live light is back in header + footer, ShieldCheck in About.
 - Key files: src/app/icon.svg (new), src/app/icon.png (new), src/app/apple-icon.png (new), scripts/gen-logo.ts (new, regenerates PNGs from SVG), layout.tsx (metadata.icons removed), header.tsx / page.tsx / about-modal.tsx (logo img → blinking dot / ShieldCheck restored), public/logo.png deleted.
 - App state: lint clean, zero console errors, dark+light verified in browser; all icon endpoints 200, old logo endpoint 404.
+
+---
+Task ID: 21
+Agent: Z.ai Code (main orchestrator)
+Task: User report — Vercel deployment build failure: `Error [TurbopackInternalError]: Dependency tracking is disabled so invalidation is not allowed at turbo-tasks-backend/src/backend/mod.rs:1526:13` (Next 16.1.3, bun, two tokio workers panicking simultaneously).
+
+Work Log:
+- Researched the exact panic → matched vercel/next.js issue #85496 "Turbopack build fails if multiple app/ icons have same name": placing BOTH `icon.png` + `icon.svg` in the app dir (a documented-legal combo) crashes `next build` with exactly this panic. Task 20 had created src/app/icon.svg + src/app/icon.png + apple-icon.png — the trigger; the earlier v9 deploy passed build before icons existed.
+- Reproduced locally: stopped dev, cleaned .next, `bun run build` → identical panic (two threads, same mod.rs:1526). Root cause confirmed, not a code/config problem.
+- Fix (bypasses the buggy icon-convention metadata generation entirely, keeps full browser coverage): moved favicon assets out of src/app into public/ — public/icon.svg, public/favicon.png (32px, regenerated via scripts/gen-logo.ts), public/apple-touch-icon.png (180px); deleted src/app/icon.* files; restored explicit metadata.icons in layout.tsx (icon: svg+xml + png 32, apple: /apple-touch-icon.png); gen-logo.ts updated to read public/icon.svg and emit public PNGs.
+- Verified: `bun run build` now completes — "✓ Compiled successfully in 9.2s", 4/4 static pages, all routes (/, /api, /api/brief, /api/cisa, /api/img, /api/news, /api/rss2json) emitted. Dev server restarted, / = 200, /icon.svg + /favicon.png + /apple-touch-icon.png = 200; agent-browser DOM shows the three icon <link> tags, header cyber-ping intact, zero logo imgs in UI, zero console/page errors; lint clean.
+
+Stage Summary:
+- Vercel blocker resolved: the Turbopack panic was upstream GH #85496 (app-dir icon.png+icon.svg collision), reproduced locally and eliminated by serving favicons from public/ + explicit metadata.icons. Production build green end-to-end locally (same script Vercel runs: next build && cp standalone).
+- Key files: layout.tsx (metadata.icons), scripts/gen-logo.ts (paths), public/icon.svg + public/favicon.png + public/apple-touch-icon.png (new/moved); src/app/icon.svg, src/app/icon.png, src/app/apple-icon.png removed.
+- App state: lint clean, dev server healthy, favicon still the C+S monogram, UI unchanged (blinking lights, no in-site logo).

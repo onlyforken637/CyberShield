@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://github.com/vercel/next.js/discussions/85232",
+    "name": "Turbopack Error: Dependency tracking is disabled so",
+    "snippet": "Next.js version: 16.0.0. Error message: Dependency tracking is disabled so invalidation is not allowed at /Users/jj/dev/actions-runner/_work/ ...",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "Oct 23, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/vercel/next.js/discussions/86193",
+    "name": "Turbopack Error: Dependency tracking is disabled so",
+    "snippet": "... Dependency tracking is disabled so invalidation is not allowed at /Users ... js 16, both locally (M1 MacBook) and on Vercel. Saw this issue #85496 and ...",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/vercel/next.js/issues/85496",
+    "name": "Turbopack build fails if multiple app/ icons have same name",
+    "snippet": "... Dependency tracking is disabled so invalidation is not allowed at /Users/geist/dev/actions-runner/_work/next.js/next.js/turbopack/crates ...",
+    "host_name": "github.com",
+    "rank": 2,
+    "date": "Oct 29, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/vercel/next.js/discussions/84803",
+    "name": "Turbopack Error: Dependency tracking is disabled so",
+    "snippet": "Turbopack Error: Dependency tracking is disabled so invalidation is not allowed at /build ... vercel next.js · Discussion #84803 · GitHub. Skip to content ...",
+    "host_name": "github.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://community.vercel.com/tag/turbopack/66",
+    "name": "Topics tagged turbopack",
+    "snippet": "When running next build on Windows, Turbopack crashes with an internal panic that states: “Dependency tracking is disabled so invalidation is not allowed”.",
+    "host_name": "community.vercel.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/vercel/next.js/discussions/84585",
+    "name": "Turbopack Error: Dependency tracking is disabled so",
+    "snippet": "Turbopack Error: Dependency tracking is disabled so invalidation is not allowed at /Users/vercel/dev/actions-runner/_work/next.js/next.js/ ...",
+    "host_name": "github.com",
+    "rank": 5,
+    "date": "Oct 10, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/vercel/next.js/discussions/87021",
+    "name": "Turbopack Error: Dependency tracking is disabled so",
+    "snippet": "Turbopack Error: Dependency tracking is disabled so invalidation is not allowed at /Users/vercel/dev/actions-runner/_work/next.js/next.js/ ...",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "Dec 10, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/vercel/next.js/discussions/92401",
+    "name": "Turbopack Error: Dependency tracking is disabled so",
+    "snippet": "... Dependency tracking is disabled so invalidation is not allowed, including on recent Next.js 16.x / Turbopack builds. The most useful thing I found is that ...",
+    "host_name": "github.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://github.com",
+    "name": "Turbopack Internal Error - Failed to write page endpoint",
+    "snippet": "Jul 21, 2025 — When running next dev --turbopack , the following failures occur: Critical Path Resolution Failure: Turbopack fails to handle Windows absolute ...",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "Jul 21, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://community.vercel.com",
+    "name": "Turbopack internal error, corrupted build cache - unfixable",
+    "snippet": "Dec 17, 2025 — Here is a summary of my issue; There is a Turbopack internal error and Vercel cannot fix it Next .js version and the fact that forcing no build ...",
+    "host_name": "community.vercel.com",
+    "rank": 1,
+    "date": "Dec 17, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://nextjs.org",
+    "name": "API Reference: Turbopack",
+    "snippet": "6 days ago — Turbopack is an incremental bundler optimized for JavaScript and TypeScript, written in Rust, and built into Next .js.",
+    "host_name": "nextjs.org",
+    "rank": 2,
+    "date": "Oct 6, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.answeroverflow.com",
+    "name": "Turbopack error running ai-sdk-v5 example - Mastra",
+    "snippet": "Sep 26, 2025 — Summary When running npm run dev with the --turbo flag I get some errors and I want to create an issue but it asks for a minimal reproduction ...",
+    "host_name": "www.answeroverflow.com",
+    "rank": 3,
+    "date": "Sep 26, 2025",
+    "favicon": ""
+  }
+]
