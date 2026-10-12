@@ -32,10 +32,10 @@ export function ArticleThumb({
       <div className={cn("relative", className)}>
         <MatrixThumb seed={item.id} className={cn("h-full w-full", className)} glyphScale={glyphScale} />
         <span
-          className="absolute bottom-1 right-1 flex items-center gap-0.5 rounded-sm bg-cyber-bg/80 px-1 py-0.5 text-[7.5px] font-bold tracking-widest text-slate-500"
+          className="absolute bottom-1.5 right-1.5 flex items-center gap-0.5 rounded-md bg-cyber-bg/80 px-1.5 py-0.5 text-[8px] font-bold tracking-widest text-mid"
           title="No media in feed payload — generated matrix placeholder"
         >
-          <ImageOff className="h-2 w-2" /> SYNTH
+          <ImageOff className="h-2.5 w-2.5" /> SYNTH
         </span>
       </div>
     );
@@ -62,28 +62,28 @@ const SEVERITY_TONE: Record<
 > = {
   CRITICAL: {
     edge: "border-l-cyber-crimson",
-    dot: "bg-cyber-crimson shadow-[0_0_8px_rgba(255,59,48,0.9)]",
+    dot: "bg-cyber-crimson shadow-[0_0_8px_rgba(255,77,94,0.9)]",
     bar: "bg-cyber-crimson",
     text: "text-cyber-crimson",
     chip: "border-cyber-crimson/50 bg-cyber-crimson/10 text-cyber-crimson",
   },
   HIGH: {
     edge: "border-l-cyber-orange",
-    dot: "bg-cyber-orange shadow-[0_0_8px_rgba(255,138,61,0.9)]",
+    dot: "bg-cyber-orange shadow-[0_0_8px_rgba(251,146,60,0.9)]",
     bar: "bg-cyber-orange",
     text: "text-cyber-orange",
     chip: "border-cyber-orange/50 bg-cyber-orange/10 text-cyber-orange",
   },
   ELEVATED: {
     edge: "border-l-cyber-amber",
-    dot: "bg-cyber-amber shadow-[0_0_8px_rgba(255,179,0,0.9)]",
+    dot: "bg-cyber-amber shadow-[0_0_8px_rgba(245,158,11,0.9)]",
     bar: "bg-cyber-amber",
     text: "text-cyber-amber",
     chip: "border-cyber-amber/50 bg-cyber-amber/10 text-cyber-amber",
   },
   MODERATE: {
     edge: "border-l-cyber-teal/60",
-    dot: "bg-cyber-teal shadow-[0_0_8px_rgba(0,229,255,0.9)]",
+    dot: "bg-cyber-teal shadow-[0_0_8px_rgba(var(--teal-rgb),0.9)]",
     bar: "bg-cyber-teal",
     text: "text-cyber-teal",
     chip: "border-cyber-teal/40 bg-cyber-teal/10 text-cyber-teal",
@@ -103,10 +103,11 @@ interface ArticleCardProps {
 }
 
 /**
- * Column B news card — proxied thumbnail, severity edge, source badge,
- * tag chips, interactive headline and a structured analyst brief
- * (punchy lede, intel highlights, CVE / org chips, read time, severity
- * meter) instead of a flat gray excerpt.
+ * Live news card — proxied thumbnail, severity edge, source badge,
+ * headline, one-line analyst lede and a severity meter. Meta noise
+ * (author, tag chips, highlight bullets) lives in the Investigation
+ * Drawer instead — the card carries only what scanning eyes need
+ * (recognition over recall, reduced cognitive load).
  */
 export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
   const intel = item.intel;
@@ -125,8 +126,8 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
       const rect = el.getBoundingClientRect();
       const px = (event.clientX - rect.left) / rect.width;
       const py = (event.clientY - rect.top) / rect.height;
-      ry((px - 0.5) * 3.6);
-      rx((0.5 - py) * 2.8);
+      ry((px - 0.5) * 2.6);
+      rx((0.5 - py) * 2.0);
     };
     const onLeave = () => {
       rx(0);
@@ -146,18 +147,18 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
       ref={cardRef}
       data-card-reveal
       className={cn(
-        "signal-sweep group relative rounded-md border border-l-2 bg-cyber-surface transition-[border-color,box-shadow,background-color] duration-200",
+        "signal-sweep group relative rounded-xl border border-l-2 bg-cyber-surface shadow-[var(--card-shadow)] transition-[border-color,box-shadow,background-color] duration-200",
         tone.edge,
         selected
-          ? "border-cyber-teal/70 shadow-[0_0_18px_rgba(0,229,255,0.12)]"
-          : "border-cyber-border/80 hover:border-cyber-teal/45 hover:bg-cyber-surface",
+          ? "border-cyber-teal/70 shadow-[0_0_20px_rgba(var(--teal-rgb),0.14)]"
+          : "border-cyber-border/80 hover:border-cyber-teal/45",
       )}
     >
-      <div className="flex gap-3 p-3">
+      <div className="flex gap-4 p-4">
         <button
           type="button"
           onClick={() => onOpen(item)}
-          className="relative h-[74px] w-[112px] shrink-0 overflow-hidden rounded-sm border border-cyber-border/70 sm:h-[92px] sm:w-[148px]"
+          className="relative h-[86px] w-[124px] shrink-0 overflow-hidden rounded-lg border border-cyber-border/70 sm:h-[100px] sm:w-[152px]"
           aria-label={`Open investigation: ${item.title}`}
           tabIndex={-1}
         >
@@ -166,33 +167,25 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
             className="h-full w-full transition-transform duration-300 group-hover:scale-[1.04]"
           />
           {hot && (
-            <span className="absolute left-1 top-1 flex items-center gap-0.5 rounded-sm bg-black/65 px-1 py-0.5 text-[7px] font-black tracking-widest text-cyber-crimson backdrop-blur-sm">
-              <Zap className="h-2 w-2" /> {intel.severity.label}
+            <span className="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded-md bg-cyber-bg/85 px-1.5 py-0.5 text-[8px] font-black tracking-widest text-cyber-crimson backdrop-blur-sm">
+              <Zap className="h-2.5 w-2.5" /> {intel.severity.label}
             </span>
           )}
         </button>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[9px] tracking-wider">
+          <div className="mb-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] tracking-wide">
             <span
-              className={cn("rounded-sm border px-1.5 py-0.5 text-[8.5px] font-bold uppercase", item.accent.chip)}
+              className={cn("rounded-md border px-1.5 py-0.5 text-[9px] font-bold uppercase", item.accent.chip)}
             >
               {item.sourceName}
             </span>
-            {intel.tags.slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className="rounded-sm border border-cyber-violet/40 bg-cyber-violet/10 px-1 py-0.5 text-[8px] font-bold tracking-widest text-cyber-violet"
-              >
-                {tag}
-              </span>
-            ))}
-            <span className="max-w-[130px] truncate text-slate-500" title={item.author}>
-              {item.author}
-            </span>
-            <span className="digital flex items-center gap-1 text-slate-500">
-              <Clock3 className="h-2.5 w-2.5" />
+            <span className="digital flex items-center gap-1 text-low">
+              <Clock3 className="h-3 w-3" />
               <span suppressHydrationWarning>{timeAgo(item.publishedAt)}</span>
+            </span>
+            <span className="hidden max-w-[160px] truncate text-low sm:inline" title={item.author}>
+              {item.author}
             </span>
           </div>
 
@@ -201,7 +194,7 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
               type="button"
               onClick={() => onOpen(item)}
               title={item.title}
-              className="block w-full text-left text-[12.5px] font-bold leading-snug text-slate-100 transition-colors group-hover:text-cyber-teal line-clamp-2"
+              className="block w-full text-left text-[13.5px] font-bold leading-snug text-hi transition-colors group-hover:text-cyber-teal line-clamp-2 sm:text-[14.5px]"
             >
               {item.title}
             </button>
@@ -209,55 +202,39 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
 
           {/* analyst lede — the punch line of the story */}
           {intel.lede && (
-            <p className="mt-1.5 border-l-2 border-cyber-teal/60 pl-2 text-[11px] font-medium leading-relaxed text-slate-300 line-clamp-2">
+            <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-mid">
               {intel.lede}
             </p>
           )}
 
-          {/* distilled intel highlights */}
-          {intel.highlights.length > 0 && (
-            <ul className="mt-1.5 hidden space-y-0.5 sm:block">
-              {intel.highlights.slice(0, 2).map((highlight, index) => (
-                <li
-                  key={index}
-                  className="flex items-start gap-1.5 text-[10px] leading-snug text-slate-500"
-                >
-                  <span className="mt-[3px] shrink-0 text-[8px] text-cyber-amber" aria-hidden="true">
-                    ▸
-                  </span>
-                  <span className="line-clamp-1">{highlight}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {/* entity chips + severity meter */}
-          <div className="mt-auto hidden flex-wrap items-center gap-1.5 pt-1.5 sm:flex">
+          {/* CVE chips + severity meter */}
+          <div className="mt-auto hidden flex-wrap items-center gap-2 pt-2 sm:flex">
             {intel.cves.slice(0, 2).map((cve) => (
               <span
                 key={cve}
-                className="digital rounded-sm border border-cyber-crimson/40 bg-cyber-crimson/10 px-1 py-0.5 text-[8px] font-bold text-cyber-crimson/90"
+                className="digital rounded-md border border-cyber-crimson/40 bg-cyber-crimson/10 px-1.5 py-0.5 text-[9px] font-bold text-cyber-crimson"
               >
                 {cve}
               </span>
             ))}
-            {intel.orgs.slice(0, 2).map((org) => (
+            {intel.orgs.slice(0, 1).map((org) => (
               <span
                 key={org}
-                className="rounded-sm border border-cyber-violet/30 bg-cyber-violet/5 px-1 py-0.5 text-[8px] font-semibold text-cyber-violet/90"
+                className="max-w-[150px] truncate rounded-md border border-cyber-violet/30 bg-cyber-violet/10 px-1.5 py-0.5 text-[9px] font-semibold text-cyber-violet"
+                title={org}
               >
                 {org}
               </span>
             ))}
 
-            <span className="ml-auto flex items-center gap-1.5">
-              <span className="digital text-[8px] tracking-wider text-slate-600">
+            <span className="ml-auto flex items-center gap-2">
+              <span className="digital text-[9px] tracking-wider text-low">
                 {intel.readMinutes} MIN READ
               </span>
-              <span className={cn("digital text-[8px] font-black tracking-widest", tone.text)}>
+              <span className={cn("digital text-[9px] font-black tracking-widest", tone.text)}>
                 {intel.severity.label}
               </span>
-              <span className="h-1 w-10 overflow-hidden rounded-full bg-cyber-border" aria-hidden="true">
+              <span className="h-1 w-12 overflow-hidden rounded-full bg-cyber-raised" aria-hidden="true">
                 <span
                   className={cn("block h-full rounded-full", tone.bar)}
                   style={{ width: `${Math.max(8, intel.severity.score)}%` }}
@@ -265,8 +242,8 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
               </span>
             </span>
 
-            <span className="flex items-center gap-0.5 text-[8.5px] font-bold tracking-widest text-cyber-teal/0 transition-colors group-hover:text-cyber-teal/90">
-              OPEN INVESTIGATION <ChevronRight className="h-3 w-3" />
+            <span className="flex items-center gap-0.5 text-[9px] font-bold tracking-widest text-cyber-teal/0 transition-colors group-hover:text-cyber-teal">
+              INVESTIGATE <ChevronRight className="h-3.5 w-3.5" />
             </span>
           </div>
         </div>

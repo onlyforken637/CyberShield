@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Inter, Orbitron } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B0F19",
+  themeColor: "#070B14",
   width: "device-width",
   initialScale: 1,
 };
@@ -49,12 +50,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${orbitron.variable} ${geistMono.variable} font-sans antialiased bg-cyber-bg text-foreground`}
       >
-        {children}
-        <Toaster theme="dark" position="bottom-right" closeButton />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+          storageKey="cs-theme"
+        >
+          {children}
+          <Toaster position="bottom-right" closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Braces, Database, Radio, ShieldCheck } from "lucide-react";
+import { Activity, Braces, Database, GraduationCap, Radio, ShieldCheck, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SOURCES } from "@/lib/cyber/feeds";
 import type { CisaMetrics } from "@/lib/cyber/cisa";
@@ -21,8 +21,8 @@ interface AboutModalProps {
 }
 
 /**
- * About / diagnostics modal — mission briefing plus a live telemetry
- * snapshot of both data pipelines.
+ * About / diagnostics modal — mission briefing, the creator card and a
+ * live telemetry snapshot of both data pipelines.
  */
 export function AboutModal({ open, onOpenChange, diagnostics }: AboutModalProps) {
   const { totalSignals, onlineCount, lastSyncAt, nextSyncAt, metrics } = diagnostics;
@@ -35,21 +35,61 @@ export function AboutModal({ open, onOpenChange, diagnostics }: AboutModalProps)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto border-cyber-border bg-cyber-surface p-5 sm:max-w-lg sm:p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-display text-base font-bold tracking-[0.14em] text-slate-100">
-            <ShieldCheck className="h-4 w-4 text-cyber-teal" />
-            CYBER<span className="text-cyber-teal">SHIELD</span> NEWS
+          <DialogTitle className="flex items-center gap-2 font-display text-base font-bold tracking-[0.14em] text-hi">
+            <ShieldCheck className="h-4.5 w-4.5 text-cyber-teal" />
+            CYBER<span className="brand-gradient">SHIELD</span> NEWS
           </DialogTitle>
-          <DialogDescription className="text-left text-xs leading-relaxed text-slate-400">
+          <DialogDescription className="text-left text-[13px] leading-relaxed text-mid">
             A real-time threat intelligence ecosystem aggregating{" "}
-            <span className="font-semibold text-slate-200">{SOURCES.length} cybersecurity research
+            <span className="font-semibold text-hi">{SOURCES.length} cybersecurity research
             streams</span>{" "}
             and the official CISA Known Exploited Vulnerabilities catalog. Every metric on the
             dashboard is computed from live upstream payloads — no mock data, no API keys.
           </DialogDescription>
         </DialogHeader>
 
+        {/* Creator */}
+        <section
+          aria-label="About the creator"
+          className="relative overflow-hidden rounded-xl border border-cyber-teal/25 bg-gradient-to-br from-cyber-teal/10 via-transparent to-transparent p-4 sm:p-5"
+        >
+          <div className="flex items-start gap-4">
+            <span
+              aria-hidden="true"
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyber-teal to-cyber-cyan font-display text-xl font-black text-cyber-bg shadow-[0_0_24px_rgba(var(--teal-rgb),0.35)]"
+            >
+              UJ
+            </span>
+            <div className="min-w-0">
+              <p className="digital text-[9px] font-bold tracking-[0.24em] text-cyber-teal">
+                <Sparkles className="mr-1 inline h-3 w-3" />
+                CREATED &amp; BUILT BY
+              </p>
+              <h3 className="mt-1 font-display text-lg font-bold tracking-wide text-hi">
+                Umair Jamal
+              </h3>
+              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-medium text-mid">
+                <span className="inline-flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 text-cyber-teal" /> Tech Enthusiast
+                </span>
+                <span className="text-low">·</span>
+                <span>18 years old</span>
+                <span className="text-low">·</span>
+                <span className="inline-flex items-center gap-1">
+                  <GraduationCap className="h-3.5 w-3.5 text-cyber-teal" /> 12th Grade Student
+                </span>
+              </p>
+              <p className="mt-2.5 text-[12.5px] leading-relaxed text-mid">
+                CyberShield was designed, engineered and shipped end-to-end by Umair — a young
+                builder passionate about making real-time threat intelligence accessible to
+                everyone, not just SOC teams.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Pipelines */}
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <PipelineCard
             icon={<Radio className="h-3.5 w-3.5 text-cyber-teal" />}
             title="NEWS PIPELINE"
@@ -71,11 +111,11 @@ export function AboutModal({ open, onOpenChange, diagnostics }: AboutModalProps)
         </div>
 
         {/* Live diagnostics */}
-        <section aria-label="Live diagnostics" className="rounded-lg border border-cyber-border bg-cyber-panel p-3.5">
-          <h3 className="digital mb-2.5 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.2em] text-slate-400">
-            <Activity className="h-3 w-3 text-cyber-teal" /> LIVE DIAGNOSTICS
+        <section aria-label="Live diagnostics" className="rounded-xl border border-cyber-border bg-cyber-panel p-4">
+          <h3 className="digital mb-3 flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.2em] text-mid">
+            <Activity className="h-3.5 w-3.5 text-cyber-teal" /> LIVE DIAGNOSTICS
           </h3>
-          <dl className="grid grid-cols-2 gap-2 text-[10.5px]">
+          <dl className="grid grid-cols-2 gap-2.5 text-[11px]">
             <DiagRow label="SIGNALS BUFFERED" value={totalSignals.toLocaleString("en-US")} />
             <DiagRow
               label="STREAMS ONLINE"
@@ -99,8 +139,8 @@ export function AboutModal({ open, onOpenChange, diagnostics }: AboutModalProps)
           </dl>
         </section>
 
-        <p className="digital flex items-center gap-1.5 text-[8.5px] leading-relaxed tracking-wider text-slate-600">
-          <Braces className="h-3 w-3 shrink-0" />
+        <p className="digital flex items-center gap-1.5 text-[9px] leading-relaxed tracking-wider text-low">
+          <Braces className="h-3.5 w-3.5 shrink-0" />
           OPEN EVERY CARD → RAW STREAM TELEMETRY TAB SHOWS THE UNTOUCHED JSON PAYLOAD. MIT OPEN
           SOURCE.
         </p>
@@ -111,15 +151,15 @@ export function AboutModal({ open, onOpenChange, diagnostics }: AboutModalProps)
 
 function PipelineCard({ icon, title, lines }: { icon: React.ReactNode; title: string; lines: string[] }) {
   return (
-    <div className="rounded-lg border border-cyber-border bg-cyber-panel p-3">
-      <h3 className="digital mb-1.5 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.2em] text-slate-300">
+    <div className="rounded-xl border border-cyber-border bg-cyber-panel p-4">
+      <h3 className="digital mb-2 flex items-center gap-1.5 text-[9.5px] font-bold tracking-[0.2em] text-hi">
         {icon}
         {title}
       </h3>
-      <ul className="space-y-1 text-[10px] leading-relaxed text-slate-500">
+      <ul className="space-y-1.5 text-[11px] leading-relaxed text-mid">
         {lines.map((line) => (
           <li key={line} className="flex gap-1.5">
-            <span className="text-cyber-teal/60">▸</span>
+            <span className="text-cyber-teal/70">▸</span>
             {line}
           </li>
         ))}
@@ -140,10 +180,10 @@ function DiagRow({
   highlight?: string;
 }) {
   return (
-    <div className="rounded-sm border border-cyber-border/70 bg-cyber-surface/70 px-2 py-1.5">
-      <dt className="text-[8px] font-bold tracking-widest text-slate-500">{label}</dt>
+    <div className="rounded-lg border border-cyber-border/70 bg-cyber-surface/70 px-2.5 py-2">
+      <dt className="text-[8.5px] font-bold tracking-widest text-low">{label}</dt>
       <dd
-        className={`mt-0.5 truncate font-semibold text-slate-200 ${mono ? "digital" : ""} ${highlight ?? ""}`}
+        className={`mt-1 truncate font-semibold text-hi ${mono ? "digital" : ""} ${highlight ?? ""}`}
       >
         {value}
       </dd>

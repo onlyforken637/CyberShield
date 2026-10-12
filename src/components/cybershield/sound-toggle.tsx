@@ -33,12 +33,12 @@ export function SoundToggle() {
       aria-pressed={enabled}
       aria-label={enabled ? "Mute interface audio" : "Unmute interface audio"}
       title={enabled ? "Voice uplink ON — click to mute" : "Voice uplink MUTED — click to enable"}
-      className="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-slate-400 transition-colors hover:text-cyber-teal"
+      className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-cyber-border bg-cyber-surface text-mid transition-colors hover:border-cyber-teal/60 hover:text-cyber-teal"
     >
       {enabled ? (
-        <Volume2 className="h-3.5 w-3.5" />
+        <Volume2 className="h-4 w-4" />
       ) : (
-        <VolumeX className="h-3.5 w-3.5 text-cyber-amber/80" />
+        <VolumeX className="h-4 w-4 text-cyber-amber" />
       )}
     </button>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { AboutModal } from "@/components/cybershield/about-modal";
 import { BootOverlay } from "@/components/cybershield/boot-overlay";
@@ -294,8 +293,8 @@ export default function CyberShieldPage() {
       <Ticker items={items} onOpenArticle={openArticle} />
 
       {/* ── Main layout: feed + sidebar analytics ─────────────────── */}
-      <main data-intro className="mx-auto w-full max-w-[1600px] flex-1 px-3 py-6 sm:px-6 lg:px-8">
-        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] lg:gap-8 xl:grid-cols-[1fr_360px]">
+      <main data-intro className="mx-auto w-full max-w-[1600px] flex-1 px-3 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[1fr_340px] lg:gap-10 xl:grid-cols-[1fr_380px]">
           {/* Feed column */}
           <section id="main-feed" className="w-full min-w-0 scroll-mt-36" aria-label="Threat feed">
             <FeedColumn
@@ -321,7 +320,7 @@ export default function CyberShieldPage() {
           </section>
 
           {/* Sidebar analytics column */}
-          <aside className="w-full space-y-5" aria-label="Sidebar analytics">
+          <aside className="w-full space-y-6" aria-label="Sidebar analytics">
             <Sidebar
               items={items}
               feedStates={feedStates}
@@ -343,25 +342,25 @@ export default function CyberShieldPage() {
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer data-intro className="mt-auto w-full border-t border-cyber-border/80 bg-cyber-panel/50 py-10 backdrop-blur-sm">
+      <footer data-intro className="mt-auto w-full border-t border-cyber-border/80 bg-cyber-panel/50 pb-8 pt-12 backdrop-blur-sm">
         <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 grid grid-cols-1 gap-8 border-b border-cyber-border/60 pb-10 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-10 grid grid-cols-1 gap-10 border-b border-cyber-border/60 pb-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Col 1: brand & status */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2.5">
                 <span className="cyber-ping relative inline-flex h-3 w-3 text-cyber-teal">
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-cyber-teal" />
                 </span>
-                <span className="font-display text-xl font-black tracking-wider text-slate-100">
-                  CYBER<span className="neon-teal">SHIELD</span>
+                <span className="font-display text-xl font-black tracking-wider text-hi">
+                  CYBER<span className="brand-gradient">SHIELD</span>
                 </span>
               </div>
-              <p className="text-xs leading-relaxed text-slate-400">
+              <p className="text-[12.5px] leading-relaxed text-mid">
                 Real-time threat intelligence ecosystem parsing {SOURCES.length}+ cybersecurity
                 research blogs, vulnerability feeds, and nation-state advisories in real time.
               </p>
               <div className="pt-1">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyber-teal/30 bg-cyber-teal/10 px-3 py-1 text-[10px] font-bold text-cyber-teal">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyber-teal/30 bg-cyber-teal/10 px-3 py-1.5 text-[10px] font-bold text-cyber-teal">
                   <span className="h-1.5 w-1.5 rounded-full bg-cyber-teal" />
                   {onlineCount}/{SOURCES.length} STREAMS ONLINE
                 </span>
@@ -370,10 +369,10 @@ export default function CyberShieldPage() {
 
             {/* Col 2: high priority intel */}
             <div>
-              <h3 className="mb-4 font-display text-xs font-bold uppercase tracking-wider text-slate-400">
+              <h3 className="mb-4 font-display text-[11px] font-bold uppercase tracking-[0.18em] text-mid">
                 High Priority Intel
               </h3>
-              <ul className="space-y-2 text-xs text-slate-400">
+              <ul className="space-y-2.5 text-[12.5px] text-mid">
                 {HIGH_PRIORITY_CATEGORY_IDS.map((categoryId) => (
                   <li key={categoryId}>
                     <button
@@ -390,10 +389,10 @@ export default function CyberShieldPage() {
 
             {/* Col 3: intel snapshot */}
             <div>
-              <h3 className="mb-4 font-display text-xs font-bold uppercase tracking-wider text-slate-400">
+              <h3 className="mb-4 font-display text-[11px] font-bold uppercase tracking-[0.18em] text-mid">
                 Intel Snapshot
               </h3>
-              <div className="space-y-2 text-xs text-slate-400">
+              <div className="space-y-2.5 text-[12px] text-mid">
                 {[
                   ["Update Frequency:", "12 MIN TTL"],
                   ["Primary Proxy:", "MULTI-FAILOVER"],
@@ -402,77 +401,67 @@ export default function CyberShieldPage() {
                 ].map(([label, value], index) => (
                   <div
                     key={label}
-                    className={`flex justify-between border-b border-cyber-border/40 pb-1 ${index === 3 ? "border-b-0" : ""}`}
+                    className={`flex justify-between border-b border-cyber-border/40 pb-2 ${index === 3 ? "border-b-0" : ""}`}
                   >
                     <span>{label}</span>
-                    <span className={`digital font-bold ${index === 3 ? "text-slate-200" : "text-cyber-teal"}`}>
+                    <span className={`digital font-bold ${index === 3 ? "text-hi" : "text-cyber-teal"}`}>
                       {value}
                     </span>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <a
-                  href="/cybershield-v3.tar.gz"
-                  download
-                  aria-label="Download CyberShield v3 source archive (tar.gz)"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-cyber-teal/40 bg-cyber-teal/10 px-3 py-1.5 text-[10px] font-bold tracking-wider text-cyber-teal transition-colors hover:bg-cyber-teal/20"
-                >
-                  <Download className="h-3 w-3" />
-                  SOURCE · V3 .TAR.GZ
-                </a>
-                <a
-                  href="/cybershield-v9.tar.gz"
-                  download
-                  aria-label="Download CyberShield v9 source archive (tar.gz)"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-300 transition-colors hover:bg-amber-400/20"
-                >
-                  <Download className="h-3 w-3" />
-                  SOURCE · V9 .TAR.GZ
-                </a>
-              </div>
             </div>
 
-            {/* Col 4: about */}
-            <div className="space-y-3">
-              <h3 className="font-display text-xs font-bold uppercase tracking-wider text-slate-400">
-                Emergency Threat Briefs
+            {/* Col 4: creator */}
+            <div>
+              <h3 className="mb-4 font-display text-[11px] font-bold uppercase tracking-[0.18em] text-mid">
+                The Creator
               </h3>
-              <p className="text-xs leading-relaxed text-slate-400">
-                Stay ahead of zero-day exploits. Bookmark CyberShield News for instant situational
-                awareness.
-              </p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value="cybershield // live_feed"
-                  aria-label="CyberShield feed identifier"
-                  className="pointer-events-none w-full rounded-lg border border-cyber-border bg-cyber-surface px-3 py-1.5 text-xs text-slate-400"
-                />
+              <div className="rounded-xl border border-cyber-teal/25 bg-gradient-to-br from-cyber-teal/10 via-transparent to-transparent p-4">
+                <div className="flex items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyber-teal to-cyber-cyan font-display text-sm font-black text-cyber-bg"
+                  >
+                    UJ
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-[13px] font-bold text-hi">Umair Jamal</p>
+                    <p className="text-[11px] text-mid">Tech Enthusiast · 18 · 12th Grade</p>
+                  </div>
+                </div>
+                <p className="mt-3 text-[11.5px] leading-relaxed text-mid">
+                  Designed &amp; engineered end-to-end to make live threat intelligence accessible
+                  to everyone.
+                </p>
                 <button
                   type="button"
                   onClick={() => setAboutOpen(true)}
-                  className="neon-teal shrink-0 rounded-lg border border-cyber-teal/50 bg-cyber-teal/10 px-3 py-1.5 text-xs font-bold text-cyber-teal transition-colors hover:bg-cyber-teal/20"
+                  className="mt-3.5 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-cyber-teal/50 bg-cyber-teal/10 px-3 py-2 text-[11px] font-bold text-cyber-teal transition-colors hover:bg-cyber-teal/20"
                 >
-                  About
+                  About CyberShield
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-between gap-4 pt-2 text-xs text-slate-500 sm:flex-row sm:text-left">
-            <div className="digital text-[9.5px] tracking-wider">
+          <div className="flex flex-col items-center justify-between gap-4 pt-2 text-[11px] text-low sm:flex-row sm:text-left">
+            <div className="digital text-center text-[9.5px] tracking-wider sm:text-left">
               © {new Date().getFullYear()} CYBERSHIELD NEWS · REAL-TIME SITUATIONAL AWARENESS
               AGGREGATOR · 100% LIVE TELEMETRY
             </div>
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="transition-colors hover:text-cyber-teal"
-            >
-              Back to Top ↑
-            </button>
+            <div className="flex items-center gap-4">
+              <span className="text-[11px]">
+                Crafted by <span className="font-semibold text-mid">Umair Jamal</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="transition-colors hover:text-cyber-teal"
+              >
+                Back to Top ↑
+              </button>
+            </div>
           </div>
         </div>
       </footer>

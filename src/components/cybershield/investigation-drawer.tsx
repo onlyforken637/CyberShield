@@ -93,7 +93,7 @@ export function InvestigationDrawer({ target, open, onClose }: InvestigationDraw
       <div
         onClick={onClose}
         className={cn(
-          "fixed inset-0 z-40 bg-black/55 backdrop-blur-sm transition-opacity duration-300",
+          "fixed inset-0 z-40 bg-black/45 backdrop-blur-sm transition-opacity duration-300",
           open ? "opacity-100" : "opacity-0",
         )}
       />
@@ -105,18 +105,18 @@ export function InvestigationDrawer({ target, open, onClose }: InvestigationDraw
         aria-modal="true"
         aria-label="Investigation drawer"
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-[500px] max-w-[94vw] flex-col border-l border-cyber-teal/30 bg-[#0E1422] shadow-[-28px_0_70px_rgba(0,0,0,0.6)] transition-transform duration-300 ease-out",
+          "fixed inset-y-0 right-0 z-50 flex w-[500px] max-w-[94vw] flex-col border-l border-cyber-border bg-cyber-panel shadow-[-28px_0_70px_rgba(0,0,0,0.45)] transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "translate-x-full",
         )}
       >
         {/* header */}
-        <header data-drawer-stagger className="flex shrink-0 items-center gap-2.5 border-b border-cyber-border bg-cyber-panel/80 px-4 py-3">
+        <header data-drawer-stagger className="flex shrink-0 items-center gap-2.5 border-b border-cyber-border bg-cyber-panel/90 px-5 py-4">
           {target?.kind === "vuln" ? (
             <Fingerprint className="h-4 w-4 shrink-0 text-cyber-crimson" />
           ) : (
             <FileSearch className="h-4 w-4 shrink-0 text-cyber-teal" />
           )}
-          <h2 className="digital min-w-0 truncate text-[11px] font-bold tracking-[0.18em] text-slate-200">
+          <h2 className="digital min-w-0 truncate text-[11.5px] font-bold tracking-[0.18em] text-hi">
             {target === null
               ? "INVESTIGATION"
               : target.kind === "article"
@@ -127,9 +127,9 @@ export function InvestigationDrawer({ target, open, onClose }: InvestigationDraw
             type="button"
             onClick={onClose}
             aria-label="Close investigation drawer"
-            className="ml-auto rounded-sm border border-cyber-border bg-cyber-surface p-1.5 text-slate-400 transition-colors hover:border-cyber-crimson/50 hover:text-cyber-crimson"
+            className="ml-auto rounded-lg border border-cyber-border bg-cyber-surface p-2 text-mid transition-colors hover:border-cyber-crimson/50 hover:text-cyber-crimson"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         </header>
 
@@ -173,7 +173,7 @@ function DrawerBody({ target }: { target: DrawerTarget | null }) {
         />
       </div>
 
-      <div data-drawer-stagger className="cyber-scroll min-h-0 flex-1 overflow-y-auto p-4">
+      <div data-drawer-stagger className="cyber-scroll min-h-0 flex-1 overflow-y-auto p-5">
         {target?.kind === "article" && (
           <ArticleSummary item={target.item} visible={tab === "summary"} />
         )}
@@ -203,10 +203,10 @@ function TabButton({
       role="tab"
       aria-selected={active}
       className={cn(
-        "flex items-center gap-1.5 rounded-t-sm border-b-2 px-2.5 pb-2 pt-1 text-[9.5px] font-bold tracking-widest transition-colors",
+        "flex items-center gap-1.5 border-b-2 px-3 pb-2.5 pt-1.5 text-[10px] font-bold tracking-widest transition-colors",
         active
           ? "border-cyber-teal text-cyber-teal"
-          : "border-transparent text-slate-500 hover:text-slate-300",
+          : "border-transparent text-low hover:text-mid",
       )}
     >
       {icon}
@@ -230,26 +230,26 @@ function ArticleSummary({ item, visible }: { item: FeedItem; visible: boolean })
   if (!visible) return null;
   return (
     <article className="space-y-3.5">
-      <div className="overflow-hidden rounded-md border border-cyber-border">
+      <div className="overflow-hidden rounded-xl border border-cyber-border">
         <ArticleThumb item={item} className="h-48 w-full" glyphScale={1.6} />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-[9px] tracking-wider">
-        <span className={cn("rounded-sm border px-1.5 py-0.5 font-bold uppercase", item.accent.chip)}>
+      <div className="flex flex-wrap items-center gap-2 text-[10px] tracking-wide">
+        <span className={cn("rounded-md border px-1.5 py-0.5 font-bold uppercase", item.accent.chip)}>
           {item.sourceName}
         </span>
-        <span className="text-slate-500">{item.author}</span>
-        <span className="digital text-slate-600">{item.pubDate}</span>
+        <span className="text-mid">{item.author}</span>
+        <span className="digital text-low">{item.pubDate}</span>
       </div>
 
-      <h3 className="text-base font-bold leading-snug text-slate-100">{item.title}</h3>
+      <h3 className="text-lg font-bold leading-snug text-hi">{item.title}</h3>
 
       {(item.intel.tags.length > 0 || item.intel.cves.length > 0 || item.intel.orgs.length > 0) && (
         <div className="flex flex-wrap items-center gap-1.5">
           {item.intel.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-sm border border-cyber-violet/40 bg-cyber-violet/10 px-1.5 py-0.5 text-[8px] font-bold tracking-widest text-cyber-violet"
+              className="rounded-md border border-cyber-violet/40 bg-cyber-violet/10 px-1.5 py-0.5 text-[9px] font-bold tracking-widest text-cyber-violet"
             >
               {tag}
             </span>
@@ -257,7 +257,7 @@ function ArticleSummary({ item, visible }: { item: FeedItem; visible: boolean })
           {item.intel.cves.map((cve) => (
             <span
               key={cve}
-              className="digital rounded-sm border border-cyber-crimson/40 bg-cyber-crimson/10 px-1.5 py-0.5 text-[8px] font-bold text-cyber-crimson/90"
+              className="digital rounded-md border border-cyber-crimson/40 bg-cyber-crimson/10 px-1.5 py-0.5 text-[9px] font-bold text-cyber-crimson"
             >
               {cve}
             </span>
@@ -265,19 +265,19 @@ function ArticleSummary({ item, visible }: { item: FeedItem; visible: boolean })
           {item.intel.orgs.map((org) => (
             <span
               key={org}
-              className="rounded-sm border border-cyber-teal/30 bg-cyber-teal/5 px-1.5 py-0.5 text-[8px] font-semibold text-cyber-teal/90"
+              className="rounded-md border border-cyber-teal/30 bg-cyber-teal/10 px-1.5 py-0.5 text-[9px] font-semibold text-cyber-teal"
             >
               {org}
             </span>
           ))}
-          <span className="digital ml-auto text-[8.5px] tracking-widest text-slate-600">
+          <span className="digital ml-auto text-[9px] tracking-widest text-low">
             {item.intel.readMinutes} MIN READ
           </span>
         </div>
       )}
 
       {item.intel.lede && (
-        <p className="border-l-2 border-cyber-teal/60 pl-2.5 text-[12px] font-medium leading-relaxed text-slate-200">
+        <p className="border-l-2 border-cyber-teal/60 pl-3 text-[13px] font-medium leading-relaxed text-hi">
           {item.intel.lede}
         </p>
       )}
@@ -285,13 +285,13 @@ function ArticleSummary({ item, visible }: { item: FeedItem; visible: boolean })
       {paragraphs.length > 0 ? (
         <div className="space-y-2.5">
           {paragraphs.map((paragraph, index) => (
-            <p key={index} className="text-[12px] leading-relaxed text-slate-300">
+            <p key={index} className="text-[13px] leading-relaxed text-mid">
               {paragraph}
             </p>
           ))}
         </div>
       ) : (
-        <p className="text-[12px] italic leading-relaxed text-slate-500">
+        <p className="text-[13px] italic leading-relaxed text-low">
           The live payload for this article did not include a readable description body.
         </p>
       )}
@@ -300,7 +300,7 @@ function ArticleSummary({ item, visible }: { item: FeedItem; visible: boolean })
         href={item.link}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 rounded-sm border border-cyber-teal/60 bg-cyber-teal/10 px-4 py-2.5 text-[11px] font-bold tracking-widest text-cyber-teal transition-all hover:bg-cyber-teal/20 hover:shadow-[0_0_18px_rgba(0,229,255,0.25)]"
+        className="flex items-center justify-center gap-2 rounded-lg border border-cyber-teal/60 bg-cyber-teal/10 px-4 py-3 text-[11.5px] font-bold tracking-widest text-cyber-teal transition-all hover:bg-cyber-teal/20 hover:shadow-[0_0_18px_rgba(var(--teal-rgb),0.22)]"
       >
         <ExternalLink className="h-3.5 w-3.5" />
         NAVIGATE TO ORIGINAL SOURCE INTELLIGENCE
@@ -320,33 +320,33 @@ function VulnSummary({ vuln, visible }: { vuln: CisaVuln; visible: boolean }) {
   return (
     <article className="space-y-4">
       <div>
-        <p className="text-[9px] tracking-[0.2em] text-slate-500">CISA KEV CATALOG ENTRY</p>
-        <h3 className="neon-crimson digital mt-1 text-2xl font-bold">{vuln.cveID}</h3>
-        <p className="mt-1 text-[12.5px] font-semibold leading-snug text-slate-200">
+        <p className="text-[9.5px] tracking-[0.2em] text-low">CISA KEV CATALOG ENTRY</p>
+        <h3 className="neon-crimson digital mt-1.5 text-[1.7rem] font-bold">{vuln.cveID}</h3>
+        <p className="mt-1.5 text-[13.5px] font-semibold leading-snug text-hi">
           {vuln.vulnerabilityName}
         </p>
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           <span
             className={cn(
-              "rounded-sm border px-1.5 py-0.5 text-[8.5px] font-bold tracking-widest",
+              "rounded-md border px-1.5 py-0.5 text-[9px] font-bold tracking-widest",
               SEVERITY_STYLES[severity.tone],
             )}
           >
             {severity.label} · {severity.daysSinceAdd}D SINCE ADD
           </span>
           {ransomware ? (
-            <span className="flex items-center gap-1 rounded-sm border border-cyber-crimson/50 bg-cyber-crimson/10 px-1.5 py-0.5 text-[8.5px] font-bold tracking-widest text-cyber-crimson">
+            <span className="flex items-center gap-1 rounded-md border border-cyber-crimson/50 bg-cyber-crimson/10 px-1.5 py-0.5 text-[9px] font-bold tracking-widest text-cyber-crimson">
               <Skull className="h-3 w-3" /> CONFIRMED RANSOMWARE USE
             </span>
           ) : (
-            <span className="rounded-sm border border-cyber-border bg-cyber-surface px-1.5 py-0.5 text-[8.5px] font-bold tracking-widest text-slate-500">
+            <span className="rounded-md border border-cyber-border bg-cyber-surface px-1.5 py-0.5 text-[9px] font-bold tracking-widest text-mid">
               NO KNOWN RANSOMWARE USE
             </span>
           )}
         </div>
       </div>
 
-      <dl className="grid grid-cols-2 gap-2">
+      <dl className="grid grid-cols-2 gap-2.5">
         <DossierField label="VENDOR / PROJECT" value={vuln.vendorProject} />
         <DossierField label="PRODUCT" value={vuln.product} />
         <DossierField label="DATE ADDED" value={vuln.dateAdded} mono />
@@ -360,12 +360,12 @@ function VulnSummary({ vuln, visible }: { vuln: CisaVuln; visible: boolean }) {
 
       <section>
         <SectionTitle>SHORT DESCRIPTION</SectionTitle>
-        <p className="mt-1 text-[12px] leading-relaxed text-slate-300">{vuln.shortDescription}</p>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-mid">{vuln.shortDescription}</p>
       </section>
 
       <section>
         <SectionTitle>REQUIRED ACTION</SectionTitle>
-        <p className="mt-1 text-[12px] leading-relaxed text-slate-300">{vuln.requiredAction}</p>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-mid">{vuln.requiredAction}</p>
       </section>
 
       <div className="flex flex-wrap gap-2">
@@ -373,9 +373,9 @@ function VulnSummary({ vuln, visible }: { vuln: CisaVuln; visible: boolean }) {
           href={nvdUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-cyber-teal/60 bg-cyber-teal/10 px-4 py-2.5 text-[10.5px] font-bold tracking-widest text-cyber-teal transition-all hover:bg-cyber-teal/20 hover:shadow-[0_0_18px_rgba(0,229,255,0.25)]"
+          className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-cyber-teal/60 bg-cyber-teal/10 px-4 py-3 text-[11px] font-bold tracking-widest text-cyber-teal transition-all hover:bg-cyber-teal/20 hover:shadow-[0_0_18px_rgba(var(--teal-rgb),0.22)]"
         >
-          <ExternalLink className="h-3.5 w-3.5" />
+          <ExternalLink className="h-4 w-4" />
           NVD ADVISORY
         </a>
         {typeof vuln.notes === "string" && /^https?:\/\//.test(vuln.notes) && (
@@ -383,9 +383,9 @@ function VulnSummary({ vuln, visible }: { vuln: CisaVuln; visible: boolean }) {
             href={vuln.notes}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-cyber-border bg-cyber-surface px-4 py-2.5 text-[10.5px] font-bold tracking-widest text-slate-300 transition-colors hover:border-cyber-teal/40 hover:text-cyber-teal"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-cyber-border bg-cyber-surface px-4 py-3 text-[11px] font-bold tracking-widest text-mid transition-colors hover:border-cyber-teal/40 hover:text-cyber-teal"
           >
-            <Flame className="h-3.5 w-3.5" />
+            <Flame className="h-4 w-4" />
             CISA REFERENCE
           </a>
         )}
@@ -406,13 +406,13 @@ function DossierField({
   icon?: ReactNode;
 }) {
   return (
-    <div className="rounded-sm border border-cyber-border/70 bg-cyber-surface/70 px-2.5 py-2">
-      <dt className="flex items-center gap-1 text-[8px] font-bold tracking-widest text-slate-500">
+    <div className="rounded-lg border border-cyber-border/70 bg-cyber-surface/70 px-3 py-2.5">
+      <dt className="flex items-center gap-1 text-[9px] font-bold tracking-widest text-low">
         {icon}
         {label}
       </dt>
       <dd
-        className={cn("mt-0.5 truncate text-[11px] font-semibold text-slate-200", mono && "digital")}
+        className={cn("mt-1 truncate text-[11.5px] font-semibold text-hi", mono && "digital")}
         title={value}
       >
         {value}
@@ -424,7 +424,7 @@ function DossierField({
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
     <h4 className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.2em] text-cyber-teal/80">
-      <span className="inline-block h-2 w-0.5 bg-cyber-teal/70" />
+      <span className="inline-block h-2.5 w-0.5 rounded-full bg-cyber-teal/70" />
       {children}
     </h4>
   );
@@ -453,7 +453,7 @@ function JsonBlock({ data }: { data: unknown }) {
     while ((match = tokenRe.exec(text)) !== null) {
       if (match.index > lastIndex) {
         out.push(
-          <span key={key++} className="text-slate-500">
+          <span key={key++} className="text-low">
             {text.slice(lastIndex, match.index)}
           </span>,
         );
@@ -488,7 +488,7 @@ function JsonBlock({ data }: { data: unknown }) {
     }
     if (lastIndex < text.length) {
       out.push(
-        <span key={key++} className="text-slate-500">
+        <span key={key++} className="text-low">
           {text.slice(lastIndex)}
         </span>,
       );
@@ -508,21 +508,21 @@ function JsonBlock({ data }: { data: unknown }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-md border border-cyber-border bg-[#0A0F1B]">
-      <div className="flex items-center justify-between border-b border-cyber-border bg-cyber-panel/70 px-3 py-2">
-        <span className="digital text-[9px] font-bold tracking-widest text-slate-500">
+    <div className="overflow-hidden rounded-lg border border-cyber-border bg-cyber-bg">
+      <div className="flex items-center justify-between border-b border-cyber-border bg-cyber-panel/70 px-3.5 py-2.5">
+        <span className="digital text-[9.5px] font-bold tracking-widest text-low">
           UPSTREAM PAYLOAD · NORMALIZED TELEMETRY
         </span>
         <button
           type="button"
           onClick={copy}
-          className="flex items-center gap-1 rounded-sm border border-cyber-border bg-cyber-surface px-2 py-1 text-[9px] font-bold tracking-widest text-slate-400 transition-colors hover:border-cyber-teal/50 hover:text-cyber-teal"
+          className="flex items-center gap-1.5 rounded-lg border border-cyber-border bg-cyber-surface px-2.5 py-1.5 text-[9.5px] font-bold tracking-widest text-mid transition-colors hover:border-cyber-teal/50 hover:text-cyber-teal"
         >
           {copied ? <Check className="h-3 w-3 text-cyber-green" /> : <Copy className="h-3 w-3" />}
           {copied ? "COPIED" : "COPY"}
         </button>
       </div>
-      <pre className="cyber-scroll max-h-[calc(100dvh-260px)] overflow-auto p-3 text-[10.5px] leading-relaxed">
+      <pre className="cyber-scroll max-h-[calc(100dvh-260px)] overflow-auto p-4 text-[11px] leading-relaxed">
         <code>{nodes}</code>
       </pre>
     </div>

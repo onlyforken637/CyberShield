@@ -67,7 +67,7 @@ function BottomButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 py-2 text-[9px] font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-cyber-teal disabled:opacity-60 aria-pressed:text-cyber-teal"
+      className="flex min-h-[48px] flex-col items-center justify-center gap-1 py-2 text-[10px] font-bold uppercase tracking-wider text-low transition-colors hover:text-cyber-teal disabled:opacity-60 aria-pressed:text-cyber-teal"
     >
       {icon}
       <span>{label}</span>
@@ -115,12 +115,12 @@ export function MobileCategoriesSheet({
           <SheetTitle className="font-display text-xs font-bold uppercase tracking-wider text-cyber-teal">
             Threat Categories
           </SheetTitle>
-          <SheetDescription className="digital text-[9px] tracking-widest text-slate-500">
+          <SheetDescription className="digital text-[10px] tracking-widest text-mid">
             {onlineCount}/{totalSources} STREAMS ONLINE · TAP TO SLICE THE FEED
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-4 flex flex-col gap-2 overflow-y-auto pb-4">
+        <div className="mt-5 flex flex-col gap-2 overflow-y-auto pb-4">
           {pills.map((pill) => {
             const selected = activeCategory === pill.id;
             return (
@@ -133,17 +133,17 @@ export function MobileCategoriesSheet({
                 }}
                 aria-pressed={selected}
                 className={cn(
-                  "flex items-center justify-between rounded-md border px-3 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors",
+                  "flex items-center justify-between rounded-lg border px-3.5 py-3 text-[11.5px] font-bold uppercase tracking-wider transition-colors",
                   selected
                     ? "border-cyber-teal bg-cyber-teal/15 text-cyber-teal"
-                    : "border-cyber-border bg-cyber-panel text-slate-400 hover:border-cyber-teal/50 hover:text-slate-200",
+                    : "border-cyber-border bg-cyber-panel text-mid hover:border-cyber-teal/50 hover:text-hi",
                 )}
               >
                 {pill.label}
                 <span
                   className={cn(
-                    "digital rounded-sm px-1.5 py-0.5 text-[9px]",
-                    selected ? "bg-cyber-teal/20 text-cyber-teal" : "bg-cyber-raised text-slate-500",
+                    "digital rounded-md px-2 py-1 text-[9.5px]",
+                    selected ? "bg-cyber-teal/20 text-cyber-teal" : "bg-cyber-raised text-low",
                   )}
                 >
                   {pill.count}

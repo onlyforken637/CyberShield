@@ -35,6 +35,7 @@ interface FeedColumnProps {
 /**
  * Main feed column — Threat Intelligence masthead, Ranked Threat Board,
  * refresh control, active filter chips and the fluid live news stream.
+ * Spacing follows an 8pt grid with deliberate breathing room (HCI).
  */
 export function FeedColumn({
   items,
@@ -81,7 +82,7 @@ export function FeedColumn({
 
   const meta = booting
     ? "Connecting to streams…"
-    : `${items.length} of ${totalCount} signals · ${signalRate} SIG/HR · ${onlineCount}/${totalSources} streams online${
+    : `${items.length} of ${totalCount} signals · ${signalRate}/hr velocity · ${onlineCount}/${totalSources} streams online${
         lastSyncAt ? ` · synced ${formatUtc(lastSyncAt, false)} UTC` : ""
       }`;
 
@@ -125,18 +126,18 @@ export function FeedColumn({
   return (
     <div className="flex min-w-0 flex-col">
       {/* ── Feed masthead ────────────────────────────────────────── */}
-      <div className="mb-5 flex items-center justify-between gap-3 border-b border-cyber-border/60 pb-3">
+      <div className="mb-6 flex items-end justify-between gap-4 border-b border-cyber-border/60 pb-5">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-cyber-teal" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-cyber-teal">
-              {"// LIVE THREAT STREAM"}
+            <span className="h-2 w-2 rounded-full bg-cyber-teal shadow-[0_0_8px_rgba(var(--teal-rgb),0.8)]" />
+            <span className="text-[10.5px] font-bold uppercase tracking-[0.22em] text-cyber-teal">
+              Live Threat Stream
             </span>
           </div>
-          <h1 className="mt-0.5 font-display text-lg font-bold text-slate-100 sm:text-2xl">
+          <h1 className="mt-1.5 font-display text-xl font-bold text-hi sm:text-[1.7rem] sm:leading-tight">
             Threat Intelligence
           </h1>
-          <p className="digital mt-0.5 truncate text-[10px] tracking-wide text-slate-500" suppressHydrationWarning>
+          <p className="digital mt-1.5 truncate text-[11px] tracking-wide text-low" suppressHydrationWarning>
             {syncing && booting ? "CONNECTING TO LIVE STREAMS…" : meta.toUpperCase()}
           </p>
         </div>
@@ -144,19 +145,19 @@ export function FeedColumn({
           type="button"
           onClick={onManualSync}
           disabled={syncing}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-cyber-border bg-cyber-surface px-3.5 py-1.5 text-xs font-semibold text-slate-400 transition-colors hover:border-cyber-teal hover:text-cyber-teal disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-10 shrink-0 items-center gap-2 rounded-lg border border-cyber-border bg-cyber-surface px-4 text-[13px] font-semibold text-mid transition-colors hover:border-cyber-teal/60 hover:text-cyber-teal disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <RefreshCw className={cn("h-3.5 w-3.5", syncing && "animate-spin")} />
-          <span className="hidden sm:inline">{syncing ? "Syncing…" : "Refresh Stream"}</span>
+          <RefreshCw className={cn("h-4 w-4", syncing && "animate-spin")} />
+          <span className="hidden sm:inline">{syncing ? "Syncing…" : "Refresh"}</span>
         </button>
       </div>
 
       {/* ── Search (mobile) + active filter chips ────────────────── */}
       {(filtersActive || query.length > 0) && (
-        <div className="mb-4 flex flex-col gap-2.5">
+        <div className="mb-5 flex flex-col gap-3">
           <div className="relative lg:hidden">
             <Search
-              className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-low"
               aria-hidden="true"
             />
             <Input
@@ -164,13 +165,13 @@ export function FeedColumn({
               onChange={(event) => onQueryChange(event.target.value)}
               placeholder="Search threats…"
               aria-label="Search live article stream"
-              className="h-9 border-cyber-border bg-cyber-surface pl-8 text-xs text-slate-200 placeholder:text-slate-600 focus-visible:border-cyber-teal focus-visible:ring-cyber-teal/40"
+              className="h-10 rounded-lg border-cyber-border bg-cyber-surface pl-9 text-[13px] text-hi placeholder:text-low focus-visible:border-cyber-teal focus-visible:ring-cyber-teal/40"
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="flex items-center gap-1 text-[9px] font-bold tracking-widest text-slate-500">
-              <SlidersHorizontal className="h-3 w-3 text-cyber-teal" /> FILTER VECTOR:
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.18em] text-low">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-cyber-teal" /> FILTERS
             </span>
             {activeCategory !== "all" && (
               <FilterChip
@@ -179,7 +180,7 @@ export function FeedColumn({
               />
             )}
             {query.trim() && (
-              <FilterChip label={`QUERY: "${query.trim()}"`} onRemove={() => onQueryChange("")} />
+              <FilterChip label={`"${query.trim()}"`} onRemove={() => onQueryChange("")} />
             )}
             {activeTopics.map((topic) => (
               <FilterChip
@@ -197,7 +198,7 @@ export function FeedColumn({
             <button
               type="button"
               onClick={onClearFilters}
-              className="ml-1 rounded-sm border border-cyber-crimson/40 bg-cyber-crimson/10 px-1.5 py-0.5 text-[9px] font-bold tracking-widest text-cyber-crimson transition-colors hover:bg-cyber-crimson/20"
+              className="rounded-lg border border-cyber-crimson/40 bg-cyber-crimson/10 px-2.5 py-1.5 text-[10px] font-bold tracking-wider text-cyber-crimson transition-colors hover:bg-cyber-crimson/20"
             >
               CLEAR ALL
             </button>
@@ -208,36 +209,32 @@ export function FeedColumn({
       {/* ── Ranked threat board (only on the unfiltered stream) ──── */}
       {!filtersActive && topThreats.length === 3 && (
         <section
-          className="mb-5 rounded-xl border border-cyber-border bg-cyber-surface p-4 shadow-lg"
+          className="card-surface signal-sweep mb-6 p-5"
           aria-label="Ranked threat board"
         >
-          <header className="mb-3 flex items-center gap-2">
-            <Flame className="h-3.5 w-3.5 text-cyber-crimson" />
-            <h2 className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-slate-300">
+          <header className="mb-4 flex items-center gap-2.5">
+            <Flame className="h-4 w-4 text-cyber-crimson" />
+            <h2 className="font-display text-[11px] font-bold uppercase tracking-[0.2em] text-hi">
               Ranked Threat Board
             </h2>
-            <span className="digital ml-auto text-[8.5px] tracking-widest text-slate-600">
-              TOP SEVERITY · LIVE COMPUTED
+            <span className="digital ml-auto text-[9.5px] tracking-widest text-low">
+              TOP SEVERITY · LIVE
             </span>
           </header>
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {topThreats.map((item, index) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => onOpenArticle(item)}
-                className="card-in group relative overflow-hidden rounded-md border border-cyber-border/80 bg-cyber-surface/80 p-3 text-left transition-all hover:border-cyber-teal/50 hover:bg-cyber-surface"
+                className="card-in group relative overflow-hidden rounded-xl border border-cyber-border/80 bg-cyber-panel/60 p-4 text-left transition-all hover:border-cyber-teal/50 hover:bg-cyber-panel"
                 style={{ animationDelay: `${index * 90}ms` }}
               >
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-3">
                   <span
                     className={cn(
-                      "digital text-2xl font-black leading-none",
-                      index === 0
-                        ? "neon-crimson"
-                        : index === 1
-                          ? "neon-amber"
-                          : "neon-teal",
+                      "digital text-[1.7rem] font-black leading-none",
+                      index === 0 ? "neon-crimson" : index === 1 ? "neon-amber" : "neon-teal",
                     )}
                   >
                     {String(index + 1).padStart(2, "0")}
@@ -245,7 +242,7 @@ export function FeedColumn({
                   <div className="min-w-0 flex-1">
                     <span
                       className={cn(
-                        "digital text-[8px] font-black tracking-widest",
+                        "digital text-[9px] font-black tracking-widest",
                         item.intel.severity.label === "CRITICAL"
                           ? "text-cyber-crimson"
                           : item.intel.severity.label === "HIGH"
@@ -255,16 +252,16 @@ export function FeedColumn({
                     >
                       {item.intel.severity.label} · {item.intel.severity.score}/100
                     </span>
-                    <p className="mt-1 line-clamp-2 text-[11.5px] font-bold leading-snug text-slate-100 transition-colors group-hover:text-cyber-teal">
+                    <p className="mt-1.5 line-clamp-2 text-[13px] font-bold leading-snug text-hi transition-colors group-hover:text-cyber-teal">
                       {item.title}
                     </p>
-                    <p className="mt-1 line-clamp-2 text-[9.5px] leading-relaxed text-slate-500">
+                    <p className="mt-1.5 line-clamp-2 text-[11px] leading-relaxed text-mid">
                       {item.intel.lede}
                     </p>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
                       <span
                         className={cn(
-                          "rounded-sm border px-1 py-0.5 text-[7.5px] font-bold tracking-widest",
+                          "rounded-md border px-1.5 py-0.5 text-[8.5px] font-bold tracking-widest",
                           item.accent.chip,
                         )}
                       >
@@ -273,17 +270,9 @@ export function FeedColumn({
                       {item.intel.cves.slice(0, 1).map((cve) => (
                         <span
                           key={cve}
-                          className="digital rounded-sm border border-cyber-crimson/40 bg-cyber-crimson/10 px-1 py-0.5 text-[7.5px] font-bold text-cyber-crimson/90"
+                          className="digital rounded-md border border-cyber-crimson/40 bg-cyber-crimson/10 px-1.5 py-0.5 text-[8.5px] font-bold text-cyber-crimson"
                         >
                           {cve}
-                        </span>
-                      ))}
-                      {item.intel.orgs.slice(0, 1).map((org) => (
-                        <span
-                          key={org}
-                          className="rounded-sm border border-cyber-violet/30 bg-cyber-violet/5 px-1 py-0.5 text-[7.5px] font-semibold text-cyber-violet/90"
-                        >
-                          {org}
                         </span>
                       ))}
                     </div>
@@ -295,44 +284,44 @@ export function FeedColumn({
         </section>
       )}
 
-      <div ref={feedListRef} className="w-full space-y-2.5" aria-label="Live cybersecurity news feed" role="feed">
+      <div ref={feedListRef} className="w-full space-y-3" aria-label="Live cybersecurity news feed" role="feed">
         {booting ? (
           <>
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="flex gap-3 rounded-md border border-cyber-border/70 bg-cyber-surface/50 p-3"
+                className="flex gap-4 rounded-xl border border-cyber-border/70 bg-cyber-surface/60 p-4"
               >
-                <Skeleton className="h-[84px] w-[132px] shrink-0 rounded-sm bg-cyber-raised" />
-                <div className="flex-1 space-y-2 py-1">
+                <Skeleton className="h-[92px] w-[140px] shrink-0 rounded-lg bg-cyber-raised" />
+                <div className="flex-1 space-y-2.5 py-1">
                   <Skeleton className="h-2.5 w-24 bg-cyber-raised" />
-                  <Skeleton className="h-3.5 w-full bg-cyber-raised" />
-                  <Skeleton className="h-3.5 w-3/4 bg-cyber-raised" />
+                  <Skeleton className="h-4 w-full bg-cyber-raised" />
+                  <Skeleton className="h-4 w-3/4 bg-cyber-raised" />
                   <Skeleton className="h-2.5 w-5/6 bg-cyber-raised" />
                 </div>
               </div>
             ))}
-            <p className="digital flex items-center justify-center gap-2 py-2 text-[10px] tracking-widest text-cyber-teal/70">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <p className="digital flex items-center justify-center gap-2 py-3 text-[11px] tracking-widest text-cyber-teal">
+              <Loader2 className="h-4 w-4 animate-spin" />
               ACQUIRING {totalSources} LIVE UPLINKS…
             </p>
           </>
         ) : items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-cyber-border/80 bg-cyber-panel/50 px-6 py-14 text-center">
-            <Search className="mb-3 h-6 w-6 text-slate-600" />
-            <p className="digital text-[11px] font-bold tracking-widest text-slate-400">
-              NO SIGNALS MATCH CURRENT FILTER VECTOR
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-cyber-border bg-cyber-panel/50 px-6 py-16 text-center">
+            <Search className="mb-4 h-7 w-7 text-low" />
+            <p className="digital text-[12px] font-bold tracking-widest text-mid">
+              NO SIGNALS MATCH CURRENT FILTERS
             </p>
-            <p className="mt-1.5 max-w-sm text-[10px] leading-relaxed tracking-wide text-slate-600">
+            <p className="mt-2 max-w-sm text-[12px] leading-relaxed text-low">
               Adjust the search query, category pill, topic badges, or re-enable disabled sources to
               widen the intercept window.
             </p>
             <button
               type="button"
               onClick={onClearFilters}
-              className="mt-4 rounded-sm border border-cyber-teal/50 bg-cyber-teal/10 px-3 py-1.5 text-[10px] font-bold tracking-widest text-cyber-teal transition-colors hover:bg-cyber-teal/20"
+              className="mt-5 rounded-lg border border-cyber-teal/50 bg-cyber-teal/10 px-4 py-2 text-[11px] font-bold tracking-wider text-cyber-teal transition-colors hover:bg-cyber-teal/20"
             >
-              RESET FILTER VECTOR
+              RESET FILTERS
             </button>
           </div>
         ) : (
@@ -352,15 +341,15 @@ export function FeedColumn({
 
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="flex items-center gap-1 rounded-sm border border-cyber-teal/40 bg-cyber-teal/10 py-0.5 pl-1.5 pr-0.5 text-[9px] font-bold tracking-wider text-cyber-teal">
+    <span className="flex items-center gap-1 rounded-lg border border-cyber-teal/40 bg-cyber-teal/10 py-1 pl-2.5 pr-1 text-[10px] font-bold tracking-wider text-cyber-teal">
       {label}
       <button
         type="button"
         onClick={onRemove}
         aria-label={`Remove filter ${label}`}
-        className="rounded-sm p-0.5 transition-colors hover:bg-cyber-teal/20"
+        className="rounded-md p-1 transition-colors hover:bg-cyber-teal/20"
       >
-        <X className="h-2.5 w-2.5" />
+        <X className="h-3 w-3" />
       </button>
     </span>
   );

@@ -363,7 +363,7 @@ export function BootOverlay() {
         ref={rootRef}
         role="status"
         aria-label="CyberShield is initializing"
-        className="fixed inset-0 z-[90] flex flex-col items-center justify-center overflow-hidden bg-cyber-bg"
+        className="dark fixed inset-0 z-[90] flex flex-col items-center justify-center overflow-hidden bg-cyber-bg"
         style={{ clipPath: "inset(0% 0% 0% 0%)" }}
       >
         {/* THREAT RADAR — the boot centerpiece */}

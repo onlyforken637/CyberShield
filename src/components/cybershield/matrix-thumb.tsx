@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { ShieldHalf } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { hashCode, mulberry32 } from "@/lib/cyber/utils";
@@ -9,6 +10,8 @@ import { hashCode, mulberry32 } from "@/lib/cyber/utils";
  * Dynamically generated fallback article thumbnail.
  * Renders a deterministic matrix-code rain with a glowing security
  * shield sigil on an offscreen canvas and serves it as a data URL.
+ * Colors are read from the active theme's CSS variables, so generated
+ * thumbnails match dark and light mode alike.
  */
 export function MatrixThumb({
   seed,
@@ -20,6 +23,8 @@ export function MatrixThumb({
   glyphScale?: number;
 }) {
   const [url, setUrl] = useState<string | null>(null);
+  const { resolvedTheme } = useTheme();
+  const theme: "dark" | "light" = resolvedTheme === "light" ? "light" : "dark";
 
   useEffect(() => {
     let cancelled = false;
@@ -30,7 +35,7 @@ export function MatrixThumb({
       const height = Math.round(300 * glyphScale);
       canvas.width = width;
       canvas.height = height;
-      drawMatrix(canvas, seed);
+      drawMatrix(canvas, seed, theme);
       const dataUrl = canvas.toDataURL("image/png");
       timer = setTimeout(() => {
         if (!cancelled) setUrl(dataUrl);
@@ -44,7 +49,7 @@ export function MatrixThumb({
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [seed, glyphScale]);
+  }, [seed, glyphScale, theme]);
 
   if (!url) {
     return (
@@ -71,17 +76,31 @@ export function MatrixThumb({
   );
 }
 
-function drawMatrix(canvas: HTMLCanvasElement, seed: string): void {
+/*
+ * Palette is picked from a JS map keyed by the React theme (NOT from
+ * getComputedStyle): ThemeProvider applies the .light/.dark class to
+ * <html> in a parent effect, which runs AFTER this child's effect —
+ * reading CSS vars here would lag one toggle behind.
+ */
+const THUMB_PALETTES = {
+  dark: { bg: "#070B14", grid: "rgba(47, 62, 99, 0.3)", teal: "45, 212, 191" },
+  light: { bg: "#EEF2F8", grid: "rgba(122, 143, 178, 0.16)", teal: "13, 148, 136" },
+} as const;
+
+function drawMatrix(canvas: HTMLCanvasElement, seed: string, theme: "dark" | "light"): void {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   const { width: w, height: h } = canvas;
   const rand = mulberry32(hashCode(seed) || 1);
 
-  ctx.fillStyle = "#0B0F19";
+  const palette = THUMB_PALETTES[theme];
+  const tealRgb = palette.teal;
+
+  ctx.fillStyle = palette.bg;
   ctx.fillRect(0, 0, w, h);
 
   // faint grid
-  ctx.strokeStyle = "rgba(34, 47, 71, 0.35)";
+  ctx.strokeStyle = palette.grid;
   ctx.lineWidth = 1;
   for (let x = 0; x <= w; x += 34) {
     ctx.beginPath();
@@ -111,8 +130,8 @@ function drawMatrix(canvas: HTMLCanvasElement, seed: string): void {
       if (y > h - 16) continue;
       const alpha = i === 0 ? 0.95 : Math.max(0.05, 0.5 * (1 - i / trail));
       ctx.shadowBlur = i === 0 ? 8 : 0;
-      ctx.shadowColor = "#00E5FF";
-      ctx.fillStyle = i === 0 ? "#7CF4FF" : `rgba(0, 229, 255, ${alpha.toFixed(3)})`;
+      ctx.shadowColor = `rgb(${tealRgb})`;
+      ctx.fillStyle = i === 0 ? `rgba(${tealRgb}, 1)` : `rgba(${tealRgb}, ${alpha.toFixed(3)})`;
       ctx.fillText(glyphs[Math.floor(rand() * glyphs.length)], x, y);
     }
   }
@@ -124,10 +143,10 @@ function drawMatrix(canvas: HTMLCanvasElement, seed: string): void {
   const sw = Math.min(88, w * 0.22);
   const sh = sw * 1.24;
 
-  ctx.strokeStyle = "rgba(0, 229, 255, 0.92)";
+  ctx.strokeStyle = `rgba(${tealRgb}, 0.92)`;
   ctx.lineWidth = 3.2;
   ctx.lineJoin = "round";
-  ctx.shadowColor = "#00E5FF";
+  ctx.shadowColor = `rgb(${tealRgb})`;
   ctx.shadowBlur = 16;
   ctx.beginPath();
   ctx.moveTo(cx, cy - sh / 2);

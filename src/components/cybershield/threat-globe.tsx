@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 import { Fingerprint, Globe2, Hand } from "lucide-react";
 import * as THREE from "three";
 import { prefersReducedMotion } from "@/lib/cyber/gsap";
@@ -19,6 +20,10 @@ import { cn } from "@/lib/utils";
  * so the map is a live geography of the actual stream. Nothing is random
  * at runtime: traces are hashed from real article IDs. Drag to rotate
  * (with inertia).
+ *
+ * v9 design pass: fresnel atmosphere rim, faint graticule, starfield
+ * backdrop, gradient-tinted land dots and a full light-theme palette
+ * (normal blending + daylight-severity colors).
  */
 
 const CITY_HUBS: Array<[number, number]> = [
@@ -35,18 +40,76 @@ const MAX_TRACES = 26;
 const WINDOW_HOURS = 48;
 const HUB_COUNT = CITY_HUBS.length;
 
-const SEVERITY_HEX: Record<string, number> = {
-  CRITICAL: 0xff3b30,
-  HIGH: 0xff8a3d,
-  ELEVATED: 0xffb300,
-  MODERATE: 0x00e5ff,
+/* ── theme palettes ─────────────────────────────────────────────────── */
+
+interface GlobeTheme {
+  core: number;
+  dot: [number, number, number];
+  hub: number;
+  halo: number;
+  haloOpacity: number;
+  atmosphere: number;
+  graticule: number;
+  graticuleOpacity: number;
+  blending: THREE.Blending;
+  arcOpacity: number;
+  ringBase: number;
+  stars: boolean;
+  starColor: number;
+  severity: Record<string, number>;
+}
+
+const THEMES: Record<"dark" | "light", GlobeTheme> = {
+  dark: {
+    core: 0x05080f,
+    dot: [0.16, 0.7, 0.64],
+    hub: 0x67e8f9,
+    halo: 0x2dd4bf,
+    haloOpacity: 0.075,
+    atmosphere: 0x2dd4bf,
+    graticule: 0x24334f,
+    graticuleOpacity: 0.42,
+    blending: THREE.AdditiveBlending,
+    arcOpacity: 0.34,
+    ringBase: 0.85,
+    stars: true,
+    starColor: 0xa8d8e8,
+    severity: {
+      CRITICAL: 0xff4d5e,
+      HIGH: 0xfb923c,
+      ELEVATED: 0xf59e0b,
+      MODERATE: 0x2dd4bf,
+    },
+  },
+  light: {
+    core: 0xffffff,
+    dot: [0.05, 0.55, 0.52],
+    hub: 0x0d9488,
+    halo: 0x0d9488,
+    haloOpacity: 0.06,
+    atmosphere: 0x0d9488,
+    graticule: 0xaebfd6,
+    graticuleOpacity: 0.5,
+    blending: THREE.NormalBlending,
+    arcOpacity: 0.55,
+    ringBase: 0.7,
+    stars: false,
+    starColor: 0xffffff,
+    severity: {
+      CRITICAL: 0xdc2626,
+      HIGH: 0xc2410c,
+      ELEVATED: 0xb45309,
+      MODERATE: 0x0d9488,
+    },
+  },
 };
 
-const SEVERITY_CSS: Record<string, string> = {
-  CRITICAL: "#ff3b30",
-  HIGH: "#ff8a3d",
-  ELEVATED: "#ffb300",
-  MODERATE: "#00e5ff",
+/* legend swatches follow the CSS tokens so the key matches both themes */
+const SEVERITY_LEGEND: Record<string, string> = {
+  CRITICAL: "var(--crimson)",
+  HIGH: "var(--orange)",
+  ELEVATED: "var(--amber)",
+  MODERATE: "var(--teal)",
 };
 
 function hash32(str: string): number {
@@ -77,7 +140,7 @@ interface Trace {
   speed: number;
 }
 
-function buildTrace(item: FeedItem): Trace {
+function buildTrace(item: FeedItem, severity: GlobeTheme["severity"]): Trace {
   const h = hash32(item.id);
   const fromIdx = h % HUB_COUNT;
   let toIdx = (fromIdx + 1 + ((h >>> 9) % (HUB_COUNT - 1))) % HUB_COUNT;
@@ -87,7 +150,7 @@ function buildTrace(item: FeedItem): Trace {
   return {
     from,
     to,
-    color: SEVERITY_HEX[item.intel.severity.label] ?? SEVERITY_HEX.MODERATE!,
+    color: severity[item.intel.severity.label] ?? severity.MODERATE!,
     phase: ((h >>> 17) % 997) / 997,
     speed: 0.1 + (((h >>> 5) % 89) / 89) * 0.14,
   };
@@ -110,11 +173,37 @@ const LAND_VERT = /* glsl */ `
 `;
 
 const LAND_FRAG = /* glsl */ `
+  uniform vec3 uColor;
   varying float vA;
   void main() {
     float d = length(gl_PointCoord - vec2(0.5));
     float alpha = smoothstep(0.5, 0.14, d) * vA;
-    gl_FragColor = vec4(vec3(0.13, 0.55, 0.66), alpha);
+    gl_FragColor = vec4(uColor, alpha);
+  }
+`;
+
+/* ── fresnel atmosphere shader — soft rim glow at the silhouette ───── */
+
+const FRESNEL_VERT = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vView;
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vView = normalize(-mv.xyz);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const FRESNEL_FRAG = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  uniform float uPower;
+  varying vec3 vNormal;
+  varying vec3 vView;
+  void main() {
+    float fres = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), uPower);
+    gl_FragColor = vec4(uColor, fres * uOpacity);
   }
 `;
 
@@ -123,6 +212,11 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
   const itemsRef = useRef(items);
   itemsRef.current = items;
   const [failed, setFailed] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const themeName: "dark" | "light" = resolvedTheme === "light" ? "light" : "dark";
+
+  /* rotation is preserved across scene rebuilds (theme flips, stream syncs) */
+  const rotRef = useRef({ x: 0.16, y: -1.1 });
 
   /* ── live trace selection (≤48h, newest first, deterministic) ───── */
   const live = useMemo(() => {
@@ -145,16 +239,18 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
     const host = hostRef.current;
     if (!host) return;
 
+    const T = THEMES[themeName];
+
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     } catch {
       setFailed(true);
       return;
     }
 
     const reduced = prefersReducedMotion();
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
     renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(dpr);
     renderer.domElement.style.width = "100%";
@@ -163,25 +259,59 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
     host.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 80);
     camera.position.set(0, 0.22, 3.3);
     camera.lookAt(0, 0, 0);
 
     const globe = new THREE.Group();
-    globe.rotation.x = 0.16;
+    globe.rotation.x = rotRef.current.x;
+    globe.rotation.y = rotRef.current.y;
     // open on the Atlantic corridor — North America ↔ Europe, FortiGuard-style
-    globe.rotation.y = -1.1;
     scene.add(globe);
 
     const disposables: Array<{ dispose: () => void }> = [];
 
     /* ── occluding core (hides the far side) ───────────────────────── */
     const core = new THREE.Mesh(
-      new THREE.SphereGeometry(0.965, 48, 48),
-      new THREE.MeshBasicMaterial({ color: 0x060a13 }),
+      new THREE.SphereGeometry(0.965, 56, 56),
+      new THREE.MeshBasicMaterial({ color: T.core }),
     );
     globe.add(core);
     disposables.push(core.geometry, core.material as THREE.Material);
+
+    /* ── graticule — faint lat/lon wireframe for cartographic depth ── */
+    {
+      const pts: number[] = [];
+      const r = 1.001;
+      const v = new THREE.Vector3();
+      for (let lat = -60; lat <= 60; lat += 20) {
+        for (let lon = -180; lon < 180; lon += 4) {
+          lonLatToVec3(lon, lat, r, v);
+          pts.push(v.x, v.y, v.z);
+          lonLatToVec3(lon + 4, lat, r, v);
+          pts.push(v.x, v.y, v.z);
+        }
+      }
+      for (let lon = -180; lon < 180; lon += 20) {
+        for (let lat = -88; lat < 88; lat += 4) {
+          lonLatToVec3(lon, lat, r, v);
+          pts.push(v.x, v.y, v.z);
+          lonLatToVec3(lon, lat + 4, r, v);
+          pts.push(v.x, v.y, v.z);
+        }
+      }
+      const gridGeo = new THREE.BufferGeometry();
+      gridGeo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+      const gridMat = new THREE.LineBasicMaterial({
+        color: T.graticule,
+        transparent: true,
+        opacity: T.graticuleOpacity,
+        depthWrite: false,
+      });
+      const grid = new THREE.LineSegments(gridGeo, gridMat);
+      globe.add(grid);
+      disposables.push(gridGeo, gridMat);
+    }
 
     /* ── land dot matrix — real geography from the NASA bitmask ────── */
     const dots = decodeMapDots();
@@ -199,7 +329,11 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
     const dotGeo = new THREE.BufferGeometry();
     dotGeo.setAttribute("position", new THREE.BufferAttribute(dotPos, 3));
     dotGeo.setAttribute("aRand", new THREE.BufferAttribute(dotRand, 1));
-    const dotUniforms = { uTime: { value: 0 }, uSize: { value: 9.5 * dpr } };
+    const dotUniforms = {
+      uTime: { value: 0 },
+      uSize: { value: 10.5 * dpr },
+      uColor: { value: new THREE.Vector3(...T.dot) },
+    };
     const dotMat = new THREE.ShaderMaterial({
       uniforms: dotUniforms,
       vertexShader: LAND_VERT,
@@ -222,8 +356,8 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
     const hubGeo = new THREE.BufferGeometry();
     hubGeo.setAttribute("position", new THREE.BufferAttribute(hubPos, 3));
     const hubMat = new THREE.PointsMaterial({
-      color: 0x5df2ff,
-      size: 0.028,
+      color: T.hub,
+      size: 0.03,
       sizeAttenuation: true,
       transparent: true,
       opacity: 0.95,
@@ -239,7 +373,7 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
           .split("|")
           .map((id) => itemsRef.current.find((entry) => entry.id === id))
           .filter((item): item is FeedItem => Boolean(item))
-          .map((item) => buildTrace(item))
+          .map((item) => buildTrace(item, T.severity))
       : [];
 
     const traceGroup = new THREE.Group();
@@ -258,12 +392,12 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
         mid,
         trace.to.clone().multiplyScalar(1.002),
       );
-      const arcGeo = new THREE.TubeGeometry(curve, 30, 0.005, 5, false);
+      const arcGeo = new THREE.TubeGeometry(curve, 32, 0.0052, 6, false);
       const arcMat = new THREE.MeshBasicMaterial({
         color: trace.color,
         transparent: true,
-        opacity: 0.3,
-        blending: THREE.AdditiveBlending,
+        opacity: T.arcOpacity,
+        blending: T.blending,
         depthWrite: false,
       });
       const arc = new THREE.Mesh(arcGeo, arcMat);
@@ -271,12 +405,12 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
       disposables.push(arcGeo, arcMat);
 
       // packet travelling the arc
-      const packetGeo = new THREE.SphereGeometry(0.015, 10, 10);
+      const packetGeo = new THREE.SphereGeometry(0.016, 12, 12);
       const packetMat = new THREE.MeshBasicMaterial({
         color: trace.color,
         transparent: true,
         opacity: 0.95,
-        blending: THREE.AdditiveBlending,
+        blending: T.blending,
         depthWrite: false,
       });
       const packet = new THREE.Mesh(packetGeo, packetMat);
@@ -293,9 +427,9 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
         const ringMat = new THREE.MeshBasicMaterial({
           color: trace.color,
           transparent: true,
-          opacity: 0.9,
+          opacity: T.ringBase,
           side: THREE.DoubleSide,
-          blending: THREE.AdditiveBlending,
+          blending: T.blending,
           depthWrite: false,
         });
         const ring = new THREE.Mesh(ringGeo, ringMat);
@@ -307,19 +441,67 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
       }
     }
 
-    /* ── atmosphere halo ───────────────────────────────────────────── */
-    const haloGeo = new THREE.SphereGeometry(1.16, 32, 32);
-    const haloMat = new THREE.MeshBasicMaterial({
-      color: 0x00e5ff,
+    /* ── fresnel atmosphere rim ────────────────────────────────────── */
+    const atmoGeo = new THREE.SphereGeometry(1.13, 48, 48);
+    const atmoMat = new THREE.ShaderMaterial({
+      uniforms: {
+        uColor: { value: new THREE.Color(T.atmosphere) },
+        uOpacity: { value: themeName === "dark" ? 0.5 : 0.32 },
+        uPower: { value: 2.4 },
+      },
+      vertexShader: FRESNEL_VERT,
+      fragmentShader: FRESNEL_FRAG,
       transparent: true,
-      opacity: 0.05,
+      blending: T.blending,
+      depthWrite: false,
+    });
+    const atmosphere = new THREE.Mesh(atmoGeo, atmoMat);
+    globe.add(atmosphere);
+    disposables.push(atmoGeo, atmoMat);
+
+    /* ── soft inner halo ───────────────────────────────────────────── */
+    const haloGeo = new THREE.SphereGeometry(1.2, 32, 32);
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: T.halo,
+      transparent: true,
+      opacity: T.haloOpacity,
       side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
+      blending: T.blending,
       depthWrite: false,
     });
     const halo = new THREE.Mesh(haloGeo, haloMat);
     globe.add(halo);
     disposables.push(haloGeo, haloMat);
+
+    /* ── starfield backdrop (dark theme only) ──────────────────────── */
+    let starPoints: THREE.Points | null = null;
+    if (T.stars) {
+      const starCount = 900;
+      const starPos = new Float32Array(starCount * 3);
+      for (let i = 0; i < starCount; i++) {
+        // uniform distribution on a large shell
+        const u = Math.random() * 2 - 1;
+        const phi = Math.random() * Math.PI * 2;
+        const s = Math.sqrt(1 - u * u);
+        const r = 16 + Math.random() * 10;
+        starPos[i * 3] = r * s * Math.cos(phi);
+        starPos[i * 3 + 1] = r * u;
+        starPos[i * 3 + 2] = r * s * Math.sin(phi);
+      }
+      const starGeo = new THREE.BufferGeometry();
+      starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
+      const starMat = new THREE.PointsMaterial({
+        color: T.starColor,
+        size: 0.045,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: 0.5,
+        depthWrite: false,
+      });
+      starPoints = new THREE.Points(starGeo, starMat);
+      scene.add(starPoints);
+      disposables.push(starGeo, starMat);
+    }
 
     /* ── interaction: drag with inertia ────────────────────────────── */
     const drag = { active: false, lastX: 0, lastY: 0, velX: 0, velY: 0 };
@@ -391,6 +573,10 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
         drag.velX *= 0.94;
         drag.velY *= 0.94;
       }
+      rotRef.current.x = globe.rotation.x;
+      rotRef.current.y = globe.rotation.y;
+
+      if (starPoints) starPoints.rotation.y = t * 0.004;
 
       dotUniforms.uTime.value = t;
 
@@ -398,7 +584,7 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
         const p = (t * 0.42 + ring.trace.phase + ring.offset) % 1;
         const s = 1 + p * 3.2;
         ring.mesh.scale.setScalar(s);
-        ring.mat.opacity = (1 - p) * 0.85;
+        ring.mat.opacity = (1 - p) * T.ringBase;
       }
 
       for (const packet of packets) {
@@ -430,11 +616,11 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
 
     raf = requestAnimationFrame(tick);
     return cleanup;
-  }, [liveKey]);
+  }, [liveKey, themeName]);
 
   if (failed) {
     return (
-      <div className={cn("cyber-grid-bg relative overflow-hidden rounded-2xl border border-cyber-border bg-cyber-panel p-4", className)}>
+      <div className={cn("card-surface cyber-grid-bg relative overflow-hidden p-5", className)}>
         <GlobeHeader stats={stats} total={live.length} />
         <div className="relative mx-auto my-6 flex aspect-square max-h-[300px] w-full max-w-[300px] items-center justify-center">
           <div className="absolute inset-0 rounded-full border border-cyber-teal/25" />
@@ -442,7 +628,7 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
           <div className="absolute inset-[32%] rounded-full border border-cyber-teal/15" />
           <Globe2 className="h-10 w-10 text-cyber-teal/70" />
         </div>
-        <p className="digital text-center text-[8px] tracking-widest text-slate-600">
+        <p className="digital text-center text-[9px] tracking-widest text-low">
           WEBGL UNAVAILABLE — STATIC MAP FALLBACK
         </p>
       </div>
@@ -452,7 +638,7 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
   return (
     <section
       className={cn(
-        "signal-sweep overflow-hidden rounded-2xl border border-cyber-border bg-cyber-surface p-4 shadow-lg",
+        "card-surface signal-sweep overflow-hidden p-5",
         className,
       )}
       aria-label="Live threat map"
@@ -460,12 +646,12 @@ export function ThreatGlobe({ items, className }: { items: FeedItem[]; className
       <GlobeHeader stats={stats} total={live.length} />
       <div
         ref={hostRef}
-        className="relative mt-2 aspect-square w-full touch-none select-none"
+        className="relative mt-3 aspect-square w-full touch-none select-none"
         role="img"
         aria-label="Rotating 3D world map with live attack arcs between real cities"
       />
-      <p className="digital mt-2 flex items-center justify-center gap-1.5 text-[8px] tracking-widest text-slate-600">
-        <Hand className="h-2.5 w-2.5" />
+      <p className="digital mt-3 flex items-center justify-center gap-1.5 text-[9px] tracking-widest text-low">
+        <Hand className="h-3 w-3" />
         DRAG TO ROTATE · ARCS = LIVE ARTICLES ≤48H · REAL GEOGRAPHY
       </p>
     </section>
@@ -476,16 +662,16 @@ function GlobeHeader({ stats, total }: { stats: Record<string, number>; total: n
   return (
     <>
       <header className="flex items-center justify-between gap-2">
-        <h2 className="flex items-center gap-1.5 font-display text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">
-          <Globe2 className="h-3.5 w-3.5 text-cyber-teal" />
+        <h2 className="flex items-center gap-2 font-display text-[11px] font-bold uppercase tracking-[0.18em] text-hi">
+          <Globe2 className="h-4 w-4 text-cyber-teal" />
           Live Threat Map
           <span className="cyber-ping relative ml-0.5 inline-flex h-1.5 w-1.5 text-cyber-teal">
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyber-teal" />
           </span>
         </h2>
         <span className="flex items-center gap-1">
-          <Fingerprint className="h-3 w-3 text-slate-500" />
-          <span className="digital text-[9px] font-bold tracking-widest text-slate-400">
+          <Fingerprint className="h-3.5 w-3.5 text-low" />
+          <span className="digital text-[9.5px] font-bold tracking-widest text-mid">
             {total} ARCS
           </span>
         </span>
@@ -496,12 +682,12 @@ function GlobeHeader({ stats, total }: { stats: Record<string, number>; total: n
             .join(", ")}
         </span>
       </header>
-      <div className="digital mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[7.5px] tracking-[0.16em] text-slate-500">
-        {(Object.keys(SEVERITY_CSS) as Array<keyof typeof SEVERITY_CSS>).map((label) => (
-          <span key={label} className="flex items-center gap-1">
+      <div className="digital mt-2 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[9px] tracking-[0.14em] text-mid">
+        {(Object.keys(SEVERITY_LEGEND) as Array<keyof typeof SEVERITY_LEGEND>).map((label) => (
+          <span key={label} className="flex items-center gap-1.5">
             <span
               className="inline-block h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: SEVERITY_CSS[label], boxShadow: `0 0 5px ${SEVERITY_CSS[label]}88` }}
+              style={{ backgroundColor: SEVERITY_LEGEND[label] }}
             />
             {label} {stats[label] ? `· ${stats[label]}` : "· 0"}
           </span>

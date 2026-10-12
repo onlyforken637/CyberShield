@@ -110,17 +110,17 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
   return (
     <section className="space-y-3" aria-label="AI analyst verdict">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="flex items-center gap-1.5 rounded-sm border border-cyber-fuchsia/40 bg-cyber-fuchsia/10 px-1.5 py-0.5 text-[8.5px] font-black tracking-widest text-cyber-fuchsia">
+        <span className="flex items-center gap-1.5 rounded-md border border-cyber-fuchsia/40 bg-cyber-fuchsia/10 px-2 py-0.5 text-[9px] font-black tracking-widest text-cyber-fuchsia">
           <Sparkles className="h-2.5 w-2.5" /> GLM ANALYST
         </span>
         {state === "done" && (
           <span
             className={cn(
-              "rounded-sm border px-1.5 py-0.5 text-[8.5px] font-bold tracking-widest",
+              "rounded-md border px-2 py-0.5 text-[9px] font-bold tracking-widest",
               degraded
                 ? "border-cyber-amber/40 bg-cyber-amber/10 text-cyber-amber"
                 : cached
-                  ? "border-cyber-border bg-cyber-surface text-slate-500"
+                  ? "border-cyber-border bg-cyber-surface text-mid"
                   : "border-cyber-green/40 bg-cyber-green/10 text-cyber-green",
             )}
           >
@@ -132,7 +132,7 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
             type="button"
             onClick={() => void load(true)}
             disabled={state === "loading"}
-            className="flex items-center gap-1 rounded-sm border border-cyber-border bg-cyber-surface px-2 py-1 text-[9px] font-bold tracking-widest text-slate-400 transition-colors hover:border-cyber-fuchsia/50 hover:text-cyber-fuchsia disabled:opacity-50"
+            className="flex items-center gap-1 rounded-lg border border-cyber-border bg-cyber-surface px-2.5 py-1.5 text-[9.5px] font-bold tracking-widest text-mid transition-colors hover:border-cyber-fuchsia/50 hover:text-cyber-fuchsia disabled:opacity-50"
           >
             <RefreshCw className={cn("h-3 w-3", state === "loading" && "animate-spin")} />
             REANALYZE
@@ -141,7 +141,7 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
             type="button"
             onClick={copy}
             disabled={state !== "done" || shown.length < full.length}
-            className="flex items-center gap-1 rounded-sm border border-cyber-border bg-cyber-surface px-2 py-1 text-[9px] font-bold tracking-widest text-slate-400 transition-colors hover:border-cyber-teal/50 hover:text-cyber-teal disabled:opacity-50"
+            className="flex items-center gap-1 rounded-lg border border-cyber-border bg-cyber-surface px-2.5 py-1.5 text-[9.5px] font-bold tracking-widest text-mid transition-colors hover:border-cyber-teal/50 hover:text-cyber-teal disabled:opacity-50"
           >
             {copied ? <Check className="h-3 w-3 text-cyber-green" /> : <Copy className="h-3 w-3" />}
             {copied ? "COPIED" : "COPY"}
@@ -150,7 +150,7 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
       </div>
 
       {state === "loading" && (
-        <div className="rounded-md border border-cyber-border bg-[#0A0F1B] p-4">
+        <div className="rounded-lg border border-cyber-border bg-cyber-bg p-4">
           <p className="digital flex items-center gap-2 text-[10px] tracking-widest text-cyber-fuchsia/90">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
             RUNNING LIVE THREAT ANALYSIS…
@@ -170,11 +170,11 @@ export function AIVerdictPanel({ item }: { item: FeedItem }) {
             <TriangleAlert className="h-3.5 w-3.5" />
             ANALYST UPLINK FAILED
           </p>
-          <p className="mt-1.5 text-[10.5px] leading-relaxed text-slate-400">{error}</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-mid">{error}</p>
           <button
             type="button"
             onClick={() => void load(false)}
-            className="mt-3 rounded-sm border border-cyber-teal/50 bg-cyber-teal/10 px-3 py-1.5 text-[10px] font-bold tracking-widest text-cyber-teal transition-colors hover:bg-cyber-teal/20"
+            className="mt-3.5 rounded-lg border border-cyber-teal/50 bg-cyber-teal/10 px-3.5 py-2 text-[10.5px] font-bold tracking-widest text-cyber-teal transition-colors hover:bg-cyber-teal/20"
           >
             RETRY ANALYSIS
           </button>
@@ -198,14 +198,14 @@ function VerdictText({ text, typing }: { text: string; typing: boolean }) {
   const lines = text.split("\n").filter((line) => line.trim().length > 0);
 
   return (
-    <div className="cyber-grid-bg rounded-md border border-cyber-fuchsia/25 bg-[#0A0F1B] p-4 shadow-[inset_0_0_30px_rgba(232,121,249,0.04)]">
+    <div className="cyber-grid-bg rounded-lg border border-cyber-fuchsia/25 bg-cyber-bg p-4 shadow-[inset_0_0_30px_rgba(232,121,249,0.04)]">
       <div className="space-y-2.5">
         {lines.map((line, index) => {
           const trimmed = line.trim();
 
           if (trimmed.startsWith("▸")) {
             return (
-              <p key={index} className="flex items-start gap-2 text-[11.5px] leading-relaxed text-slate-300">
+              <p key={index} className="flex items-start gap-2 text-[12.5px] leading-relaxed text-mid">
                 <span className="mt-[1px] shrink-0 text-[10px] text-cyber-amber" aria-hidden="true">
                   ▸
                 </span>
@@ -229,13 +229,13 @@ function VerdictText({ text, typing }: { text: string; typing: boolean }) {
                 >
                   {label}
                 </span>
-                <span className="font-semibold text-slate-100">{value}</span>
+                <span className="font-semibold text-hi">{value}</span>
               </p>
             );
           }
 
           return (
-            <p key={index} className="text-[11.5px] leading-relaxed text-slate-300">
+            <p key={index} className="text-[12.5px] leading-relaxed text-mid">
               {trimmed}
             </p>
           );

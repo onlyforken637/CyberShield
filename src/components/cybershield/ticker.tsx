@@ -57,25 +57,25 @@ export function Ticker({ items, onOpenArticle }: TickerProps) {
   return (
     <div
       data-intro
-      className="w-full overflow-hidden border-b border-cyber-border/80 bg-cyber-panel/70 py-2"
+      className="w-full overflow-hidden border-b border-cyber-border/60 bg-cyber-panel/60 py-2.5"
       role="region"
       aria-label="Live alerts ticker"
     >
       <div className="mx-auto flex w-full max-w-[1600px] items-center px-3 sm:px-6 lg:px-8">
         <div className="flex shrink-0 items-center gap-1.5 border-r border-cyber-crimson/40 pr-3 sm:pr-4">
           <span className="blink-soft h-2 w-2 rounded-full bg-cyber-crimson" />
-          <span className="text-[9px] font-extrabold uppercase tracking-widest text-cyber-crimson sm:text-[10px]">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-cyber-crimson">
             LIVE ALERTS
           </span>
         </div>
 
         <div ref={containerRef} className="marquee-container no-scrollbar flex-1 overflow-hidden">
           {alerts.length === 0 ? (
-            <p className="digital pl-4 text-[10.5px] tracking-widest text-slate-600">
+            <p className="digital pl-4 text-[11px] tracking-widest text-low">
               AWAITING FIRST ALERTS FROM THE UPSTREAM GRID…
             </p>
           ) : (
-            <div className="marquee-track text-xs text-slate-400">
+            <div className="marquee-track text-xs text-mid">
               <TickerTrack alerts={alerts} onOpenArticle={onOpenArticle} />
               <TickerTrack alerts={alerts} onOpenArticle={onOpenArticle} ariaHidden />
             </div>
@@ -106,11 +106,11 @@ function TickerTrack({
             tabIndex={ariaHidden ? -1 : 0}
           >
             <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", item.accent.dot)} />
-            <span className="digital shrink-0 text-[8.5px] font-bold tracking-widest text-slate-500">
+            <span className="digital shrink-0 text-[9px] font-bold tracking-widest text-low">
               {item.sourceShort}
             </span>
             <span className="truncate font-medium">{item.title}</span>
-            <span className="digital shrink-0 text-[8.5px] text-slate-600" suppressHydrationWarning>
+            <span className="digital shrink-0 text-[9px] text-low" suppressHydrationWarning>
               {timeAgo(item.publishedAt)}
             </span>
           </button>
