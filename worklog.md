@@ -395,3 +395,21 @@ Stage Summary:
 - Deliverable: /home/z/my-project/public/cybershield-explainer.mp4 — Vox-style CyberShield explainer with full voiceover, ambient bed and section pings; also reachable in the app at /cybershield-explainer.mp4.
 - Editable pipeline retained: narration script (gen-tts.sh), timeline (timings.js/gen-timings.ts), motion engine (engine.html/css/js), capture (capture.js), audio mix (assemble-audio.sh).
 - No app code touched; tars/PDF/PPTX unaffected.
+---
+Task ID: 17b
+Agent: Z.ai Code (main orchestrator)
+Task: User request — "remove small ai slops texts from the video and instead of that child voice match it with the website intro audio"
+
+Work Log:
+- Found /home/z/.stage/vox/ wiped by sandbox — rebuilt the full pipeline from scratch; identified site intro voice: public/audio/jarvis-welcome.mp3 = final "xiaochen" recast (8.23s/82.6KB match in worklog), so video narration re-cast with the SAME voice (user calls it "child voice") + SAME comms master chain to match the site intro audio.
+- Narration: new 8-section script (script.json), TTS via z-ai CLI voice xiaochen speed 1.0; s5 "CISA" mangled on first take (ASR heard "Sys's") — regenerated with letter-spaced "C I S A", ASR-verified. Master chain per segment: silence trim + tighten pauses to 0.4s, 70Hz HP, +1.5dB @160Hz, +1dB @3kHz, 9.5kHz LP, loudnorm I=-16, 2.5:1 compressor + limiter, fade-in (matches jarvis-welcome.mp3 treatment). 8 segments = 100.7s (durations.json).
+- Engine REBUILT CLEAN (engine.html/vox.css/engine.js): AI-slop texts REMOVED per user — no corner telemetry, no section counter text, no dim micro-captions, no fake data strings. Only narration-synced kinetic typography + real feature labels, all ≥22px. Chrome = thin progress bar (shape only). Scenes: cold-open word slam → LIVE dashboard stack → 19 count-up → 4MIN ring → 4-step GATHER/READ/SCORE/SORT with 0-100 meter → category chips (RANSOMWARE/ZERO-DAYS/DATA BREACHES/+7 MORE) → verdict panel (CRITICAL 92/100 + 3 questions) → DIRECT/RELAY/OFFLINE ghost-fill tiles → CISA KEV ≤30d/≤180d/older rows → browser-frame 4-step how-to → THAT'S IT checks → VERCEL/DOCKER/SELF-HOST + FREE/YOURS chips → CYBERSHIELD outro.
+- Bugs fixed: c2l1-4 missing ids (null.style crash); krow width:0+padding rendered 104px squares pre-draw → switched to clip-path inset reveal; category chips overflow/wrap → 30px + nowrap; verdict panel q3 clipped → panel 1060x512 top 104; deploy tile borders → teal interpolation.
+- Capture: Playwright chromium, 2770 frames @24fps JPEG q95, 7 synchronous chunks (1..2770). Audio mix: 8 narration adelay'd + 7×880Hz boundary pings + ambient drone/brown-noise bed → amix/alimiter master.wav 115.415s (mean -19.0dB, max -1.6dB).
+- Encode: 4 chunked x264 ultrafast -threads 2 (OOM-safe) → concat → AAC 192k +faststart → public/cybershield-explainer.mp4 (10.0MB, 1280x720, 115.415s, h264+aac).
+- Verified: ffprobe streams; 8 frames decoded from final MP4 at 4.5/15.5/32/50/70/86/101/111s all match engine; ASR of extracted MP4 audio returns s1 verbatim (voice present); HTTP 200 (10MB). Intermediates cleaned (frames/parts removed); editable pipeline + audio retained at /home/z/.stage/vox/ (32MB).
+
+Stage Summary:
+- Deliverable: /home/z/my-project/public/cybershield-explainer.mp4 — rebuilt Vox-style explainer (1:55), now with (1) zero AI-slop micro-texts — only big narration-synced type + real feature labels, (2) narration in the SAME voice as the website intro audio (xiaochen, same comms master), ASR-verified.
+- Editable pipeline retained: script.json, gen-tts.ts, master.sh, gen-timings.ts, engine.*, capture.js, assemble-audio.sh, encode.sh.
+- App code, tars, PDF, PPTX untouched.
