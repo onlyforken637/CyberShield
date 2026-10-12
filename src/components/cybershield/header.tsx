@@ -42,7 +42,7 @@ export function DashboardHeader({
                 <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-cyber-teal" />
               </span>
             </span>
-            <span className="whitespace-nowrap font-display text-lg font-black tracking-[0.16em] text-hi sm:text-[1.55rem]">
+            <span className="whitespace-nowrap font-display text-[1.02rem] font-black tracking-[0.14em] text-hi sm:text-lg sm:tracking-[0.16em] md:text-[1.55rem]">
               CYBER<span className="brand-gradient">SHIELD</span>
             </span>
             <span className="ml-1 hidden border-l border-cyber-border pl-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-low md:inline-block">
@@ -51,8 +51,8 @@ export function DashboardHeader({
           </a>
 
           {/* Right action cluster */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="relative">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <div className="relative w-28 shrink sm:w-56 md:w-80">
               <Search
                 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-low"
                 aria-hidden="true"
@@ -63,7 +63,7 @@ export function DashboardHeader({
                 onChange={(event) => onQueryChange(event.target.value)}
                 placeholder="Search threats…"
                 aria-label="Search live article stream"
-                className="h-10 w-44 rounded-lg border-cyber-border bg-cyber-surface pl-9 text-[13px] text-hi placeholder:text-low focus-visible:border-cyber-teal focus-visible:ring-cyber-teal/40 sm:w-60 md:w-80"
+                className="h-10 rounded-lg border-cyber-border bg-cyber-surface pl-9 text-[13px] text-hi placeholder:text-low focus-visible:border-cyber-teal focus-visible:ring-cyber-teal/40"
               />
             </div>
 
