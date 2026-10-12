@@ -33,10 +33,6 @@ export const metadata: Metadata = {
     "zero-day",
     "live feed",
   ],
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
-  },
 };
 
 export const viewport: Viewport = {

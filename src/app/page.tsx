@@ -351,12 +351,10 @@ export default function CyberShieldPage() {
           <div className="mb-10 grid grid-cols-1 gap-10 border-b border-cyber-border/60 pb-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Col 1: brand & status */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <img
-                  src="/logo.png"
-                  alt="CyberShield logo"
-                  className="h-9 w-9 rounded-xl border border-cyber-border object-cover"
-                />
+              <div className="flex items-center gap-2.5">
+                <span className="cyber-ping relative inline-flex h-3 w-3 text-cyber-teal">
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-cyber-teal" />
+                </span>
                 <span className="font-display text-xl font-black tracking-wider text-hi">
                   CYBER<span className="brand-gradient">SHIELD</span>
                 </span>

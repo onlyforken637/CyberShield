@@ -454,3 +454,20 @@ Stage Summary:
 - Shipped: globe-free sidebar, aqua/turquoise dark theme + white/red light theme with top toggle, 3-layer thumbnail fix (proxy→wsrv retry→og resolve→synth), new CyberShield logo everywhere (favicon/header/footer/about), in-site Mission Resources hub (PDF manual + 13-slide deck viewer + explainer film), mobile top-bar fix.
 - Key files: globals.css (re-theme), api/img/route.ts (rewrite: relayFetch + resolve mode), lib/cyber/intel.ts (og tunables), article-card.tsx (thumb chain + light severity), matrix-thumb.tsx (palettes), resources-section.tsx (new), top-bar.tsx, header.tsx, about-modal.tsx, layout.tsx, page.tsx, sidebar.tsx; deleted threat-globe/cyber-canvas/world-dots/gen-world-dots/logo.svg; added public/logo.png, public/slides/*, public/CyberShield-Presentation.pptx.
 - App state: lint clean, zero console/hydration errors, dark+light verified end-to-end at desktop and mobile widths; all resource endpoints 200.
+
+---
+Task ID: 20
+Agent: Z.ai Code (main orchestrator)
+Task: User feedback — "i didnot like the logo you designed also dont implement logo inside the website it is enough just for browser icon that blinking light was better in website i will suggest you to design logo with charcaters like C and S"
+
+Work Log:
+- New logo designed from C + S letterforms: hand-crafted geometric SVG (src/app/icon.svg) — dark-navy rounded-square plate + turquoise→aqua gradient "C" (arc path, round caps) and "S" (two stacked 3/4-arc paths), subtle teal halo + inner ring. Deterministic paths, no font dependency.
+- Rendered via sharp (scripts/gen-logo.ts): src/app/apple-icon.png (180²) + src/app/icon.png (48²); visually verified 256px and 32px renders (legible at favicon size).
+- Favicon-only implementation: removed metadata.icons from layout.tsx, switched to Next.js file-convention icons (/icon.svg + /icon.png + /apple-icon.png — verified in DOM link tags); deleted public/logo.png (old AI-generated shield+lock) and old public/logo.svg leftovers — /logo.png now 404s.
+- Logo removed from ALL in-site surfaces; pre-logo elements restored exactly: header brand lockup back to standalone blinking teal dot (cyber-ping), footer brand back to cyber-ping dot, About modal title back to ShieldCheck lucide icon (re-added to lucide imports).
+- Verified with agent-browser: dark top (blinking dot lockup), footer (blinking dot, Umair Jamal card intact), About modal (ShieldCheck title), light mode (ping renders red via tokens — white+red visibility preserved), DOM has zero /logo.png imgs, icon links = icon.svg/icon.png/apple-icon.png, no console/page errors, lint clean.
+
+Stage Summary:
+- Browser icon is now a crisp C+S character monogram (favicon/apple-touch only); the website UI carries no logo imagery — the blinking live light is back in header + footer, ShieldCheck in About.
+- Key files: src/app/icon.svg (new), src/app/icon.png (new), src/app/apple-icon.png (new), scripts/gen-logo.ts (new, regenerates PNGs from SVG), layout.tsx (metadata.icons removed), header.tsx / page.tsx / about-modal.tsx (logo img → blinking dot / ShieldCheck restored), public/logo.png deleted.
+- App state: lint clean, zero console errors, dark+light verified in browser; all icon endpoints 200, old logo endpoint 404.

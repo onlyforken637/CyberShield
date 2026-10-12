@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="0" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0D1D31"/>
+      <stop offset="1" stop-color="#081120"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="64" cy="58" r="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2FE6CF" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#2FE6CF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cs" x1="26" y1="36" x2="102" y2="92" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4BF5DF"/>
+      <stop offset="0.55" stop-color="#2BDCE8"/>
+      <stop offset="1" stop-color="#00C6FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- badge plate -->
+  <rect x="3" y="3" width="122" height="122" rx="32" fill="url(#plate)"/>
+  <rect x="3" y="3" width="122" height="122" rx="32" fill="url(#halo)"/>
+  <rect x="6.75" y="6.75" width="114.5" height="114.5" rx="29" fill="none" stroke="#2FE6CF" stroke-opacity="0.3" stroke-width="1.5"/>
+
+  <!-- C -->
+  <path d="M 59.4 48.4 A 19 19 0 1 0 59.4 79.6" fill="none" stroke="url(#cs)" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- S -->
+  <path d="M 99.5 53.5 A 11 11 0 1 0 88.5 64 A 11 11 0 1 1 77.5 74.5" fill="none" stroke="url(#cs)" stroke-width="12" stroke-linecap="round"/>
+</svg>
