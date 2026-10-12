@@ -83,8 +83,8 @@ export function MatrixThumb({
  * reading CSS vars here would lag one toggle behind.
  */
 const THUMB_PALETTES = {
-  dark: { bg: "#070B14", grid: "rgba(47, 62, 99, 0.3)", teal: "45, 212, 191" },
-  light: { bg: "#EEF2F8", grid: "rgba(122, 143, 178, 0.16)", teal: "13, 148, 136" },
+  dark: { bg: "#070B14", grid: "rgba(32, 78, 88, 0.34)", teal: "47, 230, 207" },
+  light: { bg: "#FFFFFF", grid: "rgba(220, 38, 38, 0.1)", teal: "220, 38, 38" },
 } as const;
 
 function drawMatrix(canvas: HTMLCanvasElement, seed: string, theme: "dark" | "light"): void {

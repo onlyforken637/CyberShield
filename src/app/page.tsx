@@ -8,6 +8,7 @@ import { DashboardHeader } from "@/components/cybershield/header";
 import { FeedColumn } from "@/components/cybershield/feed-column";
 import { InvestigationDrawer, type DrawerTarget } from "@/components/cybershield/investigation-drawer";
 import { MobileBottomBar, MobileCategoriesSheet } from "@/components/cybershield/mobile-nav";
+import { ResourcesSection } from "@/components/cybershield/resources-section";
 import { Sidebar } from "@/components/cybershield/sidebar";
 import { Ticker } from "@/components/cybershield/ticker";
 import { TopBar } from "@/components/cybershield/top-bar";
@@ -341,16 +342,21 @@ export default function CyberShieldPage() {
         </div>
       </main>
 
+      {/* ── Mission resources: docs · deck · film ─────────────────── */}
+      <ResourcesSection />
+
       {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer data-intro className="mt-auto w-full border-t border-cyber-border/80 bg-cyber-panel/50 pb-8 pt-12 backdrop-blur-sm">
         <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8">
           <div className="mb-10 grid grid-cols-1 gap-10 border-b border-cyber-border/60 pb-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Col 1: brand & status */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2.5">
-                <span className="cyber-ping relative inline-flex h-3 w-3 text-cyber-teal">
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-cyber-teal" />
-                </span>
+              <div className="flex items-center gap-3">
+                <img
+                  src="/logo.png"
+                  alt="CyberShield logo"
+                  className="h-9 w-9 rounded-xl border border-cyber-border object-cover"
+                />
                 <span className="font-display text-xl font-black tracking-wider text-hi">
                   CYBER<span className="brand-gradient">SHIELD</span>
                 </span>
@@ -454,6 +460,12 @@ export default function CyberShieldPage() {
               <span className="text-[11px]">
                 Crafted by <span className="font-semibold text-mid">Umair Jamal</span>
               </span>
+              <a
+                href="#resources"
+                className="transition-colors hover:text-cyber-teal"
+              >
+                Docs &amp; Media
+              </a>
               <button
                 type="button"
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

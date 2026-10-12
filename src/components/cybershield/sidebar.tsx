@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Filter, Gauge, Radio, Rss, Tags } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ThreatGlobe } from "@/components/cybershield/threat-globe";
 import {
   ExploitMatrixCard,
   KevMetricsCard,
@@ -37,9 +36,9 @@ interface TopicCount {
 const MAX_TOPICS = 16;
 
 /**
- * Sidebar analytics column — Live Threat Map, Threat Condition, Live
- * Metrics, Threat Severity, Exploitation Matrix, Topic Cloud and the
- * Active Sources tracker, spaced on an 8pt grid for comfortable scanning.
+ * Sidebar analytics column — Threat Condition, Live Metrics, Threat
+ * Severity, Exploitation Matrix, Topic Cloud and the Active Sources
+ * tracker, spaced on an 8pt grid for comfortable scanning.
  */
 export function Sidebar({
   items,
@@ -77,9 +76,6 @@ export function Sidebar({
 
   return (
     <div className="space-y-6">
-      <div data-reveal>
-        <ThreatGlobe items={items} />
-      </div>
       <ThreatConditionCard items={items} metrics={metrics} />
       <KevMetricsCard {...kevPanel} />
       <SeverityBreakdownCard metrics={metrics} syncing={syncing} />

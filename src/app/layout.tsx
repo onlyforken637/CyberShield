@@ -34,7 +34,8 @@ export const metadata: Metadata = {
     "live feed",
   ],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
 };
 

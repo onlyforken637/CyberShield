@@ -37,9 +37,16 @@ export function DashboardHeader({
             className="group flex shrink-0 items-center gap-3"
             aria-label="CyberShield News home"
           >
-            <span className="relative flex h-3.5 w-3.5">
-              <span className="cyber-ping absolute inline-flex h-3.5 w-3.5 text-cyber-teal opacity-75">
-                <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-cyber-teal" />
+            <span className="relative shrink-0">
+              <img
+                src="/logo.png"
+                alt="CyberShield logo"
+                className="h-9 w-9 rounded-xl border border-cyber-border object-cover shadow-[0_0_18px_rgba(var(--teal-rgb),0.25)] sm:h-10 sm:w-10"
+              />
+              <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5">
+                <span className="cyber-ping absolute inline-flex h-2.5 w-2.5 text-cyber-teal opacity-75">
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-cyber-teal" />
+                </span>
               </span>
             </span>
             <span className="whitespace-nowrap font-display text-lg font-black tracking-[0.16em] text-hi sm:text-[1.55rem]">

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberShield — Who It's For</title>
+<link rel="stylesheet" href="global.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--bg); overflow: hidden; }
+  .tile-title { font-family: var(--font-heading); font-size: 16.5px; font-weight: 600; letter-spacing: 0.05em; color: var(--text); }
+  .tile-desc { font-family: var(--font-body); font-size: 14.5px; line-height: 1.55; color: var(--text-dim); }
+  .tile-num { font-family: var(--font-num); font-size: 12px; letter-spacing: 0.18em; color: rgba(143, 168, 163, 0.72); }
+  .icon-box { width: 46px; height: 46px; border-radius: 11px; background: var(--primary-soft); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; flex: none; }
+  .icon-box .material-icons { font-size: 24px; color: var(--primary); }
+</style>
+</head>
+<body>
+<div class="slide scanlines">
+  <!-- decorative glow -->
+  <div data-decor aria-hidden="true" style="position:absolute; top:-220px; right:-180px; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle, rgba(45,212,191,0.07) 0%, rgba(45,212,191,0) 70%);"></div>
+
+  <div style="position:absolute; inset:0; padding:52px 64px; display:flex; flex-direction:column;">
+    <!-- header -->
+    <div class="flex items-end justify-between">
+      <div>
+        <div class="kicker">WHO IT'S FOR</div>
+        <h1 style="font-family:var(--font-heading); font-size:40px; font-weight:700; line-height:1.1; margin:12px 0 0; color:var(--text);">Built for anyone who needs to <span class="text-primary-c">know first</span>.</h1>
+      </div>
+      <div style="font-family:var(--font-num); font-size:12px; letter-spacing:0.22em; color:var(--text-dim); padding-bottom:8px;">SEGMENTS // 06</div>
+    </div>
+    <div class="rule" style="margin:22px 0 24px;"></div>
+
+    <!-- 2 x 3 bento grid -->
+    <div style="flex:1; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:1fr 1fr; gap:20px;">
+
+      <div class="card" style="padding:22px 24px; display:flex; flex-direction:column;">
+        <div class="flex items-center justify-between">
+          <div class="icon-box"><span class="material-icons">security</span></div>
+          <div class="tile-num">01</div>
+        </div>
+        <div class="tile-title" style="margin-top:16px;">SOC &amp; SECURITY TEAMS</div>
+        <div class="tile-desc" style="margin-top:8px;">A shared live wall for the ops room — everyone reads the same scored feed.</div>
+      </div>
+
+      <div class="card" style="padding:22px 24px; display:flex; flex-direction:column;">
+        <div class="flex items-center justify-between">
+          <div class="icon-box"><span class="material-icons">manage_accounts</span></div>
+          <div class="tile-num">02</div>
+        </div>
+        <div class="tile-title" style="margin-top:16px;">IT MANAGERS</div>
+        <div class="tile-desc" style="margin-top:8px;">Vendor-neutral awareness: know what is being exploited before it lands in your stack.</div>
+      </div>
+
+      <div class="card" style="padding:22px 24px; display:flex; flex-direction:column;">
+        <div class="flex items-center justify-between">
+          <div class="icon-box"><span class="material-icons">travel_explore</span></div>
+          <div class="tile-num">03</div>
+        </div>
+        <div class="tile-title" style="margin-top:16px;">ANALYSTS &amp; RESEARCHERS</div>
+        <div class="tile-desc" style="margin-top:8px;">Cross-source dedupe and KEV cross-checks speed up open-source investigations.</div>
+      </div>
+
+      <div class="card" style="padding:22px 24px; display:flex; flex-direction:column;">
+        <div class="flex items-center justify-between">
+          <div class="icon-box"><span class="material-icons">school</span></div>
+          <div class="tile-num">04</div>
+        </div>
+        <div class="tile-title" style="margin-top:16px;">EDUCATORS &amp; STUDENTS</div>
+        <div class="tile-desc" style="margin-top:8px;">Real cases, real severity scores — the threat landscape as living course material.</div>
+      </div>
+
+      <div class="card" style="padding:22px 24px; display:flex; flex-direction:column;">
+        <div class="flex items-center justify-between">
+          <div class="icon-box"><span class="material-icons">edit_note</span></div>
+          <div class="tile-num">05</div>
+        </div>
+        <div class="tile-title" style="margin-top:16px;">NEWSLETTER &amp; CONTENT CREATORS</div>
+        <div class="tile-desc" style="margin-top:8px;">Never miss the story: 19 streams, deduplicated, with thumbnails ready to quote.</div>
+      </div>
+
+      <div class="card" style="padding:22px 24px; display:flex; flex-direction:column;">
+        <div class="flex items-center justify-between">
+          <div class="icon-box"><span class="material-icons">insights</span></div>
+          <div class="tile-num">06</div>
+        </div>
+        <div class="tile-title" style="margin-top:16px;">EXECUTIVES</div>
+        <div class="tile-desc" style="margin-top:8px;">The five-minute morning read: highest-severity items first, plain-language verdicts.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

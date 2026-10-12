@@ -10,8 +10,11 @@ import { cn } from "@/lib/utils";
 
 /**
  * Live article thumbnail — routed through our own /api/img relay so
- * hotlink-protected CDNs can't blank it. Degrades silently to the
- * generated matrix-code placeholder when the upstream has no media.
+ * hotlink-protected CDNs can't blank it. Resolution chain:
+ *   1. feed-provided image, proxied (`?u=`)
+ *   2. lazy og:image scraped off the article page (`?r=`) — covers items
+ *      whose feed shipped no media and missed the sync-cycle enrichment
+ *   3. generated matrix-code placeholder — always something on screen
  */
 export function ArticleThumb({
   item,
@@ -22,18 +25,26 @@ export function ArticleThumb({
   className?: string;
   glyphScale?: number;
 }) {
-  const [failed, setFailed] = useState(false);
-  const proxied = item.imageUrl
+  const [proxyFailed, setProxyFailed] = useState(false);
+  const [resolveFailed, setResolveFailed] = useState(false);
+
+  const proxySrc = item.imageUrl
     ? `/api/img?u=${encodeURIComponent(item.imageUrl)}`
     : null;
+  const resolveSrc = /^https?:\/\//i.test(item.link)
+    ? `/api/img?r=${encodeURIComponent(item.link)}`
+    : null;
 
-  if (!proxied || failed) {
+  const showProxy = Boolean(proxySrc) && !proxyFailed;
+  const showResolve = !showProxy && Boolean(resolveSrc) && !resolveFailed;
+
+  if (!showProxy && !showResolve) {
     return (
       <div className={cn("relative", className)}>
         <MatrixThumb seed={item.id} className={cn("h-full w-full", className)} glyphScale={glyphScale} />
         <span
           className="absolute bottom-1.5 right-1.5 flex items-center gap-0.5 rounded-md bg-cyber-bg/80 px-1.5 py-0.5 text-[8px] font-bold tracking-widest text-mid"
-          title="No media in feed payload — generated matrix placeholder"
+          title="No media available — generated matrix placeholder"
         >
           <ImageOff className="h-2.5 w-2.5" /> SYNTH
         </span>
@@ -41,13 +52,27 @@ export function ArticleThumb({
     );
   }
 
+  if (showProxy) {
+    return (
+      <img
+        src={proxySrc!}
+        alt={`Thumbnail for: ${item.title}`}
+        loading="lazy"
+        decoding="async"
+        onError={() => setProxyFailed(true)}
+        className={cn("object-cover", className)}
+        draggable={false}
+      />
+    );
+  }
+
   return (
     <img
-      src={proxied}
+      src={resolveSrc!}
       alt={`Thumbnail for: ${item.title}`}
       loading="lazy"
       decoding="async"
-      onError={() => setFailed(true)}
+      onError={() => setResolveFailed(true)}
       className={cn("object-cover", className)}
       draggable={false}
     />
@@ -82,11 +107,11 @@ const SEVERITY_TONE: Record<
     chip: "border-cyber-amber/50 bg-cyber-amber/10 text-cyber-amber",
   },
   MODERATE: {
-    edge: "border-l-cyber-teal/60",
-    dot: "bg-cyber-teal shadow-[0_0_8px_rgba(var(--teal-rgb),0.9)]",
-    bar: "bg-cyber-teal",
-    text: "text-cyber-teal",
-    chip: "border-cyber-teal/40 bg-cyber-teal/10 text-cyber-teal",
+    edge: "border-l-cyber-teal/60 light:border-l-cyber-border-strong",
+    dot: "bg-cyber-teal shadow-[0_0_8px_rgba(var(--teal-rgb),0.9)] light:bg-cyber-border-strong light:shadow-none",
+    bar: "bg-cyber-teal light:bg-cyber-border-strong",
+    text: "text-cyber-teal light:text-mid",
+    chip: "border-cyber-teal/40 bg-cyber-teal/10 text-cyber-teal light:border-cyber-border-strong light:bg-cyber-raised light:text-mid",
   },
 };
 

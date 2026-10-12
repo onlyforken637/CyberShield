@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Braces, Database, GraduationCap, Radio, ShieldCheck, Sparkles } from "lucide-react";
+import { Activity, Braces, Database, GraduationCap, Radio, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SOURCES } from "@/lib/cyber/feeds";
 import type { CisaMetrics } from "@/lib/cyber/cisa";
@@ -35,8 +35,13 @@ export function AboutModal({ open, onOpenChange, diagnostics }: AboutModalProps)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto border-cyber-border bg-cyber-surface p-5 sm:max-w-lg sm:p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-display text-base font-bold tracking-[0.14em] text-hi">
-            <ShieldCheck className="h-4.5 w-4.5 text-cyber-teal" />
+          <DialogTitle className="flex items-center gap-2.5 font-display text-base font-bold tracking-[0.14em] text-hi">
+            <img
+              src="/logo.png"
+              alt=""
+              aria-hidden="true"
+              className="h-7 w-7 rounded-lg border border-cyber-border object-cover"
+            />
             CYBER<span className="brand-gradient">SHIELD</span> NEWS
           </DialogTitle>
           <DialogDescription className="text-left text-[13px] leading-relaxed text-mid">

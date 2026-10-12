@@ -45,10 +45,12 @@ const BROWSER_UA =
 
 const DIRECT_TIMEOUT_MS = 9_000;
 const CONVERTER_TIMEOUT_MS = 15_000;
-const OG_TIMEOUT_MS = 4_500;
-const OG_MAX_PER_CYCLE = 60;
+const OG_TIMEOUT_MS = 5_000;
+const OG_MAX_PER_CYCLE = 90;
 const OG_POOL = 12;
 const OG_TTL_MS = 6 * 60 * 60 * 1000;
+/** Failed og:image lookups retry sooner than hits. */
+const OG_MISS_TTL_MS = 30 * 60 * 1000;
 
 /** Newest N items kept per stream — bounds payload + enrichment cost. */
 const PER_SOURCE_CAP = 12;
@@ -373,7 +375,10 @@ async function fetchOgImage(articleUrl: string): Promise<string | null> {
 
 async function ogFor(articleUrl: string): Promise<string | null> {
   const cached = ogCache.get(articleUrl);
-  if (cached && Date.now() - cached.at < OG_TTL_MS) return cached.image;
+  if (cached) {
+    const ttl = cached.image ? OG_TTL_MS : OG_MISS_TTL_MS;
+    if (Date.now() - cached.at < ttl) return cached.image;
+  }
   const image = await fetchOgImage(articleUrl);
   ogCache.set(articleUrl, { at: Date.now(), image });
   if (ogCache.size > 800) {

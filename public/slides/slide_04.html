@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>CyberShield — 04 The Pipeline</title>
+<link rel="stylesheet" href="global.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:#05080d;}
+  .stage-num{font-family:var(--font-num);font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--primary);background:var(--primary-soft);border:1px solid var(--line);border-radius:6px;padding:4px 10px;align-self:flex-start;}
+  .stage-name{margin:14px 0 0;font-family:var(--font-heading);font-weight:700;font-size:20px;letter-spacing:.02em;color:var(--text);}
+  .stage-desc{margin:10px 0 0;font-size:13px;line-height:1.58;color:#a9bdb9;}
+  .flow-arrow{width:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-num);font-size:22px;color:var(--primary);}
+  .sev-c{color:var(--danger);font-weight:700;font-size:11.5px;font-family:var(--font-num);}
+  .sev-h{color:var(--accent);font-weight:700;font-size:11.5px;font-family:var(--font-num);}
+  .sev-e{color:var(--primary);font-weight:700;font-size:11.5px;font-family:var(--font-num);}
+  .sev-m{color:var(--text-dim);font-weight:700;font-size:11.5px;font-family:var(--font-num);}
+</style>
+</head>
+<body>
+<div class="slide scanlines">
+  <div class="relative h-full flex flex-col" style="padding:58px 60px 50px;">
+
+    <!-- Kicker -->
+    <div class="flex items-center" style="gap:16px;">
+      <span class="kicker" style="font-size:12px;">HOW IT WORKS</span>
+      <span data-decor aria-hidden="true" class="flex-1" style="height:1px;background:linear-gradient(90deg, rgba(45,212,191,.4), rgba(45,212,191,0));"></span>
+    </div>
+
+    <!-- Title -->
+    <h1 style="margin:14px 0 0;font-family:var(--font-heading);font-weight:700;font-size:42px;line-height:1.1;letter-spacing:-0.015em;color:var(--text);">
+      From raw feeds to decisions in <span style="color:var(--primary);">five stages.</span>
+    </h1>
+
+    <!-- Pipeline row -->
+    <div class="flex-1 flex flex-col justify-center">
+      <div class="flex items-stretch" style="height:318px;">
+
+        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
+          <span class="stage-num">01</span>
+          <h3 class="stage-name">AGGREGATE</h3>
+          <p class="stage-desc">Fetches 19 XML streams directly; public-converter relay is the automatic fallback.</p>
+        </div>
+
+        <div class="flow-arrow" data-decor aria-hidden="true">→</div>
+
+        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
+          <span class="stage-num">02</span>
+          <h3 class="stage-name">DISTILL</h3>
+          <p class="stage-desc">Deduplicates stories, picks the best thumbnail, distills an analyst lede.</p>
+        </div>
+
+        <div class="flow-arrow" data-decor aria-hidden="true">→</div>
+
+        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
+          <span class="stage-num">03</span>
+          <h3 class="stage-name">SCORE</h3>
+          <p class="stage-desc">Keyword-and-signal engine rates every story <span class="sev-c">CRITICAL</span> / <span class="sev-h">HIGH</span> / <span class="sev-e">ELEVATED</span> / <span class="sev-m">MODERATE</span> with a 0-100 score.</p>
+        </div>
+
+        <div class="flow-arrow" data-decor aria-hidden="true">→</div>
+
+        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
+          <span class="stage-num">04</span>
+          <h3 class="stage-name">CLASSIFY</h3>
+          <p class="stage-desc">Sorts stories into 10 threat categories from Ransomware to AI Security.</p>
+        </div>
+
+        <div class="flow-arrow" data-decor aria-hidden="true">→</div>
+
+        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
+          <span class="stage-num">05</span>
+          <h3 class="stage-name">SERVE</h3>
+          <p class="stage-desc">Caches the snapshot: 4-minute fresh window, 30-minute stale-safe serve while a background refresh runs.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Stack strip -->
+    <div class="flex items-center justify-center" style="background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:15px 24px;gap:12px;">
+      <span class="material-icons" aria-hidden="true" style="font-size:17px;color:var(--accent);">layers</span>
+      <span style="font-family:var(--font-num);font-size:12.5px;letter-spacing:.08em;color:#b7c9c5;"><span style="color:var(--accent);font-weight:700;">STACK</span> — NEXT.JS APP ROUTER · PRISMA + SQLITE CACHE · 5 API ENDPOINTS · ZERO DATABASE SERVERS</span>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

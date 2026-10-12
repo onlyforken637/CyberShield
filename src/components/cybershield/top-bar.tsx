@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Info } from "lucide-react";
+import { Activity, BookOpen, Info } from "lucide-react";
 import { SystemClock } from "@/components/cybershield/clock";
 import { SoundToggle } from "@/components/cybershield/sound-toggle";
 import { ThemeToggle } from "@/components/cybershield/theme-toggle";
@@ -36,7 +36,7 @@ export function TopBar({ onlineCount, nextSyncAt, onOpenAbout }: TopBarProps) {
           <SystemClock className="hidden text-[10px] text-mid sm:flex" />
           <span className="hidden h-3 w-px bg-cyber-border sm:block" aria-hidden="true" />
           <span
-            className="flex shrink-0 items-center gap-1.5 truncate font-semibold text-cyber-green"
+            className="hidden shrink-0 items-center gap-1.5 truncate font-semibold text-cyber-green sm:flex"
             title="Research streams confirmed online this cycle"
           >
             <span className="cyber-ping relative inline-flex h-1.5 w-1.5 text-cyber-green">
@@ -61,13 +61,21 @@ export function TopBar({ onlineCount, nextSyncAt, onOpenAbout }: TopBarProps) {
           )}
           <ThemeToggle />
           <SoundToggle />
+          <a
+            href="#resources"
+            aria-label="Resources — documentation, presentation and video"
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-transparent px-2 text-[10px] font-semibold uppercase tracking-wider text-cyber-teal transition-colors hover:border-cyber-teal/40 hover:bg-cyber-teal/10"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Resources</span>
+          </a>
           <button
             type="button"
             onClick={onOpenAbout}
             className="flex h-8 items-center gap-1.5 rounded-lg border border-transparent px-2 text-[10px] font-semibold uppercase tracking-wider text-cyber-teal transition-colors hover:border-cyber-teal/40 hover:bg-cyber-teal/10"
           >
             <Info className="h-3.5 w-3.5" />
-            About
+            <span className="hidden sm:inline">About</span>
           </button>
         </div>
       </div>
