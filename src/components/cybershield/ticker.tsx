@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { gsap, prefersReducedMotion } from "@/lib/cyber/gsap";
 import type { FeedItem } from "@/lib/cyber/feeds";
 import { timeAgo } from "@/lib/cyber/utils";
@@ -18,7 +18,11 @@ const MAX_TICKER_ITEMS = 14;
  * GSAP-driven so hover glides the track to a near-stop instead of hard
  * pausing (award-site motion language). Every alert opens the drawer.
  */
-export function Ticker({ items, onOpenArticle }: TickerProps) {
+/**
+ * Memoized — the marquee renders hundreds of nodes; filter clicks in
+ * the page must not reconcile it when `items` hasn't changed.
+ */
+export const Ticker = memo(function Ticker({ items, onOpenArticle }: TickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const alerts = useMemo(() => {
     const cutoff = Date.now() - 24 * 60 * 60 * 1000;
@@ -84,7 +88,7 @@ export function Ticker({ items, onOpenArticle }: TickerProps) {
       </div>
     </div>
   );
-}
+});
 
 function TickerTrack({
   alerts,

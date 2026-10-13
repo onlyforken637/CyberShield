@@ -200,7 +200,7 @@ export function BootOverlay() {
       const started = await playVoice(audioRef.current);
       if (started) {
         playBootChime();
-        enterTimer = window.setTimeout(runExit, 240);
+        enterTimer = setTimeout(runExit, 240);
       } else {
         // autoplay locked → reveal immediately, voice self-engages later
         armVoiceOnFirstInteraction();

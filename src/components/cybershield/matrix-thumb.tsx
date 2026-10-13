@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { ShieldHalf } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ import { hashCode, mulberry32 } from "@/lib/cyber/utils";
  * Colors are read from the active theme's CSS variables, so generated
  * thumbnails match dark and light mode alike.
  */
-export function MatrixThumb({
+export const MatrixThumb = memo(function MatrixThumb({
   seed,
   className,
   glyphScale = 1,
@@ -28,25 +28,45 @@ export function MatrixThumb({
 
   useEffect(() => {
     let cancelled = false;
+    let idleId = 0;
+    let rafId = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    try {
-      const canvas = document.createElement("canvas");
-      const width = 480;
-      const height = Math.round(300 * glyphScale);
-      canvas.width = width;
-      canvas.height = height;
-      drawMatrix(canvas, seed, theme);
-      const dataUrl = canvas.toDataURL("image/png");
-      timer = setTimeout(() => {
-        if (!cancelled) setUrl(dataUrl);
-      }, 0);
-    } catch {
-      timer = setTimeout(() => {
-        if (!cancelled) setUrl(null);
-      }, 0);
+
+    /* The canvas draw + toDataURL is the single most expensive piece of
+       per-card work. Scheduling it in idle time keeps filter switches
+       responsive — the shield placeholder paints instantly and the
+       matrix thumb pops in a beat later (24 draws never block one
+       long task). */
+    const draw = () => {
+      if (cancelled) return;
+      try {
+        const canvas = document.createElement("canvas");
+        const width = 480;
+        const height = Math.round(300 * glyphScale);
+        canvas.width = width;
+        canvas.height = height;
+        drawMatrix(canvas, seed, theme);
+        const dataUrl = canvas.toDataURL("image/png");
+        timer = setTimeout(() => {
+          if (!cancelled) setUrl(dataUrl);
+        }, 0);
+      } catch {
+        timer = setTimeout(() => {
+          if (!cancelled) setUrl(null);
+        }, 0);
+      }
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(draw, { timeout: 350 });
+    } else {
+      rafId = window.requestAnimationFrame(draw);
     }
+
     return () => {
       cancelled = true;
+      if (idleId) window.cancelIdleCallback(idleId);
+      if (rafId) cancelAnimationFrame(rafId);
       if (timer) clearTimeout(timer);
     };
   }, [seed, glyphScale, theme]);
@@ -74,7 +94,7 @@ export function MatrixThumb({
       draggable={false}
     />
   );
-}
+});
 
 /*
  * Palette is picked from a JS map keyed by the React theme (NOT from
@@ -83,7 +103,7 @@ export function MatrixThumb({
  * reading CSS vars here would lag one toggle behind.
  */
 const THUMB_PALETTES = {
-  dark: { bg: "#070B14", grid: "rgba(32, 78, 88, 0.34)", teal: "47, 230, 207" },
+  dark: { bg: "#05080d", grid: "rgba(32, 78, 88, 0.3)", teal: "47, 230, 207" },
   light: { bg: "#FFFFFF", grid: "rgba(220, 38, 38, 0.1)", teal: "220, 38, 38" },
 } as const;
 

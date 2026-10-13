@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { ChevronRight, Clock3, ImageOff, Zap } from "lucide-react";
 import { MatrixThumb } from "@/components/cybershield/matrix-thumb";
 import { gsap, prefersReducedMotion } from "@/lib/cyber/gsap";
@@ -133,8 +133,12 @@ interface ArticleCardProps {
  * (author, tag chips, highlight bullets) lives in the Investigation
  * Drawer instead — the card carries only what scanning eyes need
  * (recognition over recall, reduced cognitive load).
+ *
+ * Memoized: the feed can render ~200 cards; filter/selection changes
+ * must not re-render unchanged cards (item ref, `selected` flag and
+ * the stable `onOpen` callback are the only inputs).
  */
-export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
+export const ArticleCard = memo(function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
   const intel = item.intel;
   const tone = severityTone(intel);
   const hot = intel.severity.label === "CRITICAL" || intel.severity.label === "HIGH";
@@ -275,4 +279,4 @@ export function ArticleCard({ item, selected, onOpen }: ArticleCardProps) {
       </div>
     </article>
   );
-}
+});

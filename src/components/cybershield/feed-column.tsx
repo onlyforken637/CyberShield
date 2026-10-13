@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Flame, Loader2, RefreshCw, Search, SlidersHorizontal, X } from "lucide-react";
 import { ArticleCard } from "@/components/cybershield/article-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CATEGORY_MAP } from "@/lib/cyber/categories";
-import { gsap, ScrollTrigger, prefersReducedMotion, whenBooted } from "@/lib/cyber/gsap";
 import type { FeedItem } from "@/lib/cyber/feeds";
 import { formatUtc } from "@/lib/cyber/utils";
 import { cn } from "@/lib/utils";
@@ -36,7 +35,15 @@ interface FeedColumnProps {
  * Main feed column — Threat Intelligence masthead, Ranked Threat Board,
  * refresh control, active filter chips and the fluid live news stream.
  * Spacing follows an 8pt grid with deliberate breathing room (HCI).
+ *
+ * Rendering is incremental: only the first INITIAL_VISIBLE cards mount
+ * up front (each card carries GSAP tilt listeners + canvas thumbs, so
+ * mounting ~200 at once froze tag/category switches). An
+ * IntersectionObserver streams in further chunks as the user scrolls.
  */
+const INITIAL_VISIBLE = 24;
+const LOAD_CHUNK = 16;
+
 export function FeedColumn({
   items,
   totalCount,
@@ -58,11 +65,45 @@ export function FeedColumn({
   onOpenArticle,
 }: FeedColumnProps) {
   const feedListRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const filtersActive =
     query.trim().length > 0 ||
     activeTopics.length > 0 ||
     activeCategory !== "all" ||
     enabledSourceCount < totalSources;
+
+  /* ── incremental stream window ───────────────────────────────── */
+  // The window state carries the items slice it was sized for. When the
+  // filter engine emits a new slice, `src !== items` and the visible
+  // count derives straight back to INITIAL_VISIBLE — no effects, no
+  // flash, and no ref writes during render (linter-safe).
+  const [streamWindow, setStreamWindow] = useState<{ src: FeedItem[]; count: number }>({
+    src: items,
+    count: INITIAL_VISIBLE,
+  });
+  const visibleCount = streamWindow.src === items ? streamWindow.count : INITIAL_VISIBLE;
+  const hasMore = visibleCount < items.length;
+  const loadMore = () =>
+    setStreamWindow({ src: items, count: Math.min(visibleCount + LOAD_CHUNK, items.length) });
+
+  // stream in the next chunk when the sentinel scrolls into range
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) loadMore();
+      },
+      { rootMargin: "700px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, visibleCount, items]);
+
+  const visibleItems = useMemo(
+    () => items.slice(0, visibleCount),
+    [items, visibleCount],
+  );
 
   // signals intercepted in the last hour — live stream velocity
   const signalRate = useMemo(() => {
@@ -86,42 +127,11 @@ export function FeedColumn({
         lastSyncAt ? ` · synced ${formatUtc(lastSyncAt, false)} UTC` : ""
       }`;
 
-  /* GSAP card choreography — the feed assembles after boot, then new
-     batches reveal on scroll. Re-runs on filter changes so every slice
-     of the stream lands with the same staggered entrance. */
-  useEffect(() => {
-    const root = feedListRef.current;
-    if (!root || prefersReducedMotion()) return;
-    const cards = Array.from(root.querySelectorAll<HTMLElement>("[data-card-reveal]"));
-    if (cards.length === 0) return;
-
-    let batch: ScrollTrigger[] = [];
-    let cancelled = false;
-    whenBooted(() => {
-      if (cancelled) return;
-      gsap.set(cards, { opacity: 0, y: 26 });
-      batch = ScrollTrigger.batch(cards, {
-        start: "top 97%",
-        once: true,
-        onEnter: (nodes) =>
-          gsap.to(nodes, {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "expo.out",
-            stagger: 0.07,
-            overwrite: true,
-            clearProps: "transform",
-          }),
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      batch.forEach((trigger) => trigger.kill());
-      gsap.set(cards, { clearProps: "all" });
-    };
-  }, [items, booting]);
+  /* Card entrances are pure CSS (`.card-in`, capped stagger on the
+     first window, reduced-motion safe). The old GSAP
+     ScrollTrigger.batch-per-filter-change choreography was the single
+     biggest source of tag/category switch lag — killing it keeps
+     switches instant. */
 
   return (
     <div className="flex min-w-0 flex-col">
@@ -325,14 +335,42 @@ export function FeedColumn({
             </button>
           </div>
         ) : (
-          items.map((item) => (
-            <ArticleCard
+          visibleItems.map((item, index) => (
+            <div
               key={item.id}
-              item={item}
-              selected={selectedId === item.id}
-              onOpen={onOpenArticle}
-            />
+              className="card-in"
+              style={{
+                animationDelay:
+                  index < INITIAL_VISIBLE ? `${Math.min(index, 11) * 45}ms` : undefined,
+              }}
+            >
+              <ArticleCard
+                item={item}
+                selected={selectedId === item.id}
+                onOpen={onOpenArticle}
+              />
+            </div>
           ))
+        )}
+
+        {/* ── incremental stream sentinel + manual load-more ───────── */}
+        {!booting && items.length > INITIAL_VISIBLE && (
+          <div ref={sentinelRef} className="flex flex-col items-center gap-3 py-6">
+            <span className="digital text-[10px] tracking-widest text-low">
+              {hasMore
+                ? `SHOWING ${visibleCount} OF ${items.length} SIGNALS · SCROLL FOR MORE`
+                : `END OF STREAM · ${items.length} SIGNALS`}
+            </span>
+            {hasMore && (
+              <button
+                type="button"
+                onClick={loadMore}
+                className="rounded-lg border border-cyber-teal/50 bg-cyber-teal/10 px-4 py-2 text-[11px] font-bold tracking-wider text-cyber-teal transition-colors hover:bg-cyber-teal/20"
+              >
+                LOAD MORE SIGNALS
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

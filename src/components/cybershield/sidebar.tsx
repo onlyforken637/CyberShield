@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { Filter, Gauge, Radio, Rss, Tags } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -39,8 +39,12 @@ const MAX_TOPICS = 16;
  * Sidebar analytics column — Threat Condition, Live Metrics, Threat
  * Severity, Exploitation Matrix, Topic Cloud and the Active Sources
  * tracker, spaced on an 8pt grid for comfortable scanning.
+ *
+ * Memoized — the column renders hundreds of nodes; category/tag/search
+ * interactions in the feed must not reconcile it unless its own inputs
+ * (items, topics, sources, KEV state) actually change.
  */
-export function Sidebar({
+export const Sidebar = memo(function Sidebar({
   items,
   feedStates,
   enabledSources,
@@ -93,7 +97,7 @@ export function Sidebar({
       />
     </div>
   );
-}
+});
 
 /* ── Threat Condition gauge ──────────────────────────────────────── */
 
