@@ -6,6 +6,7 @@ import { AboutModal } from "@/components/cybershield/about-modal";
 import { BootOverlay } from "@/components/cybershield/boot-overlay";
 import { DashboardHeader } from "@/components/cybershield/header";
 import { FeedColumn } from "@/components/cybershield/feed-column";
+import { FloatingNav } from "@/components/cybershield/floating-nav";
 import { InvestigationDrawer, type DrawerTarget } from "@/components/cybershield/investigation-drawer";
 import { MobileBottomBar, MobileCategoriesSheet } from "@/components/cybershield/mobile-nav";
 import { ResourcesSection } from "@/components/cybershield/resources-section";
@@ -458,19 +459,9 @@ export default function CyberShieldPage() {
               <span className="text-[11px]">
                 Crafted by <span className="font-semibold text-mid">Umair Jamal</span>
               </span>
-              <a
-                href="#resources"
-                className="transition-colors hover:text-cyber-teal"
-              >
+              <a href="#resources" className="transition-colors hover:text-cyber-teal">
                 Docs &amp; Media
               </a>
-              <button
-                type="button"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="transition-colors hover:text-cyber-teal"
-              >
-                Back to Top ↑
-              </button>
             </div>
           </div>
         </div>
@@ -494,6 +485,9 @@ export default function CyberShieldPage() {
         onlineCount={onlineCount}
         totalSources={SOURCES.length}
       />
+
+      {/* ── Quick navigation floating action button ──────────────── */}
+      <FloatingNav onOpenAbout={() => setAboutOpen(true)} />
 
       <AboutModal
         open={aboutOpen}

@@ -521,3 +521,23 @@
 .boot-glow {
   filter: drop-shadow(0 0 14px rgba(47, 230, 207, 0.55));
 }
+
+/* ── FAB speed-dial entrance (staggered via animation-delay) ────── */
+@keyframes fab-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.fab-item-in {
+  animation: fab-item-in 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.15) backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fab-item-in {
+    animation: none;
+  }
+}
