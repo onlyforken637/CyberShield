@@ -105,12 +105,12 @@ export function InvestigationDrawer({ target, open, onClose }: InvestigationDraw
         aria-modal="true"
         aria-label="Investigation drawer"
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-[500px] max-w-[94vw] flex-col border-l border-cyber-border bg-cyber-panel shadow-[-28px_0_70px_rgba(0,0,0,0.45)] transition-transform duration-300 ease-out",
+          "glass-sheet fixed inset-y-0 right-0 z-50 flex w-[500px] max-w-[94vw] flex-col border-l border-cyber-border transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "translate-x-full",
         )}
       >
         {/* header */}
-        <header data-drawer-stagger className="flex shrink-0 items-center gap-2.5 border-b border-cyber-border bg-cyber-panel/90 px-5 py-4">
+        <header data-drawer-stagger className="flex shrink-0 items-center gap-2.5 border-b border-cyber-border bg-cyber-panel/60 px-5 py-4">
           {target?.kind === "vuln" ? (
             <Fingerprint className="h-4 w-4 shrink-0 text-cyber-crimson" />
           ) : (

@@ -61,7 +61,7 @@ export const Ticker = memo(function Ticker({ items, onOpenArticle }: TickerProps
   return (
     <div
       data-intro
-      className="w-full overflow-hidden border-b border-cyber-border/60 bg-cyber-panel/60 py-2.5"
+      className="glass-bar w-full overflow-hidden border-b border-cyber-border/60 py-2.5"
       role="region"
       aria-label="Live alerts ticker"
     >

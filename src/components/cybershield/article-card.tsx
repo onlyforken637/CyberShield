@@ -176,7 +176,7 @@ export const ArticleCard = memo(function ArticleCard({ item, selected, onOpen }:
       ref={cardRef}
       data-card-reveal
       className={cn(
-        "signal-sweep group relative rounded-xl border border-l-2 bg-cyber-surface shadow-[var(--card-shadow)] transition-[border-color,box-shadow,background-color] duration-200",
+        "glass-card signal-sweep group relative rounded-xl border border-l-2 shadow-[var(--glass-shadow)] transition-[border-color,box-shadow,background-color] duration-200",
         tone.edge,
         selected
           ? "border-cyber-teal/70 shadow-[0_0_20px_rgba(var(--teal-rgb),0.14)]"

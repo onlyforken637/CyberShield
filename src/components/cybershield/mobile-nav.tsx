@@ -32,7 +32,7 @@ export function MobileBottomBar({
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-cyber-border bg-cyber-panel/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+      className="glass-bar-strong fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-cyber-border pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <BottomButton icon={<Home className="h-5 w-5" />} label="Feed" onClick={onScrollTop} />
       <BottomButton
@@ -109,7 +109,7 @@ export function MobileCategoriesSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="left"
-        className="w-[85vw] max-w-[320px] border-cyber-border bg-cyber-surface p-5"
+        className="glass-sheet w-[85vw] max-w-[320px] border-cyber-border p-5"
       >
         <SheetHeader className="border-b border-cyber-border p-0 pb-3 text-left">
           <SheetTitle className="font-display text-xs font-bold uppercase tracking-wider text-cyber-teal">

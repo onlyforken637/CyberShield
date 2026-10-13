@@ -28,7 +28,7 @@ export function DashboardHeader({
   onOpenMobileNav,
 }: DashboardHeaderProps) {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-cyber-border/80 bg-cyber-bg/85 backdrop-blur-xl">
+    <header className="glass-bar sticky top-0 z-40 w-full border-b border-cyber-border/80">
       <div className="mx-auto w-full max-w-[1600px] px-3 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4 sm:h-[4.5rem]">
           {/* Brand */}

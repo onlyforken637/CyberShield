@@ -33,7 +33,7 @@ export function AboutModal({ open, onOpenChange, diagnostics }: AboutModalProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto border-cyber-border bg-cyber-surface p-5 sm:max-w-lg sm:p-6">
+      <DialogContent className="glass-sheet max-h-[90vh] overflow-y-auto border-cyber-border p-5 sm:max-w-lg sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display text-base font-bold tracking-[0.14em] text-hi">
             <ShieldCheck className="h-4.5 w-4.5 text-cyber-teal" />

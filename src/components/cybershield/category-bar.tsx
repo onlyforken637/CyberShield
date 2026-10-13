@@ -58,7 +58,7 @@ export function CategoryBar({ counts, active, onSelect }: CategoryBarProps) {
   ];
 
   return (
-    <div className="no-scrollbar w-full overflow-x-auto border-t border-cyber-border/50 bg-cyber-panel/40 py-2">
+    <div className="glass-bar no-scrollbar w-full overflow-x-auto border-t border-cyber-border/50 py-2">
       <nav
         className="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 py-1 sm:px-6 lg:px-8"
         aria-label="Threat categories"

@@ -27,7 +27,7 @@ export function TopBar({ onlineCount, nextSyncAt, onOpenAbout }: TopBarProps) {
   return (
     <div
       data-intro
-      className="w-full border-b border-cyber-border/60 bg-cyber-panel/80 py-2 text-[11px] text-mid backdrop-blur-md"
+      className="glass-bar w-full border-b border-cyber-border/60 py-2 text-[11px] text-mid"
     >
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3 px-3 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">

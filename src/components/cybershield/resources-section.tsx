@@ -181,7 +181,7 @@ export function ResourcesSection() {
 
       {/* ── Documentation dialog ──────────────────────────────────── */}
       <Dialog open={openKind === "docs"} onOpenChange={(open) => !open && setOpenKind(null)}>
-        <DialogContent className="max-h-[92vh] overflow-hidden border-cyber-border bg-cyber-surface p-4 sm:max-w-4xl sm:p-5">
+        <DialogContent className="glass-sheet max-h-[92vh] overflow-hidden border-cyber-border p-4 sm:max-w-4xl sm:p-5">
           <DialogHeader>
             <DialogTitle className="font-display text-sm font-bold tracking-[0.14em] text-hi">
               CyberShield — Documentation
@@ -208,7 +208,7 @@ export function ResourcesSection() {
 
       {/* ── Presentation dialog ───────────────────────────────────── */}
       <Dialog open={openKind === "slides"} onOpenChange={(open) => !open && setOpenKind(null)}>
-        <DialogContent className="max-h-[92vh] overflow-hidden border-cyber-border bg-cyber-surface p-4 sm:max-w-4xl sm:p-5">
+        <DialogContent className="glass-sheet max-h-[92vh] overflow-hidden border-cyber-border p-4 sm:max-w-4xl sm:p-5">
           <DialogHeader>
             <DialogTitle className="font-display text-sm font-bold tracking-[0.14em] text-hi">
               CyberShield — Product Presentation
@@ -267,7 +267,7 @@ export function ResourcesSection() {
 
       {/* ── Explainer video dialog ────────────────────────────────── */}
       <Dialog open={openKind === "video"} onOpenChange={(open) => !open && setOpenKind(null)}>
-        <DialogContent className="max-h-[92vh] overflow-hidden border-cyber-border bg-cyber-surface p-4 sm:max-w-3xl sm:p-5">
+        <DialogContent className="glass-sheet max-h-[92vh] overflow-hidden border-cyber-border p-4 sm:max-w-3xl sm:p-5">
           <DialogHeader>
             <DialogTitle className="font-display text-sm font-bold tracking-[0.14em] text-hi">
               CyberShield — Explainer Film

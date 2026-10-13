@@ -75,12 +75,12 @@
 .dark {
   color-scheme: dark;
 
-  --cyber-bg: #070b14;
-  --cyber-panel: #0b1120;
-  --cyber-surface: #0f1729;
-  --cyber-raised: #18233c;
-  --cyber-border: #202c48;
-  --cyber-border-strong: #2e3e63;
+  --cyber-bg: #000000;
+  --cyber-panel: #070b12;
+  --cyber-surface: #0c111c;
+  --cyber-raised: #16202f;
+  --cyber-border: #1e2a44;
+  --cyber-border-strong: #2c3c60;
 
   /* turquoise → aqua brand pair */
   --teal: #2fe6cf;
@@ -104,44 +104,56 @@
   --glow-crimson: 0 0 8px rgba(255, 77, 94, 0.65), 0 0 26px rgba(255, 77, 94, 0.28);
   --glow-green: 0 0 8px rgba(52, 211, 153, 0.6), 0 0 24px rgba(52, 211, 153, 0.26);
 
-  --grid-line: rgba(32, 78, 88, 0.32);
+  --grid-line: rgba(32, 78, 88, 0.24);
   --teal-rgb: 47, 230, 207;
 
-  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -18px rgba(0, 0, 0, 0.55);
-  --hairline: linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 42%);
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -18px rgba(0, 0, 0, 0.7);
+  --hairline: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 46%);
+
+  /* ── Glassmorphism system — frosted HUD glass over the pitch-black field ──
+     (light theme maps every glass token back to its crisp solid equivalent) */
+  --glass-filter: blur(14px) saturate(150%);
+  --glass-filter-bar: blur(18px) saturate(155%);
+  --glass-tint: rgba(12, 18, 30, 0.55);
+  --glass-tint-card: rgba(14, 20, 33, 0.5);
+  --glass-tint-bar: rgba(5, 9, 16, 0.58);
+  --glass-tint-sheet: rgba(10, 15, 26, 0.8);
+  --glass-edge: rgba(255, 255, 255, 0.09);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 18px 44px -22px rgba(0, 0, 0, 0.85), 0 4px 14px -8px rgba(0, 0, 0, 0.55);
 
   /* shadcn token bridge */
   --radius: 0.625rem;
-  --background: #070b14;
+  --background: #000000;
   --foreground: #eaf0fc;
-  --card: #0f1729;
+  --card: #0c111c;
   --card-foreground: #eaf0fc;
-  --popover: #0b1120;
+  --popover: #070b12;
   --popover-foreground: #eaf0fc;
   --primary: #2fe6cf;
   --primary-foreground: #04211c;
-  --secondary: #18233c;
+  --secondary: #16202f;
   --secondary-foreground: #c6d1e8;
-  --muted: #141d31;
+  --muted: #111a29;
   --muted-foreground: #8b99b8;
-  --accent: #18233c;
+  --accent: #16202f;
   --accent-foreground: #eaf0fc;
   --destructive: #ff4d5e;
-  --border: #202c48;
-  --input: #202c48;
+  --border: #1e2a44;
+  --input: #1e2a44;
   --ring: #2fe6cf;
   --chart-1: #2fe6cf;
   --chart-2: #f59e0b;
   --chart-3: #ff4d5e;
   --chart-4: #34d399;
   --chart-5: #a78bfa;
-  --sidebar: #0b1120;
+  --sidebar: #070b12;
   --sidebar-foreground: #eaf0fc;
   --sidebar-primary: #2fe6cf;
   --sidebar-primary-foreground: #04211c;
-  --sidebar-accent: #18233c;
+  --sidebar-accent: #16202f;
   --sidebar-accent-foreground: #eaf0fc;
-  --sidebar-border: #202c48;
+  --sidebar-border: #1e2a44;
   --sidebar-ring: #2fe6cf;
 }
 
@@ -185,6 +197,17 @@
 
   --card-shadow: 0 1px 2px rgba(24, 24, 27, 0.06), 0 10px 30px -14px rgba(24, 24, 27, 0.16);
   --hairline: linear-gradient(180deg, rgba(255, 255, 255, 0.9), transparent 40%);
+
+  /* glass tokens resolve to the existing crisp solids — light look unchanged */
+  --glass-filter: none;
+  --glass-filter-bar: blur(18px);
+  --glass-tint: #ffffff;
+  --glass-tint-card: #ffffff;
+  --glass-tint-bar: rgba(255, 255, 255, 0.85);
+  --glass-tint-sheet: #ffffff;
+  --glass-edge: #e4e4e7;
+  --glass-highlight: 0 0 0 0 rgba(0, 0, 0, 0);
+  --glass-shadow: var(--card-shadow);
 
   --background: #ffffff;
   --foreground: #101014;
@@ -230,7 +253,7 @@
     @apply bg-cyber-bg text-foreground;
     background-image:
       radial-gradient(1150px 660px at 84% -12%, rgba(var(--teal-rgb), 0.1), transparent 62%),
-      radial-gradient(920px 580px at -8% 16%, rgba(0, 216, 255, 0.055), transparent 56%),
+      radial-gradient(920px 580px at -8% 16%, rgba(0, 216, 255, 0.06), transparent 56%),
       radial-gradient(1200px 740px at 50% 120%, rgba(var(--teal-rgb), 0.06), transparent 64%);
     background-attachment: fixed;
   }
@@ -260,13 +283,73 @@
   background-size: 34px 34px;
 }
 
-/* ── Card surface recipe (elevation + gradient hairline) ────────── */
+/* ── Card surface recipe — glassmorphism panel ─────────────────────
+   dark:  translucent frosted glass (aurora refracts through the blur)
+   light: same recipe resolves to the crisp white solid card */
 .card-surface {
-  background-color: var(--cyber-surface);
+  background-color: var(--glass-tint);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   background-image: var(--hairline);
-  border: 1px solid var(--cyber-border);
+  border: 1px solid var(--glass-edge);
   border-radius: 1rem;
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+}
+
+/* ── Glass utilities (token-driven · theme-aware) ────────────────── */
+/* frosted article card — border & box-shadow stay owned by the component */
+.glass-card {
+  background-color: var(--glass-tint-card);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+/* chrome bars: header · ticker · category strip · footer */
+.glass-bar {
+  background-color: var(--glass-tint-bar);
+  -webkit-backdrop-filter: var(--glass-filter-bar);
+  backdrop-filter: var(--glass-filter-bar);
+}
+/* high-opacity bar for overlays sitting on scrolling content */
+.glass-bar-strong {
+  background-color: var(--glass-tint-sheet);
+  -webkit-backdrop-filter: var(--glass-filter-bar);
+  backdrop-filter: var(--glass-filter-bar);
+}
+/* floating sheets: modals · drawer */
+.glass-sheet {
+  background-color: var(--glass-tint-sheet);
+  -webkit-backdrop-filter: var(--glass-filter-bar);
+  backdrop-filter: var(--glass-filter-bar);
+}
+.dark .glass-sheet {
+  box-shadow: 0 24px 70px -26px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+/* lighter blur budget on small screens — keeps Task-28-grade fluidity */
+@media (max-width: 640px) {
+  .dark {
+    --glass-filter: blur(11px) saturate(150%);
+    --glass-filter-bar: blur(14px) saturate(150%);
+  }
+}
+
+/* ── Aurora field — ambient color blobs behind the glass (dark only) ──
+   gives backdrop-blur real content to refract over the pitch-black bg */
+.glass-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  display: none;
+  background:
+    radial-gradient(560px 420px at 12% 6%, rgba(0, 216, 255, 0.13), transparent 64%),
+    radial-gradient(640px 480px at 88% 12%, rgba(47, 230, 207, 0.11), transparent 62%),
+    radial-gradient(720px 560px at 80% 76%, rgba(167, 139, 250, 0.09), transparent 66%),
+    radial-gradient(520px 400px at 6% 88%, rgba(255, 77, 94, 0.06), transparent 60%),
+    radial-gradient(900px 620px at 50% 36%, rgba(0, 216, 255, 0.05), transparent 70%);
+}
+.dark .glass-aurora {
+  display: block;
 }
 
 /* ── Gradient brand text — turquoise→aqua (dark) / red→deep red (light) ── */
