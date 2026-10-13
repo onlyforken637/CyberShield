@@ -3,89 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280, initial-scale=1">
-<title>CyberShield — 04 The Pipeline</title>
+<title>CyberShield — Signal Pipeline</title>
 <link rel="stylesheet" href="global.css">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="tailwind.js"></script>
 <style>
-  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:#05080d;}
-  .stage-num{font-family:var(--font-num);font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--primary);background:var(--primary-soft);border:1px solid var(--line);border-radius:6px;padding:4px 10px;align-self:flex-start;}
-  .stage-name{margin:14px 0 0;font-family:var(--font-heading);font-weight:700;font-size:20px;letter-spacing:.02em;color:var(--text);}
-  .stage-desc{margin:10px 0 0;font-size:13px;line-height:1.58;color:#a9bdb9;}
-  .flow-arrow{width:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-num);font-size:22px;color:var(--primary);}
-  .sev-c{color:var(--danger);font-weight:700;font-size:11.5px;font-family:var(--font-num);}
-  .sev-h{color:var(--accent);font-weight:700;font-size:11.5px;font-family:var(--font-num);}
-  .sev-e{color:var(--primary);font-weight:700;font-size:11.5px;font-family:var(--font-num);}
-  .sev-m{color:var(--text-dim);font-weight:700;font-size:11.5px;font-family:var(--font-num);}
+  html, body { margin:0; padding:0; width:1280px; height:720px; overflow:hidden; background:var(--bg); }
+  .kicker { font-family:var(--font-num); font-size:11.5px; font-weight:500; letter-spacing:.3em; color:var(--text-dim); }
+  .kdot { width:8px; height:8px; border-radius:50%; background:var(--primary); flex:none; box-shadow:0 0 8px rgba(45,212,191,.8); }
+  .h2 { font-family:var(--font-heading); font-size:42px; font-weight:700; letter-spacing:-.02em; line-height:1.1; color:var(--text); }
+  .step { flex:1; min-width:0; display:flex; flex-direction:column; padding:20px 16px 16px; }
+  .step-num { font-family:var(--font-num); font-size:34px; font-weight:700; line-height:1; color:var(--primary); }
+  .step-ic { width:42px; height:42px; border-radius:11px; background:var(--primary-soft); border:1px solid var(--line);
+             display:flex; align-items:center; justify-content:center; margin-top:14px; }
+  .step-ic .material-icons { font-size:22px; color:var(--primary); }
+  .step-name { font-family:var(--font-heading); font-size:16.5px; font-weight:700; letter-spacing:.05em; color:var(--text); margin-top:13px; white-space:nowrap; }
+  .step-copy { font-size:12.5px; line-height:1.52; color:var(--text-dim); margin-top:8px; }
+  .step-copy .n { font-family:var(--font-num); color:var(--text); font-weight:500; font-size:.95em; }
+  .step-foot { margin-top:auto; padding-top:10px; border-top:1px solid var(--line-soft);
+               font-family:var(--font-num); font-size:10px; font-weight:500; letter-spacing:.14em; color:var(--primary); white-space:nowrap; }
+  .conn { width:16px; flex:none; align-self:flex-start; margin-top:87px; height:2px;
+          background:linear-gradient(90deg, rgba(45,212,191,.9), rgba(45,212,191,.12)); }
+  .strip { font-family:var(--font-num); font-size:11px; letter-spacing:.2em; color:var(--text-dim); }
+  .strip .sl { color:var(--primary); font-weight:700; }
 </style>
 </head>
 <body>
-<div class="slide scanlines">
-  <div class="relative h-full flex flex-col" style="padding:58px 60px 50px;">
+<section class="slide scanlines">
+  <div data-decor aria-hidden="true" class="absolute" style="left:-160px; top:-200px; width:540px; height:540px; border-radius:50%; background:radial-gradient(circle, rgba(45,212,191,.09), transparent 62%);"></div>
 
-    <!-- Kicker -->
-    <div class="flex items-center" style="gap:16px;">
-      <span class="kicker" style="font-size:12px;">HOW IT WORKS</span>
-      <span data-decor aria-hidden="true" class="flex-1" style="height:1px;background:linear-gradient(90deg, rgba(45,212,191,.4), rgba(45,212,191,0));"></span>
+  <div class="absolute inset-0 flex flex-col" style="padding:56px 60px 48px;">
+    <!-- header -->
+    <div class="flex items-center" style="gap:12px;">
+      <span class="kdot"></span>
+      <span class="kicker">HOW A SIGNAL FLOWS</span>
     </div>
+    <h2 class="h2" style="margin-top:14px;">Source to screen in <span style="color:var(--primary);">five moves.</span></h2>
 
-    <!-- Title -->
-    <h1 style="margin:14px 0 0;font-family:var(--font-heading);font-weight:700;font-size:42px;line-height:1.1;letter-spacing:-0.015em;color:var(--text);">
-      From raw feeds to decisions in <span style="color:var(--primary);">five stages.</span>
-    </h1>
-
-    <!-- Pipeline row -->
-    <div class="flex-1 flex flex-col justify-center">
-      <div class="flex items-stretch" style="height:318px;">
-
-        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
-          <span class="stage-num">01</span>
-          <h3 class="stage-name">AGGREGATE</h3>
-          <p class="stage-desc">Fetches 19 XML streams directly; public-converter relay is the automatic fallback.</p>
+    <!-- steps -->
+    <div class="flex-1 flex items-center" style="min-height:0;">
+      <div class="w-full flex items-stretch">
+        <div class="card-glow step">
+          <div class="step-num">01</div>
+          <div class="step-ic"><span class="material-icons">rss_feed</span></div>
+          <div class="step-name">INGEST</div>
+          <p class="step-copy"><span class="n">19</span> RSS/Atom streams — The Hacker News, Krebs, BleepingComputer, CISA Advisories, Unit 42 and more — pulled server-side.</p>
+          <div class="step-foot">19/19 ONLINE</div>
         </div>
-
-        <div class="flow-arrow" data-decor aria-hidden="true">→</div>
-
-        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
-          <span class="stage-num">02</span>
-          <h3 class="stage-name">DISTILL</h3>
-          <p class="stage-desc">Deduplicates stories, picks the best thumbnail, distills an analyst lede.</p>
+        <div class="conn" aria-hidden="true"></div>
+        <div class="card-glow step">
+          <div class="step-num">02</div>
+          <div class="step-ic"><span class="material-icons">merge_type</span></div>
+          <div class="step-name">NORMALIZE</div>
+          <p class="step-copy">Titles, summaries and timestamps cleaned, deduped and merged into one canonical stream.</p>
+          <div class="step-foot">SINGLE FEED</div>
         </div>
-
-        <div class="flow-arrow" data-decor aria-hidden="true">→</div>
-
-        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
-          <span class="stage-num">03</span>
-          <h3 class="stage-name">SCORE</h3>
-          <p class="stage-desc">Keyword-and-signal engine rates every story <span class="sev-c">CRITICAL</span> / <span class="sev-h">HIGH</span> / <span class="sev-e">ELEVATED</span> / <span class="sev-m">MODERATE</span> with a 0-100 score.</p>
+        <div class="conn" aria-hidden="true"></div>
+        <div class="card-glow step">
+          <div class="step-num">03</div>
+          <div class="step-ic"><span class="material-icons">hub</span></div>
+          <div class="step-name">ENRICH</div>
+          <p class="step-copy">On-device NLP extracts CVE IDs, threat orgs, tags and read time for every article.</p>
+          <div class="step-foot">34 CVE-TAGGED TODAY</div>
         </div>
-
-        <div class="flow-arrow" data-decor aria-hidden="true">→</div>
-
-        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
-          <span class="stage-num">04</span>
-          <h3 class="stage-name">CLASSIFY</h3>
-          <p class="stage-desc">Sorts stories into 10 threat categories from Ransomware to AI Security.</p>
+        <div class="conn" aria-hidden="true"></div>
+        <div class="card-glow step">
+          <div class="step-num">04</div>
+          <div class="step-ic"><span class="material-icons">speed</span></div>
+          <div class="step-name">SCORE</div>
+          <p class="step-copy">A <span class="n">0–100</span> engine weighs CISA KEV membership, CVSS, exploit age, source reliability and recency.</p>
+          <div class="step-foot">TOP TODAY: 100/100</div>
         </div>
-
-        <div class="flow-arrow" data-decor aria-hidden="true">→</div>
-
-        <div class="card-glow flex-1 flex flex-col" style="padding:22px 20px;">
-          <span class="stage-num">05</span>
-          <h3 class="stage-name">SERVE</h3>
-          <p class="stage-desc">Caches the snapshot: 4-minute fresh window, 30-minute stale-safe serve while a background refresh runs.</p>
+        <div class="conn" aria-hidden="true"></div>
+        <div class="card-glow step">
+          <div class="step-num">05</div>
+          <div class="step-ic"><span class="material-icons">dashboard</span></div>
+          <div class="step-name">RANK &amp; RENDER</div>
+          <p class="step-copy">Ranked JSON over <span class="n">5</span> API endpoints renders the wall, gauge and board you saw.</p>
+          <div class="step-foot">12-MIN FRESHNESS</div>
         </div>
-
       </div>
     </div>
 
-    <!-- Stack strip -->
-    <div class="flex items-center justify-center" style="background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:15px 24px;gap:12px;">
-      <span class="material-icons" aria-hidden="true" style="font-size:17px;color:var(--accent);">layers</span>
-      <span style="font-family:var(--font-num);font-size:12.5px;letter-spacing:.08em;color:#b7c9c5;"><span style="color:var(--accent);font-weight:700;">STACK</span> — NEXT.JS APP ROUTER · PRISMA + SQLITE CACHE · 5 API ENDPOINTS · ZERO DATABASE SERVERS</span>
+    <!-- bottom strip -->
+    <div class="flex items-center justify-center" style="border:1px solid var(--line-soft); background:var(--surface); border-radius:10px; padding:13px 18px;">
+      <span class="strip"><span class="sl">//</span>&nbsp; NO EXTERNAL AI KEYS REQUIRED TO RUN&nbsp;·&nbsp;OFFLINE FALLBACK BUILT IN</span>
     </div>
-
   </div>
-</div>
+</section>
 </body>
 </html>

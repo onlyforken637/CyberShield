@@ -1,111 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>CyberShield — Slide 09 // Investigation &amp; Triage</title>
+<meta charset="UTF-8">
+<title>CyberShield — AI Analyst Verdict</title>
+<script src="tailwind.js"></script>
 <link rel="stylesheet" href="global.css">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
-  html, body { margin:0; padding:0; background:var(--bg); overflow:hidden; }
-  .heading { font-family:var(--font-heading); }
-  .mono { font-family:var(--font-num); }
-  .chip {
-    display:inline-flex; align-items:center; padding:6px 13px; border-radius:999px;
-    font-size:12px; font-weight:500; color:var(--text);
-    background:var(--bg-raised); border:1px solid var(--line-soft); white-space:nowrap;
-  }
-  .chip-active { background:var(--primary-soft); border:1px solid var(--line); color:var(--primary); }
-  .swatch { width:12px; height:12px; border-radius:3px; flex:none; }
+  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:var(--bg)}
+  .kicker{font-family:var(--font-num);font-size:11px;font-weight:500;letter-spacing:.32em;color:var(--primary);text-transform:uppercase}
+  .kdot{width:8px;height:8px;border-radius:50%;background:var(--primary);box-shadow:0 0 12px rgba(45,212,191,.9);animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  .h2{font-family:var(--font-heading);font-weight:700;font-size:36px;line-height:1.12;letter-spacing:-.015em;color:var(--text)}
+  .mono{font-family:var(--font-num)}
+  .vlab{font-family:var(--font-num);font-size:9.5px;font-weight:500;letter-spacing:.2em;color:var(--text-dim)}
+  .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-family:var(--font-num);font-size:9.5px;font-weight:700;letter-spacing:.18em}
+  .shotcap{font-family:var(--font-num);font-size:10px;letter-spacing:.18em;color:var(--text-dim)}
+  .vdiv{height:1px;background:var(--line-soft);margin:12px 0}
 </style>
 </head>
 <body>
 <div class="slide scanlines">
+  <!-- decor -->
+  <div data-decor aria-hidden="true" style="position:absolute;right:-180px;top:-200px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(45,212,191,.09),transparent 65%)"></div>
+  <div data-decor aria-hidden="true" style="position:absolute;left:-160px;bottom:-220px;width:460px;height:460px;border-radius:50%;background:radial-gradient(circle,rgba(45,212,191,.06),transparent 65%)"></div>
 
-  <div class="absolute inset-0 flex flex-col" style="padding:52px 64px 46px;">
+  <div style="position:absolute;inset:0;padding:56px 64px 48px;display:flex;align-items:center;gap:44px">
+    <!-- LEFT 45% -->
+    <div style="width:500px;flex:none;display:flex;flex-direction:column;justify-content:center">
+      <div style="display:flex;align-items:center;gap:12px"><span class="kdot"></span><span class="kicker">AI Analyst</span></div>
+      <h2 class="h2" style="margin-top:12px">Every critical signal gets a <span style="color:var(--primary)">verdict.</span></h2>
+      <p style="margin-top:16px;font-size:14px;line-height:1.62;color:rgba(230,241,239,.74)">Open any signal and the AI analyst has already read it. When a GLM uplink is configured it writes a structured verdict per story; with no keys configured, a deterministic on-device analyst takes over — marked <span class="mono" style="font-size:12.5px;font-weight:700;color:var(--accent)">DEGRADED</span>, and it never errors out.</p>
 
-    <!-- header -->
-    <div class="flex items-center" style="gap:16px;">
-      <span class="kicker">CORE FEATURE 05</span>
-      <div class="rule" style="flex:1; max-width:220px;"></div>
+      <!-- verdict card -->
+      <div class="card-glow" style="margin-top:20px;padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--primary);box-shadow:0 0 9px rgba(45,212,191,.85);flex:none"></span>
+          <span class="mono" style="font-size:10px;font-weight:700;letter-spacing:.24em;color:var(--primary)">AI ANALYST VERDICT</span>
+        </div>
+        <div class="vdiv"></div>
+        <div>
+          <span class="vlab">THREAT CLASS:</span>
+          <div style="font-family:var(--font-heading);font-size:18px;font-weight:600;color:var(--text);margin-top:4px">State Sponsored Data Theft</div>
+        </div>
+        <div class="vdiv"></div>
+        <div>
+          <span class="vlab">SEVERITY RATING:</span>
+          <p style="margin-top:4px;font-size:12.5px;line-height:1.55;color:var(--text-dim)"><span class="mono" style="font-size:13px;font-weight:700;color:var(--danger)">CRITICAL</span> <span class="mono" style="font-size:13px;font-weight:700;color:var(--text);margin-left:4px">100/100</span> — Chinese actors exploiting critical infrastructure with automated and hands-on techniques</p>
+        </div>
+        <div class="vdiv"></div>
+        <div>
+          <span class="vlab">WHAT HAPPENED:</span>
+          <p style="margin-top:4px;font-size:12.5px;line-height:1.55;color:#c3d4d0">Chinese government-linked actors using automated tools and hands-on exploitation target organizations worldwide, including US critical infrastructure.</p>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <span class="chip" style="background:var(--primary-soft);border:1px solid var(--line);color:var(--primary)"><span style="width:5px;height:5px;border-radius:50%;background:var(--primary)"></span>GLM ANALYST</span>
+          <span class="chip" style="border:1px solid var(--line-soft);color:var(--text-dim)"><span class="material-icons" style="font-size:12px">refresh</span>REANALYZE</span>
+        </div>
+      </div>
     </div>
-    <h1 class="heading" style="font-size:40px; font-weight:700; line-height:1.12; letter-spacing:-0.01em; margin-top:14px; color:var(--text);">
-      From headline to <span class="text-primary-c">hands-on</span> in one click.
-    </h1>
 
-    <!-- body: left text / right image card -->
-    <div class="grid" style="grid-template-columns:55fr 45fr; gap:40px; margin-top:24px; flex:1; min-height:0;">
-
-      <!-- LEFT -->
-      <div class="flex flex-col" style="min-height:0;">
-        <p style="font-size:15.5px; line-height:1.68; color:var(--text);">
-          Click any story to open the investigation drawer: the full AI verdict, the story’s
-          category context, a KEV cross-check for mentioned CVEs, and a clean link out to
-          the original source.
-        </p>
-
-        <!-- category filters -->
-        <div style="margin-top:22px;">
-          <div class="mono" style="font-size:10.5px; letter-spacing:.28em; color:var(--text-dim); text-transform:uppercase;">10 CATEGORY FILTERS</div>
-          <div class="flex flex-wrap" style="margin-top:12px; gap:8px;">
-            <span class="chip chip-active">All Signals</span>
-            <span class="chip">Ransomware</span>
-            <span class="chip">Zero-Days &amp; CVEs</span>
-            <span class="chip">Data Breaches</span>
-            <span class="chip">APT &amp; Nation-State</span>
-            <span class="chip">Malware</span>
-            <span class="chip">Phishing &amp; Scams</span>
-            <span class="chip">AI Security</span>
-            <span class="chip">Cloud &amp; Enterprise</span>
-            <span class="chip">Mobile &amp; IoT</span>
-          </div>
-        </div>
-
-        <!-- severity strip -->
-        <div style="margin-top:22px;">
-          <div class="mono" style="font-size:10.5px; letter-spacing:.28em; color:var(--text-dim); text-transform:uppercase;">SEVERITY</div>
-          <div class="flex items-center" style="margin-top:12px; gap:10px;">
-            <span class="flex items-center" style="gap:7px;">
-              <span class="swatch" style="background:var(--danger);"></span>
-              <span class="mono" style="font-size:11px; letter-spacing:.12em; color:var(--text);">CRITICAL</span>
-            </span>
-            <span style="color:var(--text-dim); font-size:13px;">→</span>
-            <span class="flex items-center" style="gap:7px;">
-              <span class="swatch" style="background:var(--accent);"></span>
-              <span class="mono" style="font-size:11px; letter-spacing:.12em; color:var(--text);">HIGH</span>
-            </span>
-            <span style="color:var(--text-dim); font-size:13px;">→</span>
-            <span class="flex items-center" style="gap:7px;">
-              <span class="swatch" style="background:var(--primary);"></span>
-              <span class="mono" style="font-size:11px; letter-spacing:.12em; color:var(--text);">ELEVATED</span>
-            </span>
-            <span style="color:var(--text-dim); font-size:13px;">→</span>
-            <span class="flex items-center" style="gap:7px;">
-              <span class="swatch" style="background:var(--text-dim);"></span>
-              <span class="mono" style="font-size:11px; letter-spacing:.12em; color:var(--text);">MODERATE</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- closing line -->
-        <div style="margin-top:auto; padding:4px 0 4px 16px; border-left:2px solid var(--primary);">
-          <span style="font-size:15px; line-height:1.6; color:var(--text);">
-            Triage a full day of global reporting in minutes — <span class="text-primary-c">filtering beats scrolling.</span>
-          </span>
-        </div>
+    <!-- RIGHT 55% -->
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">
+      <div class="shot" style="height:478px">
+        <img src="shot-verdict.png" alt="AI ANALYST VERDICT tab inside the CyberShield investigation drawer">
       </div>
-
-      <!-- RIGHT: image card -->
-      <div class="relative" style="border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:0 24px 60px rgba(0,0,0,0.5); min-height:0;">
-        <img src="https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/601e9f74a4a9.jpg"
-             alt="Programmer typing code on a laptop at night"
-             style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
-        <div data-decor aria-hidden="true" class="absolute inset-0"
-             style="background:linear-gradient(0deg, rgba(5,8,13,0.88) 0%, rgba(5,8,13,0.35) 42%, rgba(5,8,13,0.05) 72%, rgba(5,8,13,0) 100%);"></div>
-        <div data-decor aria-hidden="true" class="absolute inset-0"
-             style="background:linear-gradient(90deg, rgba(5,8,13,0.55) 0%, rgba(5,8,13,0) 32%);"></div>
+      <div class="shotcap" style="margin-top:11px;display:flex;align-items:center;gap:9px">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--primary);box-shadow:0 0 8px rgba(45,212,191,.8);flex:none"></span>
+        REAL VERDICT — RENDERED IN THE INVESTIGATION DRAWER
       </div>
-
     </div>
   </div>
 </div>

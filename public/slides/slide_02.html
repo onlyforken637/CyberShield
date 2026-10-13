@@ -3,83 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280, initial-scale=1">
-<title>CyberShield — 02 What It Is</title>
+<title>CyberShield — The Mission</title>
 <link rel="stylesheet" href="global.css">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="tailwind.js"></script>
 <style>
-  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:#05080d;}
+  html, body { margin:0; padding:0; width:1280px; height:720px; overflow:hidden; background:var(--bg); }
+  .kicker { font-family:var(--font-num); font-size:11.5px; font-weight:500; letter-spacing:.3em; color:var(--text-dim); }
+  .kdot { width:8px; height:8px; border-radius:50%; background:var(--primary); flex:none; box-shadow:0 0 8px rgba(45,212,191,.8); }
+  .statement { font-family:var(--font-heading); font-weight:700; font-size:64px; line-height:1.09; letter-spacing:-.025em; color:var(--text); }
+  .statement .hot { color:var(--primary); text-shadow:0 0 28px rgba(45,212,191,.35); }
+  .body-copy { font-size:18px; line-height:1.62; color:var(--text-dim); }
+  .body-copy .n { font-family:var(--font-num); color:var(--text); font-weight:500; font-size:.92em; }
+  .idx { font-family:var(--font-num); font-size:12px; font-weight:700; letter-spacing:.2em; color:var(--primary); }
+  .icon-chip { width:38px; height:38px; border-radius:10px; background:var(--primary-soft); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
+  .icon-chip .material-icons { font-size:21px; color:var(--primary); }
+  .pillar-name { font-family:var(--font-heading); font-size:21px; font-weight:700; letter-spacing:-.01em; color:var(--text); }
+  .pillar-copy { font-size:13.5px; line-height:1.55; color:var(--text-dim); }
+  .pillar-copy .n { font-family:var(--font-num); color:var(--text); font-weight:500; font-size:.92em; }
+  .micro { font-family:var(--font-num); font-size:11px; letter-spacing:.22em; color:var(--text-dim); }
+  .micro .u { color:var(--primary); }
+  .live-dot { width:7px; height:7px; border-radius:50%; background:var(--primary); box-shadow:0 0 8px rgba(45,212,191,.85); animation:pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 </style>
 </head>
 <body>
-<div class="slide scanlines">
-  <div class="relative h-full flex flex-col" style="padding:62px 72px 50px;">
+<section class="slide scanlines">
+  <div data-decor aria-hidden="true" class="absolute" style="right:-170px; top:-210px; width:580px; height:580px; border-radius:50%; background:radial-gradient(circle, rgba(45,212,191,.1), transparent 62%);"></div>
+  <div data-decor aria-hidden="true" class="absolute mono" style="right:70px; top:52px; font-size:150px; font-weight:700; line-height:1; color:rgba(45,212,191,.045); letter-spacing:-.04em;">01</div>
 
-    <!-- Kicker -->
-    <div class="flex items-center" style="gap:16px;">
-      <span class="kicker" style="font-size:12px;">WHAT IT IS</span>
-      <span data-decor aria-hidden="true" class="flex-1" style="height:1px;background:linear-gradient(90deg, rgba(45,212,191,.4), rgba(45,212,191,0));"></span>
+  <div class="absolute inset-0 flex flex-col" style="padding:56px 72px 44px;">
+    <!-- kicker -->
+    <div class="flex items-center" style="gap:12px;">
+      <span class="kdot"></span>
+      <span class="kicker">THE MISSION</span>
     </div>
 
-    <!-- Big statement -->
-    <h1 style="margin:30px 0 0;font-family:var(--font-heading);font-weight:700;font-size:58px;line-height:1.14;letter-spacing:-0.018em;color:var(--text);max-width:1060px;">
-      <span style="color:var(--primary);">One live wall</span> for the world&rsquo;s cybersecurity reporting.
-    </h1>
+    <!-- statement -->
+    <h1 class="statement" style="margin-top:28px;">Threat news is scattered.<br>Attackers move<br>in <span class="hot">minutes.</span></h1>
 
-    <!-- Supporting paragraph -->
-    <p style="margin:24px 0 0;font-size:18px;line-height:1.62;color:#b7c9c5;max-width:1075px;">
-      CyberShield is a self-hosted threat-intelligence dashboard. It pulls cybersecurity news from
-      <span style="font-family:var(--font-num);color:var(--primary);">19</span> trusted research streams into a single real-time feed —
-      automatically scoring every story for severity, classifying it into threat categories, and explaining
-      what it means on demand with an AI analyst verdict.
-    </p>
+    <p class="body-copy" style="max-width:780px; margin-top:24px;">Critical intel hides across dozens of publications, advisories and vendor blogs. CyberShield fuses them into one live wall — every signal pulled, enriched, scored and ranked the moment it publishes. No mock data, no manual curation, no waiting for a morning digest.</p>
 
-    <!-- Three definition cards -->
-    <div class="grid grid-cols-3" style="gap:24px;margin-top:36px;">
-      <div class="card" style="padding:22px 24px;">
-        <div class="flex items-center" style="gap:14px;">
-          <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <span class="material-icons" style="font-size:22px;color:var(--primary);">feed</span>
-          </div>
-          <div style="font-family:var(--font-num);font-size:13px;font-weight:700;letter-spacing:.18em;color:var(--text);">AGGREGATOR</div>
+    <div class="flex-1"></div>
+
+    <!-- pillars -->
+    <div class="grid grid-cols-3" style="gap:20px;">
+      <div class="card-glow" style="padding:22px 22px 20px;">
+        <div class="flex items-center justify-between">
+          <span class="idx">01</span>
+          <div class="icon-chip"><span class="material-icons">hub</span></div>
         </div>
-        <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:var(--text-dim);">
-          19 streams, one deduplicated wall, refreshed every 4 minutes.
-        </p>
+        <div class="pillar-name" style="margin-top:14px;">aggregate</div>
+        <p class="pillar-copy" style="margin-top:8px;"><span class="n">19</span> research streams fused into a single ranked feed, refreshed every <span class="n">12</span> minutes.</p>
       </div>
-
-      <div class="card" style="padding:22px 24px;">
-        <div class="flex items-center" style="gap:14px;">
-          <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <span class="material-icons" style="font-size:22px;color:var(--primary);">psychology</span>
-          </div>
-          <div style="font-family:var(--font-num);font-size:13px;font-weight:700;letter-spacing:.18em;color:var(--text);">EXPLAINER</div>
+      <div class="card-glow" style="padding:22px 22px 20px;">
+        <div class="flex items-center justify-between">
+          <span class="idx">02</span>
+          <div class="icon-chip"><span class="material-icons">speed</span></div>
         </div>
-        <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:var(--text-dim);">
-          AI verdicts in SOC format: threat class, severity, immediate actions.
-        </p>
+        <div class="pillar-name" style="margin-top:14px;">score</div>
+        <p class="pillar-copy" style="margin-top:8px;">Every story rated <span class="n">0–100</span> by a transparent engine cross-checked against CISA KEV.</p>
       </div>
-
-      <div class="card" style="padding:22px 24px;">
-        <div class="flex items-center" style="gap:14px;">
-          <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <span class="material-icons" style="font-size:22px;color:var(--primary);">radar</span>
-          </div>
-          <div style="font-family:var(--font-num);font-size:13px;font-weight:700;letter-spacing:.18em;color:var(--text);">AWARENESS LAYER</div>
+      <div class="card-glow" style="padding:22px 22px 20px;">
+        <div class="flex items-center justify-between">
+          <span class="idx">03</span>
+          <div class="icon-chip"><span class="material-icons">psychology</span></div>
         </div>
-        <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:var(--text-dim);">
-          Not a scanner or firewall — it keeps you informed, not the network patched.
-        </p>
+        <div class="pillar-name" style="margin-top:14px;">explain</div>
+        <p class="pillar-copy" style="margin-top:8px;">An AI analyst turns raw telemetry into threat class, impact and recommended action.</p>
       </div>
     </div>
 
-    <!-- Mono footnote -->
-    <div class="flex items-center" style="gap:10px;margin-top:auto;">
-      <span class="material-icons" aria-hidden="true" style="font-size:15px;color:var(--primary);">lock</span>
-      <span style="font-family:var(--font-num);font-size:11px;letter-spacing:.18em;color:var(--text-dim);">RUNS ON A FREE HOSTING TIER — NO PAID SERVICES REQUIRED.</span>
+    <!-- micro line -->
+    <div class="flex items-center" style="gap:10px; margin-top:22px;">
+      <span class="live-dot"></span>
+      <span class="micro">cybershield-news.vercel.app — <span class="u">live now</span></span>
     </div>
-
   </div>
-</div>
+</section>
 </body>
 </html>

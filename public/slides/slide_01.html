@@ -3,74 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280, initial-scale=1">
-<title>CyberShield — 01 Cover</title>
+<title>CyberShield — Cover</title>
 <link rel="stylesheet" href="global.css">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="tailwind.js"></script>
 <style>
-  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:#05080d;}
+  html, body { margin:0; padding:0; width:1280px; height:720px; overflow:hidden; background:var(--bg); }
+  .mono { font-family: var(--font-num); }
+  .kicker { font-family:var(--font-num); font-size:12px; font-weight:500; letter-spacing:.3em; color:var(--primary); }
+  .kdot { width:9px; height:9px; border-radius:50%; background:var(--primary); flex:none;
+          box-shadow:0 0 8px rgba(45,212,191,.9), 0 0 22px rgba(45,212,191,.5);
+          animation:pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .display { font-family:var(--font-heading); font-weight:700; font-size:120px; line-height:1; letter-spacing:-.035em; }
+  .glow { text-shadow:0 0 30px rgba(45,212,191,.45), 0 0 90px rgba(45,212,191,.22); }
+  .subtitle { font-size:21px; line-height:1.56; color:var(--text-dim); }
+  .subtitle .n { font-family:var(--font-num); color:var(--primary); font-weight:500; font-size:.95em; }
+  .stat-num { font-family:var(--font-num); font-size:40px; font-weight:700; line-height:1; color:var(--primary); }
+  .stat-label { font-family:var(--font-num); font-size:11px; letter-spacing:.24em; color:var(--text-dim); margin-top:9px; }
+  .vrule { width:1px; height:58px; align-self:center; background:var(--line-soft); }
+  .author { font-family:var(--font-num); font-size:10.5px; letter-spacing:.32em; color:var(--text-dim); }
+  .pill { font-family:var(--font-num); font-size:10.5px; letter-spacing:.16em; color:var(--text);
+          border:1px solid var(--line); background:rgba(13,22,32,.72); border-radius:999px; padding:10px 18px; white-space:nowrap; }
 </style>
 </head>
 <body>
-<div class="slide">
+<section class="slide scanlines">
+  <img src="shot-hero.png" alt="CyberShield live dashboard" class="absolute inset-0 w-full h-full object-cover">
+  <div class="absolute inset-0" style="background:linear-gradient(118deg, rgba(5,8,13,0.78) 0%, rgba(5,8,13,0.95) 100%);"></div>
+  <div data-decor aria-hidden="true" class="absolute" style="left:-150px; bottom:-190px; width:540px; height:540px; border-radius:50%; background:radial-gradient(circle, rgba(45,212,191,.13), transparent 65%);"></div>
 
-  <!-- Full-bleed background image -->
-  <img src="https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/af0c13be7287.jpg"
-       alt="Futuristic dark control room with glowing screens"
-       class="absolute inset-0 w-full h-full object-cover">
-
-  <!-- Dimming overlay per brief: 0.82 → 0.95 -->
-  <div data-decor aria-hidden="true" class="absolute inset-0"
-       style="background:linear-gradient(135deg, rgba(5,8,13,0.82) 0%, rgba(5,8,13,0.95) 100%);"></div>
-  <!-- extra bottom scrim so stat chips pass AA over the image -->
-  <div data-decor aria-hidden="true" class="absolute inset-x-0 bottom-0"
-       style="height:300px;background:linear-gradient(180deg, rgba(5,8,13,0) 0%, rgba(5,8,13,0.9) 100%);"></div>
-
-  <div class="relative z-10 h-full flex flex-col" style="padding:60px 72px 52px;">
-
-    <!-- Kicker -->
-    <div class="flex items-center" style="gap:16px;">
-      <span data-decor aria-hidden="true" style="width:9px;height:9px;border-radius:9999px;background:var(--primary);box-shadow:0 0 14px rgba(45,212,191,.85);"></span>
-      <span class="kicker" style="font-size:12px;">LIVE THREAT INTELLIGENCE // MISSION WALL</span>
-      <span data-decor aria-hidden="true" class="flex-1" style="height:1px;background:linear-gradient(90deg, rgba(45,212,191,.4), rgba(45,212,191,0));"></span>
+  <div class="absolute inset-0 flex flex-col" style="padding:58px 64px 50px;">
+    <!-- kicker -->
+    <div class="flex items-center" style="gap:14px;">
+      <span class="kdot"></span>
+      <span class="kicker">LIVE THREAT INTELLIGENCE&nbsp;&nbsp;//&nbsp;&nbsp;MISSION WALL</span>
     </div>
 
-    <!-- Hero title block -->
-    <div class="flex-1 flex flex-col justify-center" style="padding-bottom:12px;">
-      <h1 style="margin:0;font-family:var(--font-heading);font-weight:700;font-size:136px;line-height:1.02;letter-spacing:-0.028em;">
-        <span style="color:var(--text);">Cyber</span><span style="color:var(--primary);">Shield</span>
-      </h1>
-      <div data-decor aria-hidden="true" style="width:238px;height:6px;border-radius:3px;margin-top:24px;background:linear-gradient(90deg, var(--primary), rgba(45,212,191,0));"></div>
-      <p style="margin:26px 0 0;font-size:21px;line-height:1.5;color:#cfe0dc;max-width:730px;">
-        Real-time cyber threat intelligence — aggregated, scored and explained as it happens.
-      </p>
+    <!-- hero title block -->
+    <div class="flex-1 flex flex-col justify-center" style="padding-bottom:10px;">
+      <h1 class="display"><span style="color:var(--text);">Cyber</span><span class="glow" style="color:var(--primary);">Shield</span></h1>
+      <div class="rule" style="width:242px; height:3px; margin-top:22px; border-radius:2px;"></div>
+      <p class="subtitle" style="max-width:720px; margin-top:26px;">Real-time cyber threat intelligence — aggregated from <span class="n">19</span> live streams, scored <span class="n">0–100</span> against the CISA KEV catalog, and explained in plain language as it happens.</p>
     </div>
 
-    <!-- Bottom row: stat chips + tag -->
-    <div class="flex items-end justify-between">
-      <div class="flex items-end" style="gap:38px;">
-        <div>
-          <div style="font-family:var(--font-num);font-weight:700;font-size:40px;line-height:1;color:var(--primary);">19</div>
-          <div style="font-family:var(--font-num);font-size:11px;letter-spacing:.22em;color:#a9bdb9;margin-top:10px;">LIVE SOURCES</div>
+    <!-- bottom row -->
+    <div>
+      <div class="author" style="text-align:right; margin-bottom:16px;">BUILT BY UMAIR JAMAL</div>
+      <div class="flex items-end justify-between">
+        <div class="flex" style="gap:34px;">
+          <div>
+            <div class="stat-num">199</div>
+            <div class="stat-label">LIVE SIGNALS</div>
+          </div>
+          <div class="vrule"></div>
+          <div>
+            <div class="stat-num">19/19</div>
+            <div class="stat-label">SOURCES ONLINE</div>
+          </div>
+          <div class="vrule"></div>
+          <div>
+            <div class="stat-num">12-MIN</div>
+            <div class="stat-label">AUTO-SYNC</div>
+          </div>
         </div>
-        <div data-decor aria-hidden="true" style="width:1px;height:54px;background:var(--line-soft);"></div>
-        <div>
-          <div style="font-family:var(--font-num);font-weight:700;font-size:40px;line-height:1;color:var(--primary);">10</div>
-          <div style="font-family:var(--font-num);font-size:11px;letter-spacing:.22em;color:#a9bdb9;margin-top:10px;">THREAT CATEGORIES</div>
-        </div>
-        <div data-decor aria-hidden="true" style="width:1px;height:54px;background:var(--line-soft);"></div>
-        <div>
-          <div style="font-family:var(--font-num);font-weight:700;font-size:40px;line-height:1;color:var(--primary);">4&nbsp;MIN</div>
-          <div style="font-family:var(--font-num);font-size:11px;letter-spacing:.22em;color:#a9bdb9;margin-top:10px;">CACHE REFRESH</div>
-        </div>
-      </div>
-
-      <div style="font-family:var(--font-num);font-size:11px;letter-spacing:.16em;color:#b7c9c5;border:1px solid var(--line-soft);background:rgba(5,8,13,.65);border-radius:9999px;padding:10px 18px;">
-        SELF-HOSTED // FREE-HOST READY
+        <div class="pill">ZERO MOCK DATA&nbsp;·&nbsp;ZERO API KEYS&nbsp;·&nbsp;<span style="color:var(--primary);">SELF-HOSTABLE</span></div>
       </div>
     </div>
-
   </div>
-</div>
+</section>
 </body>
 </html>

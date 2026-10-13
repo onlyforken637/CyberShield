@@ -1,5 +1,52 @@
-/* CyberShield deck — dark cyber theme (matches the branded PDF manual) */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+/* CyberShield deck v2 — dark cyber theme, visual-first (real screenshots + live data)
+   Fully self-contained: fonts + icons + Tailwind runtime are self-hosted siblings
+   so the deck renders identically under the site's strict CSP (style-src 'self'). */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url(fonts/space-grotesk-var.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(fonts/inter-var.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url(fonts/jetbrains-mono-var.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(fonts/material-icons.woff2) format('woff2');
+}
+
+/* Material Icons class (replaces the blocked googleapis stylesheet) */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
 
 :root {
   /* palette */
@@ -11,20 +58,20 @@
   --primary-dim: #14b8a6;
   --primary-soft: rgba(45, 212, 191, 0.12);
   --accent: #f59e0b;
-  --accent-soft: rgba(245, 158, 11, 0.12);
+  --accent-soft: rgba(245, 158, 11, 0.14);
   --danger: #f87171;
-  --danger-soft: rgba(248, 113, 113, 0.12);
+  --danger-soft: rgba(248, 113, 113, 0.13);
   --text: #e6f1ef;
   --text-dim: #8fa8a3;
-  --line: rgba(45, 212, 191, 0.18);
-  --line-soft: rgba(143, 168, 163, 0.15);
+  --line: rgba(45, 212, 191, 0.20);
+  --line-soft: rgba(143, 168, 163, 0.16);
 
   /* typography tokens (families + scale only — no pre-baked classes) */
   --font-heading: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-num: 'JetBrains Mono', monospace;
-  --fs-display: 72px;
-  --fs-h1: 44px;
+  --fs-display: 84px;
+  --fs-h1: 46px;
   --fs-h2: 30px;
   --fs-h3: 20px;
   --fs-body: 16px;
@@ -55,32 +102,33 @@
   border-radius: 14px;
 }
 
-/* accents */
+/* non-typography helpers */
 .text-primary-c { color: var(--primary); }
 .text-accent-c { color: var(--accent); }
 .text-dim-c { color: var(--text-dim); }
 .bg-primary-c { background: var(--primary); }
 .bg-primary-soft { background: var(--primary-soft); }
 .bg-accent-soft { background: var(--accent-soft); }
+.bg-danger-soft { background: var(--danger-soft); }
 .border-line { border-color: var(--line); }
 .border-line-soft { border-color: var(--line-soft); }
 
-/* kicker label */
-.kicker {
-  font-family: var(--font-num);
-  font-size: var(--fs-micro);
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--primary);
-}
-
-/* thin rule */
 .rule {
   height: 1px;
   background: linear-gradient(90deg, var(--primary), rgba(45, 212, 191, 0));
 }
 
-/* scanline texture (subtle, non-distracting) */
+/* screenshot frame — every product screenshot sits in this bezel */
+.shot {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(45, 212, 191, 0.06);
+  background: var(--bg-raised);
+}
+.shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* scanline texture (subtle) */
 .scanlines::after {
   content: '';
   position: absolute;

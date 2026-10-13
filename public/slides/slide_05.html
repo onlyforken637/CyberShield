@@ -3,90 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1280, initial-scale=1">
-<title>CyberShield — 05 Core Feature 01</title>
+<title>CyberShield — Today, By The Numbers</title>
 <link rel="stylesheet" href="global.css">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="tailwind.js"></script>
 <style>
-  html,body{margin:0;padding:0;width:1280px;height:720px;overflow:hidden;background:#05080d;}
-  .src-chip{display:flex;align-items:center;gap:10px;height:46px;background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;padding:0 13px;min-width:0;}
-  .src-code{font-family:var(--font-num);font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--primary);background:var(--primary-soft);border:1px solid var(--line);border-radius:6px;padding:3px 7px;flex-shrink:0;}
-  .src-name{font-size:13px;font-weight:500;color:#dce8e5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  html, body { margin:0; padding:0; width:1280px; height:720px; overflow:hidden; background:var(--bg); }
+  .kicker { font-family:var(--font-num); font-size:11.5px; font-weight:500; letter-spacing:.26em; color:var(--text-dim); }
+  .kicker .path { color:var(--primary); }
+  .kdot { width:8px; height:8px; border-radius:50%; background:var(--primary); flex:none; box-shadow:0 0 8px rgba(45,212,191,.8); }
+  .h2 { font-family:var(--font-heading); font-size:40px; font-weight:700; letter-spacing:-.02em; line-height:1.1; color:var(--text); }
+  .band { border-top:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft); }
+  .band-cell { padding:20px 0 18px; }
+  .band-cell + .band-cell { border-left:1px solid var(--line-soft); padding-left:30px; }
+  .stat-num { font-family:var(--font-num); font-size:56px; font-weight:700; line-height:1; color:var(--primary); }
+  .stat-num.danger { color:var(--danger); }
+  .stat-label { font-family:var(--font-num); font-size:11px; letter-spacing:.22em; color:var(--text-dim); margin-top:10px; }
+  .chart-title { font-family:var(--font-num); font-size:11px; font-weight:500; letter-spacing:.22em; color:var(--text-dim); }
+  .row-label { font-family:var(--font-num); font-size:12.5px; font-weight:700; letter-spacing:.12em; color:var(--text); }
+  .row-val { font-family:var(--font-num); font-size:12px; color:var(--text-dim); }
+  .row-val b { color:var(--text); font-weight:700; }
+  .track { height:18px; border-radius:999px; background:rgba(255,255,255,.05); overflow:hidden; margin-top:7px; }
+  .fill { height:100%; border-radius:999px; }
+  .badge-danger { font-family:var(--font-num); font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--danger);
+                  background:var(--danger-soft); border:1px solid rgba(248,113,113,.35); border-radius:7px; padding:7px 10px; white-space:nowrap; }
+  .badge-src { font-family:var(--font-num); font-size:10.5px; letter-spacing:.12em; color:var(--text-dim);
+               border:1px solid var(--line-soft); border-radius:7px; padding:7px 10px; white-space:nowrap; }
+  .footnote { font-family:var(--font-num); font-size:10px; letter-spacing:.16em; color:var(--text-dim); }
+  .ghost-100 { font-family:var(--font-num); font-weight:700; font-size:118px; line-height:1; color:rgba(248,113,113,.07); letter-spacing:-.04em; }
 </style>
 </head>
 <body>
-<div class="slide">
-  <div class="relative h-full flex flex-col" style="padding:56px 64px 46px;">
+<section class="slide scanlines">
+  <div data-decor aria-hidden="true" class="absolute" style="right:-150px; top:-190px; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, rgba(45,212,191,.09), transparent 62%);"></div>
 
-    <!-- Kicker -->
-    <div class="flex items-center" style="gap:16px;">
-      <span class="kicker" style="font-size:12px;">CORE FEATURE 01</span>
-      <span data-decor aria-hidden="true" class="flex-1" style="height:1px;background:linear-gradient(90deg, rgba(45,212,191,.4), rgba(45,212,191,0));"></span>
+  <div class="absolute inset-0 flex flex-col" style="padding:54px 60px 44px;">
+    <!-- header -->
+    <div class="flex items-center" style="gap:12px;">
+      <span class="kdot"></span>
+      <span class="kicker">LIVE SNAPSHOT — SYNCED FROM <span class="path">/API/NEWS</span></span>
+    </div>
+    <h2 class="h2" style="margin-top:12px;">Today&rsquo;s wall, <span style="color:var(--primary);">by the numbers.</span></h2>
+
+    <!-- stat band -->
+    <div class="band grid grid-cols-4" style="margin-top:22px;">
+      <div class="band-cell">
+        <div class="stat-num">199</div>
+        <div class="stat-label">LIVE SIGNALS</div>
+      </div>
+      <div class="band-cell">
+        <div class="stat-num danger">24</div>
+        <div class="stat-label">CRITICAL ≥72</div>
+      </div>
+      <div class="band-cell">
+        <div class="stat-num">34</div>
+        <div class="stat-label">CVE-TAGGED</div>
+      </div>
+      <div class="band-cell">
+        <div class="stat-num">4.9</div>
+        <div class="stat-label">AVG MIN READ</div>
+      </div>
     </div>
 
-    <!-- Title + intro -->
-    <h1 style="margin:12px 0 0;font-family:var(--font-heading);font-weight:700;font-size:40px;line-height:1.1;letter-spacing:-0.015em;color:var(--text);">
-      Every stream that matters, <span style="color:var(--primary);">on one wall.</span>
-    </h1>
-    <p style="margin:10px 0 0;font-size:15.5px;line-height:1.5;color:#b7c9c5;max-width:1120px;">
-      The aggregation engine monitors 19 research streams — direct XML first, with a public-converter relay
-      as automatic fallback so a blocked host never blanks the wall.
-    </p>
-
-    <!-- 19-source grid: 18 chips + full-width CISA row -->
-    <div class="grid grid-cols-3" style="gap:10px 12px;margin-top:20px;">
-
-      <div class="src-chip"><span class="src-code">BPC</span><span class="src-name">BleepingComputer</span></div>
-      <div class="src-chip"><span class="src-code">THN</span><span class="src-name">The Hacker News</span></div>
-      <div class="src-chip"><span class="src-code">TPOST</span><span class="src-name">Threatpost</span></div>
-
-      <div class="src-chip"><span class="src-code">KREBS</span><span class="src-name">Krebs on Security</span></div>
-      <div class="src-chip"><span class="src-code">SECWK</span><span class="src-name">SecurityWeek</span></div>
-      <div class="src-chip"><span class="src-code">HNS</span><span class="src-name">Help Net Security</span></div>
-
-      <div class="src-chip"><span class="src-code">INFOMAG</span><span class="src-name">Infosecurity Magazine</span></div>
-      <div class="src-chip"><span class="src-code">SCOOP</span><span class="src-name">CyberScoop</span></div>
-      <div class="src-chip"><span class="src-code">RECORD</span><span class="src-name">The Record</span></div>
-
-      <div class="src-chip"><span class="src-code">CLULEY</span><span class="src-name">Graham Cluley</span></div>
-      <div class="src-chip"><span class="src-code">MBLabs</span><span class="src-name">Malwarebytes Labs</span></div>
-      <div class="src-chip"><span class="src-code">SECLST</span><span class="src-name">Securelist</span></div>
-
-      <div class="src-chip"><span class="src-code">U42</span><span class="src-name">Unit 42</span></div>
-      <div class="src-chip"><span class="src-code">MSFT</span><span class="src-name">Microsoft Security</span></div>
-      <div class="src-chip"><span class="src-code">S1</span><span class="src-name">SentinelOne Labs</span></div>
-
-      <div class="src-chip"><span class="src-code">SCHNEIER</span><span class="src-name">Schneier on Security</span></div>
-      <div class="src-chip"><span class="src-code">ARS</span><span class="src-name">Ars Technica Security</span></div>
-      <div class="src-chip"><span class="src-code">ZDI</span><span class="src-name">Zero Day Initiative</span></div>
-
-      <div class="col-span-3 flex items-center justify-between" style="height:46px;background:linear-gradient(90deg, rgba(245,158,11,.07), var(--surface) 55%);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:0 14px;">
-        <div class="flex items-center" style="gap:10px;">
-          <span class="src-code" style="color:#fbbf24;background:var(--accent-soft);border-color:rgba(245,158,11,.3);">CISA</span>
-          <span class="src-name">CISA Advisories</span>
+    <!-- main: chart + top signal -->
+    <div class="flex-1 flex" style="gap:28px; margin-top:24px; min-height:0;">
+      <!-- severity distribution -->
+      <div class="card-glow flex-1 flex flex-col" style="padding:22px 24px; min-width:0;">
+        <div class="flex items-center justify-between">
+          <span class="chart-title">SEVERITY DISTRIBUTION (0–100 ENGINE)</span>
+          <span class="material-icons" aria-hidden="true" style="font-size:17px; color:var(--primary);">stacked_bar_chart</span>
         </div>
-        <span class="material-icons" aria-hidden="true" style="font-size:17px;color:rgba(251,191,36,.85);">account_balance</span>
+        <div class="flex-1 flex flex-col justify-around" style="margin-top:10px;">
+          <div>
+            <div class="flex items-end justify-between">
+              <span class="row-label" style="color:var(--danger);">CRITICAL</span>
+              <span class="row-val"><b>24</b> signals (12.1%)</span>
+            </div>
+            <div class="track"><div class="fill" style="width:22.6%; background:var(--danger); box-shadow:0 0 12px rgba(248,113,113,.45);"></div></div>
+          </div>
+          <div>
+            <div class="flex items-end justify-between">
+              <span class="row-label" style="color:var(--accent);">HIGH</span>
+              <span class="row-val"><b>15</b> signals (7.5%)</span>
+            </div>
+            <div class="track"><div class="fill" style="width:14.2%; background:var(--accent); box-shadow:0 0 12px rgba(245,158,11,.4);"></div></div>
+          </div>
+          <div>
+            <div class="flex items-end justify-between">
+              <span class="row-label" style="color:var(--primary);">ELEVATED</span>
+              <span class="row-val"><b>54</b> signals (27.1%)</span>
+            </div>
+            <div class="track"><div class="fill" style="width:50.9%; background:var(--primary); box-shadow:0 0 12px rgba(45,212,191,.45);"></div></div>
+          </div>
+          <div>
+            <div class="flex items-end justify-between">
+              <span class="row-label" style="color:#8fa8a3;">MODERATE</span>
+              <span class="row-val"><b>106</b> signals (53.3%)</span>
+            </div>
+            <div class="track"><div class="fill" style="width:100%; background:#64807b;"></div></div>
+          </div>
+        </div>
       </div>
 
+      <!-- top rated signal -->
+      <aside class="card-glow relative flex flex-col" style="width:372px; flex:none; padding:22px 22px 20px; overflow:hidden;">
+        <div data-decor aria-hidden="true" class="ghost-100 absolute" style="right:10px; bottom:-14px;">100</div>
+        <div class="flex items-center justify-between">
+          <span class="chart-title" style="color:var(--primary);">TOP RATED SIGNAL</span>
+          <span class="material-icons" aria-hidden="true" style="font-size:18px; color:var(--primary);">workspace_premium</span>
+        </div>
+        <h3 style="font-family:var(--font-heading); font-size:19px; font-weight:700; line-height:1.38; color:var(--text); margin-top:16px; position:relative;">Chinese Government-linked Cyber Threat Actors Combine Automated and Hands-on Hacking Tools</h3>
+        <div class="flex items-center" style="gap:8px; margin-top:auto; padding-top:14px; border-top:1px solid var(--line-soft); position:relative;">
+          <span class="badge-danger">CRITICAL · 100/100</span>
+          <span class="badge-src">CISA ADVISORIES</span>
+        </div>
+      </aside>
     </div>
 
-    <!-- Footer bullets -->
-    <div class="flex items-center justify-between" style="margin-top:auto;border-top:1px solid var(--line-soft);padding-top:16px;">
-      <div class="flex items-center" style="gap:9px;">
-        <span class="material-icons" aria-hidden="true" style="font-size:15px;color:var(--primary);">check_circle</span>
-        <span style="font-family:var(--font-num);font-size:12px;letter-spacing:.05em;color:#b7c9c5;">Duplicate collapse across outlets</span>
-      </div>
-      <div class="flex items-center" style="gap:9px;">
-        <span class="material-icons" aria-hidden="true" style="font-size:15px;color:var(--primary);">check_circle</span>
-        <span style="font-family:var(--font-num);font-size:12px;letter-spacing:.05em;color:#b7c9c5;">Best-thumbnail extraction per article</span>
-      </div>
-      <div class="flex items-center" style="gap:9px;">
-        <span class="material-icons" aria-hidden="true" style="font-size:15px;color:var(--primary);">check_circle</span>
-        <span style="font-family:var(--font-num);font-size:12px;letter-spacing:.05em;color:#b7c9c5;">Per-story severity + read-time</span>
-      </div>
+    <!-- footnote -->
+    <div class="flex items-center" style="gap:10px; margin-top:18px;">
+      <span aria-hidden="true" style="width:6px; height:6px; background:var(--primary); flex:none;"></span>
+      <span class="footnote">FIGURES READ FROM THE LIVE STREAM AT BUILD TIME — THE WALL NEVER SHOWS PLACEHOLDER DATA.</span>
     </div>
-
   </div>
-</div>
+</section>
 </body>
 </html>

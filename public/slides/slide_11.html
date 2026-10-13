@@ -2,99 +2,89 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CyberShield — Use-Case Scenarios</title>
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>Control The Room — CyberShield</title>
+<script src="tailwind.js"></script>
 <link rel="stylesheet" href="global.css">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
-  html, body { margin: 0; padding: 0; background: var(--bg); overflow: hidden; }
-  .sc-num { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: var(--primary); line-height: 1; }
-  .sc-title { font-family: var(--font-heading); font-size: 19px; font-weight: 600; letter-spacing: 0.08em; color: var(--text); }
-  .sc-body { font-family: var(--font-body); font-size: 15px; line-height: 1.6; color: var(--text); margin: 0; }
-  .sc-arrow { font-family: var(--font-num); color: var(--primary); padding: 0 2px; }
-  .result-chip { display: flex; align-items: center; gap: 10px; background: var(--primary-soft); border: 1px solid var(--line); border-radius: 8px; padding: 9px 14px; }
-  .result-label { font-family: var(--font-num); font-size: 10.5px; letter-spacing: 0.24em; color: var(--primary); flex: none; }
-  .result-text { font-family: var(--font-body); font-size: 13.5px; font-weight: 500; color: var(--primary); line-height: 1.4; }
-  .hairline { height: 1px; background: var(--line-soft); margin: 14px 0; }
+  html, body { margin:0; padding:0; background:var(--bg); width:1280px; height:720px; overflow:hidden; }
+  .kicker { font-family:var(--font-num); font-size:11px; font-weight:500; letter-spacing:.34em; color:var(--primary); text-transform:uppercase; display:flex; align-items:center; gap:11px; }
+  .kdot { width:8px; height:8px; border-radius:50%; background:var(--primary); box-shadow:0 0 10px var(--primary), 0 0 24px rgba(45,212,191,.55); flex:none; }
+  .tile-icon { width:40px; height:40px; border-radius:10px; background:var(--primary-soft); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; flex:none; }
+  .tile-title { font-family:var(--font-num); font-size:12.5px; font-weight:700; letter-spacing:.22em; color:var(--text); }
+  .tile-copy { font-size:13px; line-height:1.55; color:var(--text-dim); margin:9px 0 0; }
+  .ghost { position:absolute; right:-14px; bottom:-20px; font-size:100px !important; color:rgba(45,212,191,.05); pointer-events:none; }
+  .shot { position:relative; }
+  .shot.fill img { position:absolute; inset:0; }
+  .gcell { min-height:0; overflow:hidden; }
+  .cap { display:flex; align-items:center; gap:8px; padding:9px 4px 1px; }
+  .cap-dot { width:5px; height:5px; border-radius:50%; background:var(--primary); box-shadow:0 0 8px var(--primary); flex:none; }
+  .cap-txt { font-family:var(--font-num); font-size:10px; letter-spacing:.18em; color:var(--text-dim); }
 </style>
 </head>
 <body>
 <div class="slide scanlines">
+
   <!-- decorative glow -->
-  <div data-decor aria-hidden="true" style="position:absolute; bottom:-260px; left:-200px; width:620px; height:620px; border-radius:50%; background:radial-gradient(circle, rgba(45,212,191,0.06) 0%, rgba(45,212,191,0) 70%);"></div>
+  <div data-decor aria-hidden="true" style="position:absolute; right:-180px; top:-180px; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle, rgba(45,212,191,.08), transparent 65%);"></div>
 
-  <div style="position:absolute; inset:0; padding:52px 64px; display:flex; flex-direction:column;">
+  <div class="relative h-full flex flex-col" style="padding:54px 64px 56px;">
+
     <!-- header -->
-    <div class="flex items-end justify-between">
-      <div>
-        <div class="kicker">HOW TEAMS USE IT</div>
-        <h1 style="font-family:var(--font-heading); font-size:40px; font-weight:700; line-height:1.1; margin:12px 0 0; color:var(--text);">Four scenarios, <span class="text-primary-c">four wins</span>.</h1>
-      </div>
-      <div style="font-family:var(--font-num); font-size:12px; letter-spacing:0.22em; color:var(--text-dim); padding-bottom:8px;">INPUT → OUTPUT // 04</div>
-    </div>
-    <div class="rule" style="margin:22px 0 24px;"></div>
+    <div class="kicker"><span class="kdot"></span>OPERATOR CONTROLS</div>
+    <h2 style="font-family:var(--font-heading); font-size:42px; font-weight:700; letter-spacing:-0.015em; line-height:1.1; color:var(--text); margin:12px 0 0;">
+      You run the <span style="color:var(--primary);">room.</span>
+    </h2>
 
-    <!-- 2 x 2 scenario grid -->
-    <div style="flex:1; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:20px;">
+    <!-- bento grid : 4 cols x 2 rows, image tiles span 2 -->
+    <div style="flex:1; min-height:0; margin-top:22px; display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:1fr 1fr; gap:16px;">
 
-      <div class="card" style="padding:24px 26px; display:flex; flex-direction:column; border-top:2px solid var(--line);">
-        <div class="flex items-baseline" style="gap:14px;">
-          <div class="sc-num">01</div>
-          <div class="sc-title">MORNING BRIEFING</div>
-        </div>
-        <div class="hairline"></div>
-        <p class="sc-body">Open the wall <span class="sc-arrow">→</span> scan scored headlines <span class="sc-arrow">→</span> read only <strong>CRITICAL/HIGH</strong> verdicts.</p>
-        <div style="margin-top:auto; padding-top:14px;">
-          <div class="result-chip">
-            <span class="result-label">RESULT</span>
-            <span class="result-text">situational awareness before the first coffee</span>
-          </div>
-        </div>
+      <!-- Tile A — text -->
+      <div class="card-glow gcell relative flex flex-col" style="padding:20px; overflow:hidden;">
+        <span data-decor aria-hidden="true" class="material-icons ghost">filter_alt</span>
+        <div class="tile-icon"><span class="material-icons" style="font-size:21px; color:var(--primary);">filter_alt</span></div>
+        <div class="tile-title" style="margin-top:14px;">LANE FILTERS</div>
+        <p class="tile-copy"><span style="font-family:var(--font-num); color:var(--text);">10</span> lane buttons with live counts re-scope wall, gauge and board in one click.</p>
       </div>
 
-      <div class="card" style="padding:24px 26px; display:flex; flex-direction:column; border-top:2px solid var(--line);">
-        <div class="flex items-baseline" style="gap:14px;">
-          <div class="sc-num">02</div>
-          <div class="sc-title">INCIDENT TRIAGE</div>
-        </div>
-        <div class="hairline"></div>
-        <p class="sc-body">Paste a live article <span class="sc-arrow">→</span> AI verdict returns class, severity, 3 immediate actions.</p>
-        <div style="margin-top:auto; padding-top:14px;">
-          <div class="result-chip">
-            <span class="result-label">RESULT</span>
-            <span class="result-text">defensible next steps in under a minute</span>
-          </div>
-        </div>
+      <!-- Tile B — text -->
+      <div class="card-glow gcell relative flex flex-col" style="padding:20px; overflow:hidden;">
+        <span data-decor aria-hidden="true" class="material-icons ghost">tune</span>
+        <div class="tile-icon"><span class="material-icons" style="font-size:21px; color:var(--primary);">tune</span></div>
+        <div class="tile-title" style="margin-top:14px;">SOURCE TOGGLES</div>
+        <p class="tile-copy"><span style="font-family:var(--font-num); color:var(--primary);">19/19</span> streams online — uncheck any outlet to exclude it from the stream instantly.</p>
       </div>
 
-      <div class="card" style="padding:24px 26px; display:flex; flex-direction:column; border-top:2px solid var(--line);">
-        <div class="flex items-baseline" style="gap:14px;">
-          <div class="sc-num">03</div>
-          <div class="sc-title">VULNERABILITY WATCH</div>
+      <!-- Tile E — screenshot, spans 2 -->
+      <div class="card-glow gcell flex flex-col" style="grid-column:span 2; padding:12px;">
+        <div class="shot fill" style="flex:1; min-height:0;">
+          <img src="shot-cloud.png" alt="Active sources and topic cloud live panels">
         </div>
-        <div class="hairline"></div>
-        <p class="sc-body">A CVE appears in a story <span class="sc-arrow">→</span> KEV cross-check shows exploit status + recency tone.</p>
-        <div style="margin-top:auto; padding-top:14px;">
-          <div class="result-chip">
-            <span class="result-label">RESULT</span>
-            <span class="result-text">patch priorities that reflect reality</span>
-          </div>
-        </div>
+        <div class="cap"><span class="cap-dot"></span><span class="cap-txt">ACTIVE SOURCES + TOPIC CLOUD — LIVE PANELS</span></div>
       </div>
 
-      <div class="card" style="padding:24px 26px; display:flex; flex-direction:column; border-top:2px solid var(--line);">
-        <div class="flex items-baseline" style="gap:14px;">
-          <div class="sc-num">04</div>
-          <div class="sc-title">TEAM AWARENESS</div>
+      <!-- Tile F — screenshot, spans 2 -->
+      <div class="card-glow gcell flex flex-col" style="grid-column:span 2; padding:12px;">
+        <div class="shot fill" style="flex:1; min-height:0;">
+          <img src="shot-light-hero.png" alt="Light theme dashboard with the same live data">
         </div>
-        <div class="hairline"></div>
-        <p class="sc-body">Put the wall on the ops-room display <span class="sc-arrow">→</span> globe, ticker and severity tones keep everyone oriented.</p>
-        <div style="margin-top:auto; padding-top:14px;">
-          <div class="result-chip">
-            <span class="result-label">RESULT</span>
-            <span class="result-text">one shared picture of the threat landscape</span>
-          </div>
-        </div>
+        <div class="cap"><span class="cap-dot"></span><span class="cap-txt">LIGHT MODE — SAME DATA, DAYLIGHT PALETTE</span></div>
+      </div>
+
+      <!-- Tile C — text -->
+      <div class="card-glow gcell relative flex flex-col" style="padding:20px; overflow:hidden;">
+        <span data-decor aria-hidden="true" class="material-icons ghost">cloud</span>
+        <div class="tile-icon"><span class="material-icons" style="font-size:21px; color:var(--primary);">cloud</span></div>
+        <div class="tile-title" style="margin-top:14px;">TOPIC CLOUD</div>
+        <p class="tile-copy"><span style="font-family:var(--font-num); color:var(--text);">MALWARE</span> <span style="font-family:var(--font-num); color:var(--primary);">×54</span>, <span style="font-family:var(--font-num); color:var(--text);">EXPLOIT</span> <span style="font-family:var(--font-num); color:var(--primary);">×51</span>, <span style="font-family:var(--font-num); color:var(--text);">VULNERABILITY</span> <span style="font-family:var(--font-num); color:var(--primary);">×41</span> — the stream's living vocabulary.</p>
+      </div>
+
+      <!-- Tile D — text -->
+      <div class="card-glow gcell relative flex flex-col" style="padding:20px; overflow:hidden;">
+        <span data-decor aria-hidden="true" class="material-icons ghost">dark_mode</span>
+        <div class="tile-icon"><span class="material-icons" style="font-size:21px; color:var(--primary);">dark_mode</span></div>
+        <div class="tile-title" style="margin-top:14px;">THEMES</div>
+        <p class="tile-copy">Dark ops wall and a daylight-readable light theme, remembered per visitor.</p>
       </div>
 
     </div>
