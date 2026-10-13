@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070B14",
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
 };
@@ -58,6 +58,8 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${orbitron.variable} ${geistMono.variable} font-sans antialiased bg-cyber-bg text-foreground`}
       >
+        {/* ambient aurora field — dark only; gives the frosted glass real depth */}
+        <div aria-hidden="true" className="glass-aurora" />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

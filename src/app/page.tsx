@@ -347,7 +347,7 @@ export default function CyberShieldPage() {
       <ResourcesSection />
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer data-intro className="mt-auto w-full border-t border-cyber-border/80 bg-cyber-panel/50 pb-8 pt-12 backdrop-blur-sm">
+      <footer data-intro className="glass-bar mt-auto w-full border-t border-cyber-border/80 pb-8 pt-12">
         <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8">
           <div className="mb-10 grid grid-cols-1 gap-10 border-b border-cyber-border/60 pb-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Col 1: brand & status */}
