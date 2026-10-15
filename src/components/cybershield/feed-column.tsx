@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CATEGORY_MAP } from "@/lib/cyber/categories";
 import type { FeedItem } from "@/lib/cyber/feeds";
+import { isAnchorFlightActive } from "@/lib/cyber/scroll";
 import { formatUtc } from "@/lib/cyber/utils";
 import { cn } from "@/lib/utils";
 
@@ -92,6 +93,10 @@ export function FeedColumn({
     if (!el || !hasMore) return;
     const io = new IntersectionObserver(
       (entries) => {
+        // hold the layout still while an anchor scroll (Resources / Threat
+        // Feed) is in flight — growing the feed mid-flight moves the target
+        // and the scroll lands short. Chunks resume on the next real scroll.
+        if (isAnchorFlightActive()) return;
         if (entries.some((entry) => entry.isIntersecting)) loadMore();
       },
       { rootMargin: "700px 0px" },

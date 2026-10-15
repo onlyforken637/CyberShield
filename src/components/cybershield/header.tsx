@@ -2,6 +2,7 @@
 
 import { Search, Menu } from "lucide-react";
 import { CategoryBar, type CategoryCount } from "@/components/cybershield/category-bar";
+import { anchorClickHandler } from "@/lib/cyber/scroll";
 import { Input } from "@/components/ui/input";
 
 interface DashboardHeaderProps {
@@ -34,6 +35,7 @@ export function DashboardHeader({
           {/* Brand */}
           <a
             href="#main-feed"
+            onClick={anchorClickHandler("main-feed")}
             className="group flex shrink-0 items-center gap-3"
             aria-label="CyberShield News home"
           >

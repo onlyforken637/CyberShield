@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUp, BookOpenText, Info, Plus, Rss } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { scrollToAnchorSafe } from "@/lib/cyber/scroll";
 
 /**
  * Theme-aware floating action button — a quick-navigation speed dial.
@@ -31,7 +32,9 @@ export function FloatingNav({ onOpenAbout }: { onOpenAbout: () => void }) {
   }, []);
 
   const scrollToAnchor = useCallback((id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // shift-resilient: the feed streams extra cards while the scroll is in
+    // flight — a one-shot scrollIntoView would land short of the target
+    scrollToAnchorSafe(id);
   }, []);
 
   const actions: FabAction[] = [

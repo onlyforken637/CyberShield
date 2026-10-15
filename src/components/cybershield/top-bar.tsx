@@ -6,6 +6,7 @@ import { SoundToggle } from "@/components/cybershield/sound-toggle";
 import { ThemeToggle } from "@/components/cybershield/theme-toggle";
 import { useClock } from "@/hooks/use-clock";
 import { SOURCES } from "@/lib/cyber/feeds";
+import { anchorClickHandler } from "@/lib/cyber/scroll";
 import { pad2 } from "@/lib/cyber/utils";
 
 interface TopBarProps {
@@ -63,6 +64,7 @@ export function TopBar({ onlineCount, nextSyncAt, onOpenAbout }: TopBarProps) {
           <SoundToggle />
           <a
             href="#resources"
+            onClick={anchorClickHandler("resources")}
             aria-label="Resources — documentation, presentation and video"
             className="flex h-8 items-center gap-1.5 rounded-lg border border-transparent px-2 text-[10px] font-semibold uppercase tracking-wider text-cyber-teal transition-colors hover:border-cyber-teal/40 hover:bg-cyber-teal/10"
           >
